@@ -189,3 +189,14 @@ func Test_MOV(t *testing.T) {
 		t.Fatal("Expecting", expected, "got", unit)
 	}
 }
+
+func Test_JMP(t *testing.T) {
+	unit, err := (&JMP{Uint8(3)}).Encode()
+	if err != nil {
+		t.Fatal(err)
+	}
+	expected := "eb03"
+	if unit.String() != expected {
+		t.Fatal("Expecting", expected, "got", unit)
+	}
+}

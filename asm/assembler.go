@@ -4,6 +4,8 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
+	"syscall"
+	"unsafe"
 )
 
 type Size uint8
@@ -19,6 +21,36 @@ type MachineCode []uint8
 
 func (m MachineCode) String() string {
 	return hex.EncodeToString(m)
+}
+
+func (m MachineCode) Execute() {
+	code := []uint8{}
+	for _, c := range m {
+		code = append(code, c)
+	}
+	// Use rax register as return arg:
+	// movq %rax, 0x8(%rsp);
+	// ret
+	// e.g. move the return value on the stack.
+	for _, c := range []uint8{0x48, 0x89, 0x44, 0x24, 0x08, 0xc3} {
+		code = append(code, c)
+	}
+	mmapFunc, err := syscall.Mmap(
+		-1,
+		0,
+		len(code),
+		syscall.PROT_READ|syscall.PROT_WRITE|syscall.PROT_EXEC, syscall.MAP_PRIVATE|syscall.MAP_ANONYMOUS,
+	)
+	if err != nil {
+		fmt.Printf("mmap err: %v", err)
+	}
+	for i, b := range code {
+		mmapFunc[i] = b
+	}
+	type execFunc func() int
+	unsafeFunc := (uintptr)(unsafe.Pointer(&mmapFunc))
+	f := *(*execFunc)(unsafe.Pointer(&unsafeFunc))
+	fmt.Println("Result:", f())
 }
 
 func EncodeModRM(mod, reg, rm uint8) uint8 {
@@ -72,6 +104,17 @@ func (i *DEC) String() string {
 	return "dec " + i.Register.String()
 }
 
+type RET struct {
+}
+
+func (i *RET) Encode() (MachineCode, error) {
+	return []uint8{0xc3}, nil
+}
+
+func (i *RET) String() string {
+	return "ret"
+}
+
 type Type uint8
 
 func CompileInstruction(instr []Instruction) (MachineCode, error) {
@@ -92,18 +135,18 @@ func CompileInstruction(instr []Instruction) (MachineCode, error) {
 
 func init() {
 	b, err := CompileInstruction([]Instruction{
-		&INC{rax},
-		&INC{rcx},
-		&INC{r14},
-		&DEC{rax},
-		&DEC{r14},
-		&MOV{rax, rax},
-		&MOV{rax, rcx},
+		&MOV{Uint64(0), rax},
 		&MOV{Uint64(0), rcx},
-		&JMP{Uint8(3)},
+		&MOV{Uint64(0), rdx},
+		&MOV{Uint64(0), rbx},
+		&MOV{Uint64(0), rbp},
+		&MOV{Uint64(0), rsi},
+		&MOV{Uint64(0), rdi},
+		&INC{rax},
 	})
 	if err != nil {
 		panic(err)
 	}
 	fmt.Println(b)
+	b.Execute()
 }
