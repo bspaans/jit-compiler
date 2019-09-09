@@ -62,3 +62,101 @@ func Test_EncodeModRM(t *testing.T) {
 		}
 	}
 }
+
+func Test_INC(t *testing.T) {
+	unit, err := (&INC{rax}).Encode()
+	if err != nil {
+		t.Fatal(err)
+	}
+	expected := "48ffc0"
+	if unit.String() != expected {
+		t.Fatal("Expecting", expected, "got", unit)
+	}
+	unit, err = (&INC{rcx}).Encode()
+	if err != nil {
+		t.Fatal(err)
+	}
+	expected = "48ffc1"
+	if unit.String() != expected {
+		t.Fatal("Expecting", expected, "got", unit)
+	}
+
+	unit, err = (&INC{r14}).Encode()
+	if err != nil {
+		t.Fatal(err)
+	}
+	expected = "49ffc6"
+	if unit.String() != expected {
+		t.Fatal("Expecting", expected, "got", unit)
+	}
+}
+
+func Test_DEC(t *testing.T) {
+	unit, err := (&DEC{rax}).Encode()
+	if err != nil {
+		t.Fatal(err)
+	}
+	expected := "48ffc8"
+	if unit.String() != expected {
+		t.Fatal("Expecting", expected, "got", unit)
+	}
+	unit, err = (&DEC{rcx}).Encode()
+	if err != nil {
+		t.Fatal(err)
+	}
+	expected = "48ffc9"
+	if unit.String() != expected {
+		t.Fatal("Expecting", expected, "got", unit)
+	}
+	unit, err = (&DEC{r14}).Encode()
+	if err != nil {
+		t.Fatal(err)
+	}
+	expected = "49ffce"
+	if unit.String() != expected {
+		t.Fatal("Expecting", expected, "got", unit)
+	}
+}
+
+func Test_MOV(t *testing.T) {
+	unit, err := (&MOV{rax, rax}).Encode()
+	if err != nil {
+		t.Fatal(err)
+	}
+	expected := "4889c0"
+	if unit.String() != expected {
+		t.Fatal("Expecting", expected, "got", unit)
+	}
+	unit, err = (&MOV{rax, rcx}).Encode()
+	if err != nil {
+		t.Fatal(err)
+	}
+	expected = "4889c1"
+	if unit.String() != expected {
+		t.Fatal("Expecting", expected, "got", unit)
+	}
+	unit, err = (&MOV{rcx, rax}).Encode()
+	if err != nil {
+		t.Fatal(err)
+	}
+	expected = "4889c8"
+	if unit.String() != expected {
+		t.Fatal("Expecting", expected, "got", unit)
+	}
+	unit, err = (&MOV{rax, r14}).Encode()
+	if err != nil {
+		t.Fatal(err)
+	}
+	expected = "4989c6"
+	if unit.String() != expected {
+		t.Fatal("Expecting", expected, "got", unit)
+	}
+	unit, err = (&MOV{r14, rax}).Encode()
+	if err != nil {
+		t.Fatal(err)
+	}
+	expected = "4c89f0"
+	if unit.String() != expected {
+		t.Fatal("Expecting", expected, "got", unit)
+	}
+}

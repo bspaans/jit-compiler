@@ -17,6 +17,9 @@ func NewRegister(name string, register uint8, size Size) *Register {
 func (r *Register) Encode() uint8 {
 	return r.Register
 }
+func (r *Register) String() string {
+	return r.Name
+}
 
 var (
 	rax *Register = NewRegister("rax", 0, QUADWORD)
