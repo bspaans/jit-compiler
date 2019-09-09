@@ -20,6 +20,9 @@ func (r *Register) Encode() uint8 {
 func (r *Register) String() string {
 	return r.Name
 }
+func (r *Register) Type() Type {
+	return T_Register
+}
 
 var (
 	rax *Register = NewRegister("rax", 0, QUADWORD)

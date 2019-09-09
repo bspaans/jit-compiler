@@ -47,6 +47,11 @@ func Test_EncodeModRM(t *testing.T) {
 	if unit != expected {
 		t.Fatal("Expecting", expected, "got", unit)
 	}
+	unit = NewModRM(IndirectRegisterMode, 0, 1).Encode()
+	expected = uint8(8)
+	if unit != expected {
+		t.Fatal("Expecting", expected, "got", unit)
+	}
 	for i, reg := range []*Register{rax, rcx, rdx, rbx, rsp, rbp, rsi, rdi} {
 		unit = NewModRM(DirectRegisterMode, reg.Encode(), 0).Encode()
 		expected = uint8(192 + i)
@@ -156,6 +161,30 @@ func Test_MOV(t *testing.T) {
 		t.Fatal(err)
 	}
 	expected = "4c89f0"
+	if unit.String() != expected {
+		t.Fatal("Expecting", expected, "got", unit)
+	}
+	unit, err = (&MOV{Uint64(0xffffffff), rax}).Encode()
+	if err != nil {
+		t.Fatal(err)
+	}
+	expected = "48b8ffffffff00000000"
+	if unit.String() != expected {
+		t.Fatal("Expecting", expected, "got", unit)
+	}
+	unit, err = (&MOV{Uint64(0xffffffff), rcx}).Encode()
+	if err != nil {
+		t.Fatal(err)
+	}
+	expected = "48b9ffffffff00000000"
+	if unit.String() != expected {
+		t.Fatal("Expecting", expected, "got", unit)
+	}
+	unit, err = (&MOV{Uint64(0xffffffff), r14}).Encode()
+	if err != nil {
+		t.Fatal(err)
+	}
+	expected = "49beffffffff00000000"
 	if unit.String() != expected {
 		t.Fatal("Expecting", expected, "got", unit)
 	}
