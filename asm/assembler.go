@@ -1,7 +1,6 @@
 package asm
 
 import (
-	"encoding/binary"
 	"encoding/hex"
 	"errors"
 	"fmt"
@@ -75,69 +74,6 @@ func (i *DEC) String() string {
 
 type Type uint8
 
-const (
-	T_Register Type = 0
-	T_Uint64   Type = 1
-)
-
-type Value interface {
-	Type() Type
-	String() string
-}
-
-type MOV struct {
-	Source Value
-	Dest   *Register
-}
-
-type Uint64 uint64
-
-func (i Uint64) Type() Type {
-	return T_Uint64
-}
-func (i Uint64) String() string {
-	return fmt.Sprintf("%d", i)
-}
-func (i Uint64) Encode() []uint8 {
-	result := make([]byte, 8)
-	binary.LittleEndian.PutUint64(result, uint64(i))
-	return result
-}
-
-func (i *MOV) Encode() (MachineCode, error) {
-	if i.Dest == nil {
-		return nil, errors.New("Missing register")
-	}
-	if i.Source == nil {
-		return nil, errors.New("Missing source")
-	}
-	if i.Source.Type() == T_Register {
-		src := i.Source.(*Register)
-		if src.Size == QUADWORD && i.Dest.Size == QUADWORD {
-			rexB := i.Dest.Register > 7
-			rexR := src.Register > 7
-			rex := NewREXPrefix(true, rexR, false, rexB).Encode()
-			modrm := NewModRM(DirectRegisterMode, i.Dest.Encode(), src.Encode()).Encode()
-			return []uint8{rex, 0x89, modrm}, nil
-		}
-		return nil, errors.New("Unsupported register size")
-	} else if i.Source.Type() == T_Uint64 {
-		src := i.Source.(Uint64)
-		rexB := i.Dest.Register > 7
-		rex := NewREXPrefix(true, false, false, rexB).Encode()
-		result := []uint8{rex, 0xB8 + (i.Dest.Encode() & 7)}
-		for _, b := range src.Encode() {
-			result = append(result, b)
-		}
-		return result, nil
-
-	}
-	return nil, errors.New("Unsupported mov operation")
-}
-func (i *MOV) String() string {
-	return "mov " + i.Source.String() + " " + i.Dest.String()
-}
-
 func CompileInstruction(instr []Instruction) (MachineCode, error) {
 	result := []uint8{}
 	for _, i := range instr {
@@ -164,6 +100,7 @@ func init() {
 		&MOV{rax, rax},
 		&MOV{rax, rcx},
 		&MOV{Uint64(0), rcx},
+		&JMP{Uint8(3)},
 	})
 	if err != nil {
 		panic(err)
