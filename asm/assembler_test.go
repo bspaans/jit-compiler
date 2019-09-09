@@ -54,4 +54,11 @@ func Test_EncodeModRM(t *testing.T) {
 			t.Fatal("Expecting", expected, "got", unit)
 		}
 	}
+	for i, reg := range []*Register{r8, r9, r10, r11, r12, r13, r14, r15} {
+		unit = NewModRM(DirectRegisterMode, reg.Encode(), 0).Encode()
+		expected = uint8(192 + i)
+		if unit != expected {
+			t.Fatal("Expecting", expected, "got", unit)
+		}
+	}
 }

@@ -24,7 +24,7 @@ func NewModRM(mode Mode, rm, reg uint8) *ModRM {
 }
 
 func (m *ModRM) Encode() uint8 {
-	result := m.RM
-	result += (m.Reg << 3)
+	result := m.RM & 7
+	result += (m.Reg & 7) << 3
 	return result + (uint8(m.Mode) << 6)
 }

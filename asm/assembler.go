@@ -38,11 +38,26 @@ func (i *INC) Encode() (MachineCode, error) {
 		return nil, errors.New("Missing register")
 	}
 	if i.Register.Size == QUADWORD {
-		if i.Register.Register > 7 {
-			return nil, fmt.Errorf("Unsupported register %s", i.Register.Name)
-		}
-		rex := NewREXPrefix(true, false, false, false).Encode()
+		rexB := i.Register.Register > 7
+		rex := NewREXPrefix(true, false, false, rexB).Encode()
 		modrm := NewModRM(DirectRegisterMode, i.Register.Encode(), 0).Encode()
+		return []uint8{rex, 0xff, modrm}, nil
+	}
+	return nil, errors.New("Unsupported register size")
+}
+
+type DEC struct {
+	Register *Register
+}
+
+func (i *DEC) Encode() (MachineCode, error) {
+	if i.Register == nil {
+		return nil, errors.New("Missing register")
+	}
+	if i.Register.Size == QUADWORD {
+		rexB := i.Register.Register > 7
+		rex := NewREXPrefix(true, false, false, rexB).Encode()
+		modrm := NewModRM(DirectRegisterMode, i.Register.Encode(), 1).Encode()
 		return []uint8{rex, 0xff, modrm}, nil
 	}
 	return nil, errors.New("Unsupported register size")
@@ -55,11 +70,11 @@ func CompileInstruction(instr []Instruction) (MachineCode, error) {
 		if err != nil {
 			return nil, err
 		}
+		fmt.Println(MachineCode(b))
 		for _, code := range b {
 			result = append(result, code)
 		}
 	}
-	fmt.Println(result)
 	return result, nil
 }
 
@@ -67,6 +82,9 @@ func init() {
 	b, err := CompileInstruction([]Instruction{
 		&INC{rax},
 		&INC{rcx},
+		&INC{r14},
+		&DEC{rax},
+		&DEC{r14},
 	})
 	if err != nil {
 		panic(err)
