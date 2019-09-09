@@ -73,7 +73,7 @@ func Test_INC(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	expected := "48ffc0"
+	expected := "  48 ff c0"
 	if unit.String() != expected {
 		t.Fatal("Expecting", expected, "got", unit)
 	}
@@ -81,7 +81,7 @@ func Test_INC(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	expected = "48ffc1"
+	expected = "  48 ff c1"
 	if unit.String() != expected {
 		t.Fatal("Expecting", expected, "got", unit)
 	}
@@ -90,7 +90,7 @@ func Test_INC(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	expected = "49ffc6"
+	expected = "  49 ff c6"
 	if unit.String() != expected {
 		t.Fatal("Expecting", expected, "got", unit)
 	}
@@ -101,7 +101,7 @@ func Test_DEC(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	expected := "48ffc8"
+	expected := "  48 ff c8"
 	if unit.String() != expected {
 		t.Fatal("Expecting", expected, "got", unit)
 	}
@@ -109,7 +109,7 @@ func Test_DEC(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	expected = "48ffc9"
+	expected = "  48 ff c9"
 	if unit.String() != expected {
 		t.Fatal("Expecting", expected, "got", unit)
 	}
@@ -117,7 +117,7 @@ func Test_DEC(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	expected = "49ffce"
+	expected = "  49 ff ce"
 	if unit.String() != expected {
 		t.Fatal("Expecting", expected, "got", unit)
 	}
@@ -128,7 +128,7 @@ func Test_MOV(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	expected := "4889c0"
+	expected := "  48 89 c0"
 	if unit.String() != expected {
 		t.Fatal("Expecting", expected, "got", unit)
 	}
@@ -136,7 +136,7 @@ func Test_MOV(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	expected = "4889c1"
+	expected = "  48 89 c1"
 	if unit.String() != expected {
 		t.Fatal("Expecting", expected, "got", unit)
 	}
@@ -144,7 +144,7 @@ func Test_MOV(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	expected = "4889c8"
+	expected = "  48 89 c8"
 	if unit.String() != expected {
 		t.Fatal("Expecting", expected, "got", unit)
 	}
@@ -152,7 +152,7 @@ func Test_MOV(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	expected = "4989c6"
+	expected = "  49 89 c6"
 	if unit.String() != expected {
 		t.Fatal("Expecting", expected, "got", unit)
 	}
@@ -160,7 +160,7 @@ func Test_MOV(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	expected = "4c89f0"
+	expected = "  4c 89 f0"
 	if unit.String() != expected {
 		t.Fatal("Expecting", expected, "got", unit)
 	}
@@ -168,7 +168,7 @@ func Test_MOV(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	expected = "48b8ffffffff00000000"
+	expected = "  48 b8 ff ff ff ff 00 \n  00 00 00"
 	if unit.String() != expected {
 		t.Fatal("Expecting", expected, "got", unit)
 	}
@@ -176,7 +176,7 @@ func Test_MOV(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	expected = "48b9ffffffff00000000"
+	expected = "  48 b9 ff ff ff ff 00 \n  00 00 00"
 	if unit.String() != expected {
 		t.Fatal("Expecting", expected, "got", unit)
 	}
@@ -184,7 +184,7 @@ func Test_MOV(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	expected = "49beffffffff00000000"
+	expected = "  49 be ff ff ff ff 00 \n  00 00 00"
 	if unit.String() != expected {
 		t.Fatal("Expecting", expected, "got", unit)
 	}
@@ -195,7 +195,7 @@ func Test_JMP(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	expected := "eb03"
+	expected := "  eb 03"
 	if unit.String() != expected {
 		t.Fatal("Expecting", expected, "got", unit)
 	}

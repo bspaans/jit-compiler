@@ -19,31 +19,31 @@ const (
 type MachineCode []uint8
 
 func (m MachineCode) String() string {
-	return hex.EncodeToString(m)
+	h := hex.EncodeToString(m)
+	result := []rune{' ', ' '}
+	for i, c := range h {
+		result = append(result, c)
+		if i%2 == 1 && i+1 < len(h) {
+			result = append(result, ' ')
+		}
+		if i%14 == 13 && i+1 < len(h) {
+			result = append(result, '\n', ' ', ' ')
+		}
+	}
+	return string(result)
 }
 
 func (m MachineCode) Execute() {
-	code := []uint8{}
-	for _, c := range m {
-		code = append(code, c)
-	}
-	// Use rax register as return arg:
-	// movq %rax, 0x8(%rsp);
-	// ret
-	// e.g. move the return value on the stack.
-	//for _, c := range []uint8{0x48, 0x89, 0x44, 0x24, 0x08, 0xc3} {
-	//	code = append(code, c)
-	//}
 	mmapFunc, err := syscall.Mmap(
 		-1,
 		0,
-		len(code),
+		len(m),
 		syscall.PROT_READ|syscall.PROT_WRITE|syscall.PROT_EXEC, syscall.MAP_PRIVATE|syscall.MAP_ANONYMOUS,
 	)
 	if err != nil {
 		fmt.Printf("mmap err: %v", err)
 	}
-	for i, b := range code {
+	for i, b := range m {
 		mmapFunc[i] = b
 	}
 	type execFunc func() uint
@@ -70,12 +70,14 @@ func (i *RET) String() string {
 
 func CompileInstruction(instr []Instruction) (MachineCode, error) {
 	result := []uint8{}
+	address := 0
 	for _, i := range instr {
 		b, err := i.Encode()
 		if err != nil {
 			return nil, err
 		}
-		fmt.Println(i)
+		fmt.Printf("0x%x: %s\n", address, i.String())
+		address += len(b)
 		fmt.Println(MachineCode(b))
 		for _, code := range b {
 			result = append(result, code)
@@ -95,7 +97,8 @@ func init() {
 		&MOV{Uint64(0), rdi},
 		&MOV{Uint64(0), &DisplacedRegister{rsp, 8}},
 		&INC{rax},
-		&CMP{Uint64(14), rax},
+		&CMP{Uint64(0xffff), rax},
+		&JNE{Uint8(0xf5)},
 		&MOV{rax, &DisplacedRegister{rsp, 8}},
 		&RET{},
 	})
