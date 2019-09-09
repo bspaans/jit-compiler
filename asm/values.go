@@ -5,14 +5,6 @@ import (
 	"fmt"
 )
 
-const (
-	T_Register Type = 0
-	T_Uint8    Type = 1
-	T_Uint16   Type = 2
-	T_Uint32   Type = 3
-	T_Uint64   Type = 4
-)
-
 type Value interface {
 	Type() Type
 	String() string
@@ -27,7 +19,7 @@ func (i Uint8) Type() Type {
 	return T_Uint8
 }
 func (i Uint8) String() string {
-	return fmt.Sprintf("%d", i)
+	return fmt.Sprintf("$%d", i)
 }
 func (i Uint8) Encode() []uint8 {
 	result := make([]byte, 1)
@@ -39,7 +31,7 @@ func (i Uint16) Type() Type {
 	return T_Uint16
 }
 func (i Uint16) String() string {
-	return fmt.Sprintf("%d", i)
+	return fmt.Sprintf("$%d", i)
 }
 func (i Uint16) Encode() []uint8 {
 	result := make([]byte, 2)
@@ -51,7 +43,7 @@ func (i Uint32) Type() Type {
 	return T_Uint32
 }
 func (i Uint32) String() string {
-	return fmt.Sprintf("%d", i)
+	return fmt.Sprintf("$%d", i)
 }
 func (i Uint32) Encode() []uint8 {
 	result := make([]byte, 4)
@@ -63,7 +55,7 @@ func (i Uint64) Type() Type {
 	return T_Uint64
 }
 func (i Uint64) String() string {
-	return fmt.Sprintf("%d", i)
+	return fmt.Sprintf("$%d", i)
 }
 func (i Uint64) Encode() []uint8 {
 	result := make([]byte, 8)

@@ -31,3 +31,9 @@ func (r *REXPrefix) Encode() uint8 {
 	}
 	return result + (1 << 6)
 }
+
+func REXEncode(opR, opB *Register) uint8 {
+	rexR := opR != nil && opR.Register > 7
+	rexB := opB != nil && opB.Register > 7
+	return NewREXPrefix(true, rexR, false, rexB).Encode()
+}

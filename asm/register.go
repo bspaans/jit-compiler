@@ -18,7 +18,7 @@ func (r *Register) Encode() uint8 {
 	return r.Register
 }
 func (r *Register) String() string {
-	return r.Name
+	return "%" + r.Name
 }
 func (r *Register) Type() Type {
 	return T_Register

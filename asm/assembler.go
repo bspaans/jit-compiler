@@ -2,7 +2,6 @@ package asm
 
 import (
 	"encoding/hex"
-	"errors"
 	"fmt"
 	"syscall"
 	"unsafe"
@@ -32,9 +31,9 @@ func (m MachineCode) Execute() {
 	// movq %rax, 0x8(%rsp);
 	// ret
 	// e.g. move the return value on the stack.
-	for _, c := range []uint8{0x48, 0x89, 0x44, 0x24, 0x08, 0xc3} {
-		code = append(code, c)
-	}
+	//for _, c := range []uint8{0x48, 0x89, 0x44, 0x24, 0x08, 0xc3} {
+	//	code = append(code, c)
+	//}
 	mmapFunc, err := syscall.Mmap(
 		-1,
 		0,
@@ -47,61 +46,15 @@ func (m MachineCode) Execute() {
 	for i, b := range code {
 		mmapFunc[i] = b
 	}
-	type execFunc func() int
+	type execFunc func() uint
 	unsafeFunc := (uintptr)(unsafe.Pointer(&mmapFunc))
 	f := *(*execFunc)(unsafe.Pointer(&unsafeFunc))
 	fmt.Println("Result:", f())
 }
 
-func EncodeModRM(mod, reg, rm uint8) uint8 {
-	return rm
-}
-
 type Instruction interface {
 	Encode() (MachineCode, error)
 	String() string
-}
-
-type INC struct {
-	Register *Register
-}
-
-func (i *INC) Encode() (MachineCode, error) {
-	if i.Register == nil {
-		return nil, errors.New("Missing register")
-	}
-	if i.Register.Size == QUADWORD {
-		rexB := i.Register.Register > 7
-		rex := NewREXPrefix(true, false, false, rexB).Encode()
-		modrm := NewModRM(DirectRegisterMode, i.Register.Encode(), 0).Encode()
-		return []uint8{rex, 0xff, modrm}, nil
-	}
-	return nil, errors.New("Unsupported register size")
-}
-
-func (i *INC) String() string {
-	return "inc " + i.Register.String()
-}
-
-type DEC struct {
-	Register *Register
-}
-
-func (i *DEC) Encode() (MachineCode, error) {
-	if i.Register == nil {
-		return nil, errors.New("Missing register")
-	}
-	if i.Register.Size == QUADWORD {
-		rexB := i.Register.Register > 7
-		rex := NewREXPrefix(true, false, false, rexB).Encode()
-		modrm := NewModRM(DirectRegisterMode, i.Register.Encode(), 1).Encode()
-		return []uint8{rex, 0xff, modrm}, nil
-	}
-	return nil, errors.New("Unsupported register size")
-}
-
-func (i *DEC) String() string {
-	return "dec " + i.Register.String()
 }
 
 type RET struct {
@@ -114,8 +67,6 @@ func (i *RET) Encode() (MachineCode, error) {
 func (i *RET) String() string {
 	return "ret"
 }
-
-type Type uint8
 
 func CompileInstruction(instr []Instruction) (MachineCode, error) {
 	result := []uint8{}
@@ -142,7 +93,11 @@ func init() {
 		&MOV{Uint64(0), rbp},
 		&MOV{Uint64(0), rsi},
 		&MOV{Uint64(0), rdi},
+		&MOV{Uint64(0), &DisplacedRegister{rsp, 8}},
 		&INC{rax},
+		&CMP{Uint64(14), rax},
+		&MOV{rax, &DisplacedRegister{rsp, 8}},
+		&RET{},
 	})
 	if err != nil {
 		panic(err)
