@@ -37,17 +37,3 @@ func (i *DEC) Encode() (MachineCode, error) {
 func (i *DEC) String() string {
 	return "dec " + i.Register.String()
 }
-
-func EncodeOpcodeWithREX(opcode uint8, op1, op2 *Register) []uint8 {
-	rex := REXEncode(op2, op1)
-	return []uint8{rex, opcode}
-}
-
-func EncodeOpcodeWithREXAndModRM(opcode uint8, op1, op2 *Register, reg uint8) []uint8 {
-	rex := REXEncode(op2, op1)
-	if op2 != nil {
-		reg = op2.Encode()
-	}
-	modrm := NewModRM(DirectRegisterMode, op1.Encode(), reg).Encode()
-	return []uint8{rex, opcode, modrm}
-}

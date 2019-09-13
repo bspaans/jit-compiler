@@ -99,6 +99,9 @@ func init() {
 		&INC{rax},
 		&CMP{Uint64(0xffff), rax},
 		&JNE{Uint8(0xf5)},
+		&MOV{Uint64(123), rcx},
+		&ADD{rcx, rax},
+		&ADD{Uint32(2), rax},
 		&MOV{rax, &DisplacedRegister{rsp, 8}},
 		&RET{},
 	})
