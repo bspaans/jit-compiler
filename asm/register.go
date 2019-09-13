@@ -24,6 +24,20 @@ func (r *Register) Type() Type {
 	return T_Register
 }
 
+func Get64BitRegisterByIndex(ix uint8) *Register {
+	for _, reg := range Registers64 {
+		if reg.Register == ix {
+			return reg
+		}
+	}
+	return nil
+}
+
+var Registers64 []*Register = []*Register{
+	rax, rcx, rdx, rbx, rsp, rbp, rsi, rdi,
+	r8, r9, r10, r11, r12, r13, r14, r15,
+}
+
 var (
 	rax *Register = NewRegister("rax", 0, QUADWORD)
 	rcx *Register = NewRegister("rcx", 1, QUADWORD)
