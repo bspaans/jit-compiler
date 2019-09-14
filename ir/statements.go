@@ -1,7 +1,6 @@
 package ir
 
 import (
-	"errors"
 	"fmt"
 
 	"github.com/bspaans/jit/asm"
@@ -27,19 +26,12 @@ func NewIR_Assignment(variable string, expr IRExpression) *IR_Assignment {
 	}
 }
 
+// Allocates a new register and assigns it the value of the expression.
 func (i *IR_Assignment) Encode(ctx *IR_Context) ([]asm.Instruction, error) {
-	reg := ctx.AllocateRegister()
-	ctx.VariableMap[i.Variable] = reg
-	// TODO expressions should always take a target registry?
-	if i.Expr.Type() == Uint64 {
-		arg := asm.Uint64(i.Expr.(*IR_Uint64).Value)
-		return []asm.Instruction{&asm.MOV{arg, asm.Get64BitRegisterByIndex(reg)}}, nil
-	} else if i.Expr.Type() == Add {
-		expr := i.Expr.(*IR_Add)
-		expr.SetTargetRegister(asm.Get64BitRegisterByIndex(reg))
-		return expr.Encode(ctx)
-	}
-	return nil, errors.New("Unsupported assigment operation")
+	r := ctx.AllocateRegister()
+	ctx.VariableMap[i.Variable] = r
+	reg := asm.Get64BitRegisterByIndex(r)
+	return i.Expr.Encode(ctx, reg)
 }
 
 func (i *IR_Assignment) String() string {
