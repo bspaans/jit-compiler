@@ -23,6 +23,14 @@ func (r *Register) String() string {
 func (r *Register) Type() Type {
 	return T_Register
 }
+func (r *Register) Lower8BitRegister() *Register {
+	for _, reg := range Registers8 {
+		if reg.Register == r.Register {
+			return reg
+		}
+	}
+	return nil
+}
 
 func Get64BitRegisterByIndex(ix uint8) *Register {
 	for _, reg := range Registers64 {
@@ -36,6 +44,18 @@ func Get64BitRegisterByIndex(ix uint8) *Register {
 var Registers64 []*Register = []*Register{
 	Rax, Rcx, Rdx, Rbx, Rsp, Rbp, Rsi, Rdi,
 	R8, R9, R10, R11, R12, R13, R14, R15,
+}
+var Registers32 []*Register = []*Register{
+	Eax, Ecx, Edx, Ebx, Esp, Ebp, Esi, Edi,
+	R8d, R9d, R10d, R11d, R12d, R13d, R14d, R15d,
+}
+var Registers16 []*Register = []*Register{
+	Ax, Cx, Dx, Bx, Sp, Bp, Si, Di,
+	R8w, R9w, R10w, R11w, R12w, R13w, R14w, R15w,
+}
+var Registers8 []*Register = []*Register{
+	Al, Cl, Dl, Bl, Spl, Bpl, Sil, Dil,
+	R8b, R9b, R10b, R11b, R12b, R13b, R14b, R15b,
 }
 
 var (
@@ -73,37 +93,37 @@ var (
 	R14d *Register = NewRegister("r14d", 14, DOUBLE)
 	R15d *Register = NewRegister("r15d", 15, DOUBLE)
 
-	Ax   *Register = NewRegister("eax", 0, WORD)
-	Cx   *Register = NewRegister("ecx", 1, WORD)
-	Dx   *Register = NewRegister("edx", 2, WORD)
-	Bx   *Register = NewRegister("ebx", 3, WORD)
-	Sp   *Register = NewRegister("esp", 4, WORD)
-	Bp   *Register = NewRegister("ebp", 5, WORD)
-	Si   *Register = NewRegister("esi", 6, WORD)
-	Di   *Register = NewRegister("edi", 7, WORD)
-	R8w  *Register = NewRegister("r8d", 8, WORD)
-	R9w  *Register = NewRegister("r9d", 9, WORD)
-	R10w *Register = NewRegister("r10d", 10, WORD)
-	R11w *Register = NewRegister("r11d", 11, WORD)
-	R12w *Register = NewRegister("r12d", 12, WORD)
-	R13w *Register = NewRegister("r13d", 13, WORD)
-	R14w *Register = NewRegister("r14d", 14, WORD)
-	R15w *Register = NewRegister("r15d", 15, WORD)
+	Ax   *Register = NewRegister("ax", 0, WORD)
+	Cx   *Register = NewRegister("cx", 1, WORD)
+	Dx   *Register = NewRegister("dx", 2, WORD)
+	Bx   *Register = NewRegister("bx", 3, WORD)
+	Sp   *Register = NewRegister("sp", 4, WORD)
+	Bp   *Register = NewRegister("bp", 5, WORD)
+	Si   *Register = NewRegister("si", 6, WORD)
+	Di   *Register = NewRegister("di", 7, WORD)
+	R8w  *Register = NewRegister("r8w", 8, WORD)
+	R9w  *Register = NewRegister("r9w", 9, WORD)
+	R10w *Register = NewRegister("r10w", 10, WORD)
+	R11w *Register = NewRegister("r11w", 11, WORD)
+	R12w *Register = NewRegister("r12w", 12, WORD)
+	R13w *Register = NewRegister("r13w", 13, WORD)
+	R14w *Register = NewRegister("r14w", 14, WORD)
+	R15w *Register = NewRegister("r15w", 15, WORD)
 
-	Al   *Register = NewRegister("eax", 0, BYTE)
-	Cl   *Register = NewRegister("ecx", 1, BYTE)
-	Dl   *Register = NewRegister("edx", 2, BYTE)
-	Bl   *Register = NewRegister("ebx", 3, BYTE)
-	Spl  *Register = NewRegister("esp", 4, BYTE)
-	Bpl  *Register = NewRegister("ebp", 5, BYTE)
-	Sil  *Register = NewRegister("esi", 6, BYTE)
-	Dil  *Register = NewRegister("edi", 7, BYTE)
-	R8b  *Register = NewRegister("r8d", 8, BYTE)
-	R9b  *Register = NewRegister("r9d", 9, BYTE)
-	R10b *Register = NewRegister("r10d", 10, BYTE)
-	R11b *Register = NewRegister("r11d", 11, BYTE)
-	R12b *Register = NewRegister("r12d", 12, BYTE)
-	R13b *Register = NewRegister("r13d", 13, BYTE)
-	R14b *Register = NewRegister("r14d", 14, BYTE)
-	R15b *Register = NewRegister("r15d", 15, BYTE)
+	Al   *Register = NewRegister("al", 0, BYTE)
+	Cl   *Register = NewRegister("cl", 1, BYTE)
+	Dl   *Register = NewRegister("dl", 2, BYTE)
+	Bl   *Register = NewRegister("bl", 3, BYTE)
+	Spl  *Register = NewRegister("spl", 4, BYTE)
+	Bpl  *Register = NewRegister("bpl", 5, BYTE)
+	Sil  *Register = NewRegister("sil", 6, BYTE)
+	Dil  *Register = NewRegister("dil", 7, BYTE)
+	R8b  *Register = NewRegister("r8b", 8, BYTE)
+	R9b  *Register = NewRegister("r9b", 9, BYTE)
+	R10b *Register = NewRegister("r10b", 10, BYTE)
+	R11b *Register = NewRegister("r11b", 11, BYTE)
+	R12b *Register = NewRegister("r12b", 12, BYTE)
+	R13b *Register = NewRegister("r13b", 13, BYTE)
+	R14b *Register = NewRegister("r14b", 14, BYTE)
+	R15b *Register = NewRegister("r15b", 15, BYTE)
 )

@@ -193,6 +193,8 @@ func (i *IR_Equals) Encode(ctx *IR_Context, target *asm.Register) ([]asm.Instruc
 		return nil, errors.New("Unsupported add IR operation")
 	}
 	result = append(result, &asm.CMP{reg1, reg2})
+	result = append(result, &asm.MOV{asm.Uint64(0), target})
+	result = append(result, &asm.SETE{target.Lower8BitRegister()})
 	return result, nil
 }
 

@@ -43,12 +43,7 @@ func CompileIR(stmts []IR) ([]asm.Instruction, error) {
 
 func init() {
 	i := []IR{
-		NewIR_Assignment("a", NewIR_Uint64(123)),
-		NewIR_Assignment("b", NewIR_Uint64(123)),
-		NewIR_Assignment("c", NewIR_Add(NewIR_Variable("a"), NewIR_Variable("b"))),
-		NewIR_Assignment("d", NewIR_Add(NewIR_Uint64(15), NewIR_Variable("b"))),
-		NewIR_Assignment("e", NewIR_Add(NewIR_Variable("b"), NewIR_Uint64(53))),
-		NewIR_Assignment("f", NewIR_Equals(NewIR_Variable("b"), NewIR_Uint64(53))),
+		NewIR_Assignment("f", NewIR_Equals(NewIR_Uint64(42), NewIR_Uint64(53))),
 	}
 	instr, err := CompileIR(i)
 	if err != nil {

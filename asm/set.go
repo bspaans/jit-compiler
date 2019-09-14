@@ -14,7 +14,7 @@ func (i *SETE) Encode() (MachineCode, error) {
 		dest := i.Dest.(*Register)
 		if dest.Size == BYTE {
 			modrm := NewModRM(DirectRegisterMode, dest.Encode(), 0).Encode()
-			return []uint8{0x0f, 0x92, modrm}, nil
+			return []uint8{0x0f, 0x94, modrm}, nil
 		}
 	}
 	return nil, errors.New("Unsupported sete operation")
