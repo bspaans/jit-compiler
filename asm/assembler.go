@@ -68,6 +68,22 @@ func (i *RET) String() string {
 	return "ret"
 }
 
+type Instructions []Instruction
+
+func (i Instructions) Encode() (MachineCode, error) {
+	result := []uint8{}
+	for _, instr := range i {
+		b, err := instr.Encode()
+		if err != nil {
+			return nil, err
+		}
+		for _, code := range b {
+			result = append(result, code)
+		}
+	}
+	return result, nil
+}
+
 func CompileInstruction(instr []Instruction) (MachineCode, error) {
 	result := []uint8{}
 	address := 0

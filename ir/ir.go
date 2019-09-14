@@ -8,6 +8,7 @@ import (
 
 type IR interface {
 	Type() IRType
+	String() string
 	Encode(*IR_Context) ([]asm.Instruction, error)
 }
 
@@ -43,17 +44,15 @@ func CompileIR(stmts []IR) ([]asm.Instruction, error) {
 
 func init() {
 	i := []IR{
-		NewIR_Assignment("f", NewIR_Equals(NewIR_Uint64(42), NewIR_Uint64(53))),
+		NewIR_If(NewIR_Equals(NewIR_Uint64(53), NewIR_Uint64(53)),
+			NewIR_Assignment("f", NewIR_Uint64(42)),
+			NewIR_Assignment("f", NewIR_Uint64(53)),
+		),
+		NewIR_Return(NewIR_Variable("f")),
 	}
 	instr, err := CompileIR(i)
 	if err != nil {
 		panic(err)
-	}
-	for _, returnStmt := range []asm.Instruction{
-		&asm.MOV{asm.Get64BitRegisterByIndex(0), &asm.DisplacedRegister{asm.Get64BitRegisterByIndex(4), 8}},
-		&asm.RET{},
-	} {
-		instr = append(instr, returnStmt)
 	}
 	b, err := asm.CompileInstruction(instr)
 	if err != nil {
