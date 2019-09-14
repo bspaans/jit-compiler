@@ -26,11 +26,7 @@ func (i *ADD) Encode() (MachineCode, error) {
 		src := i.Source.(Uint32)
 		if i.Dest.Type() == T_Register {
 			dest := i.Dest.(*Register)
-			result := EncodeOpcodeWithREXAndModRM(0x81, dest, nil, 0)
-			for _, b := range src.Encode() {
-				result = append(result, b)
-			}
-			return result, nil
+			return EncodeOpcodeWithREXAndModRMAndImm(0x81, dest, nil, 0, src), nil
 		}
 	}
 	return nil, errors.New("Unsupported add operation")

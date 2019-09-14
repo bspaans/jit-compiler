@@ -8,6 +8,7 @@ import (
 type Value interface {
 	Type() Type
 	String() string
+	Encode() []uint8
 }
 
 type Uint8 uint8

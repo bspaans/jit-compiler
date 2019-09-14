@@ -51,3 +51,11 @@ func EncodeOpcodeWithREXAndModRM(opcode uint8, op1, op2 *Register, reg uint8) []
 	modrm := NewModRM(DirectRegisterMode, op1.Encode(), reg).Encode()
 	return []uint8{rex, opcode, modrm}
 }
+
+func EncodeOpcodeWithREXAndModRMAndImm(opcode uint8, op1, op2 *Register, reg uint8, value Value) []uint8 {
+	result := EncodeOpcodeWithREXAndModRM(0x81, op1, op2, reg)
+	for _, b := range value.Encode() {
+		result = append(result, b)
+	}
+	return result
+}
