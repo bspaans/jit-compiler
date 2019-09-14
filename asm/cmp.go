@@ -31,7 +31,6 @@ func (i *CMP) Encode() (MachineCode, error) {
 			rex := NewREXPrefix(true, false, false, rexB).Encode()
 			modrm := NewModRM(DirectRegisterMode, dest.Encode(), 7).Encode()
 			result := []uint8{rex, 0x81, modrm}
-			// Can only cmp to a double
 			for _, b := range src.Encode() {
 				result = append(result, b)
 			}

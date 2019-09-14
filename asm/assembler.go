@@ -103,6 +103,10 @@ func init() {
 		&MOV{Uint64(123), rcx},
 		&ADD{rcx, rax},
 		&ADD{Uint32(2), rax},
+		&PUSH{rax},
+		&POP{rax},
+		&PUSH{rdx},
+		&POP{rdx},
 		&MOV{rax, &DisplacedRegister{rsp, 8}},
 		&RET{},
 	})
