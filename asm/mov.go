@@ -28,7 +28,7 @@ func (i *MOV) Encode() (MachineCode, error) {
 				modrm := NewModRM(IndirectRegisterByteDisplacedMode, dest.Encode(), src.Encode()).Encode()
 				result := []uint8{rex, 0x89, modrm}
 				// Not sure why this is needed, but it is.
-				if dest.Register == rsp {
+				if dest.Register == Rsp {
 					result = append(result, 0x24)
 				}
 				result = append(result, dest.Displacement)
@@ -50,7 +50,7 @@ func (i *MOV) Encode() (MachineCode, error) {
 			modrm := NewModRM(IndirectRegisterByteDisplacedMode, dest.Encode(), 0).Encode()
 			result = append(result, modrm)
 			// Not sure why this is needed, but it is
-			if dest.Register == rsp {
+			if dest.Register == Rsp {
 				result = append(result, 0x24)
 			}
 			result = append(result, dest.Displacement)

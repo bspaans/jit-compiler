@@ -52,14 +52,14 @@ func Test_EncodeModRM(t *testing.T) {
 	if unit != expected {
 		t.Fatal("Expecting", expected, "got", unit)
 	}
-	for i, reg := range []*Register{rax, rcx, rdx, rbx, rsp, rbp, rsi, rdi} {
+	for i, reg := range []*Register{Rax, Rcx, Rdx, Rbx, Rsp, Rbp, Rsi, Rdi} {
 		unit = NewModRM(DirectRegisterMode, reg.Encode(), 0).Encode()
 		expected = uint8(192 + i)
 		if unit != expected {
 			t.Fatal("Expecting", expected, "got", unit)
 		}
 	}
-	for i, reg := range []*Register{r8, r9, r10, r11, r12, r13, r14, r15} {
+	for i, reg := range []*Register{R8, R9, R10, R11, R12, R13, R14, R15} {
 		unit = NewModRM(DirectRegisterMode, reg.Encode(), 0).Encode()
 		expected = uint8(192 + i)
 		if unit != expected {
@@ -69,7 +69,7 @@ func Test_EncodeModRM(t *testing.T) {
 }
 
 func Test_INC(t *testing.T) {
-	unit, err := (&INC{rax}).Encode()
+	unit, err := (&INC{Rax}).Encode()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -77,7 +77,7 @@ func Test_INC(t *testing.T) {
 	if unit.String() != expected {
 		t.Fatal("Expecting", expected, "got", unit)
 	}
-	unit, err = (&INC{rcx}).Encode()
+	unit, err = (&INC{Rcx}).Encode()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -86,7 +86,7 @@ func Test_INC(t *testing.T) {
 		t.Fatal("Expecting", expected, "got", unit)
 	}
 
-	unit, err = (&INC{r14}).Encode()
+	unit, err = (&INC{R14}).Encode()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -97,7 +97,7 @@ func Test_INC(t *testing.T) {
 }
 
 func Test_DEC(t *testing.T) {
-	unit, err := (&DEC{rax}).Encode()
+	unit, err := (&DEC{Rax}).Encode()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -105,7 +105,7 @@ func Test_DEC(t *testing.T) {
 	if unit.String() != expected {
 		t.Fatal("Expecting", expected, "got", unit)
 	}
-	unit, err = (&DEC{rcx}).Encode()
+	unit, err = (&DEC{Rcx}).Encode()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -113,7 +113,7 @@ func Test_DEC(t *testing.T) {
 	if unit.String() != expected {
 		t.Fatal("Expecting", expected, "got", unit)
 	}
-	unit, err = (&DEC{r14}).Encode()
+	unit, err = (&DEC{R14}).Encode()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -124,7 +124,7 @@ func Test_DEC(t *testing.T) {
 }
 
 func Test_MOV(t *testing.T) {
-	unit, err := (&MOV{rax, rax}).Encode()
+	unit, err := (&MOV{Rax, Rax}).Encode()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -132,7 +132,7 @@ func Test_MOV(t *testing.T) {
 	if unit.String() != expected {
 		t.Fatal("Expecting", expected, "got", unit)
 	}
-	unit, err = (&MOV{rax, rcx}).Encode()
+	unit, err = (&MOV{Rax, Rcx}).Encode()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -140,7 +140,7 @@ func Test_MOV(t *testing.T) {
 	if unit.String() != expected {
 		t.Fatal("Expecting", expected, "got", unit)
 	}
-	unit, err = (&MOV{rcx, rax}).Encode()
+	unit, err = (&MOV{Rcx, Rax}).Encode()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -148,7 +148,7 @@ func Test_MOV(t *testing.T) {
 	if unit.String() != expected {
 		t.Fatal("Expecting", expected, "got", unit)
 	}
-	unit, err = (&MOV{rax, r14}).Encode()
+	unit, err = (&MOV{Rax, R14}).Encode()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -156,7 +156,7 @@ func Test_MOV(t *testing.T) {
 	if unit.String() != expected {
 		t.Fatal("Expecting", expected, "got", unit)
 	}
-	unit, err = (&MOV{r14, rax}).Encode()
+	unit, err = (&MOV{R14, Rax}).Encode()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -164,7 +164,7 @@ func Test_MOV(t *testing.T) {
 	if unit.String() != expected {
 		t.Fatal("Expecting", expected, "got", unit)
 	}
-	unit, err = (&MOV{Uint64(0xffffffff), rax}).Encode()
+	unit, err = (&MOV{Uint64(0xffffffff), Rax}).Encode()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -172,7 +172,7 @@ func Test_MOV(t *testing.T) {
 	if unit.String() != expected {
 		t.Fatal("Expecting", expected, "got", unit)
 	}
-	unit, err = (&MOV{Uint64(0xffffffff), rcx}).Encode()
+	unit, err = (&MOV{Uint64(0xffffffff), Rcx}).Encode()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -180,7 +180,7 @@ func Test_MOV(t *testing.T) {
 	if unit.String() != expected {
 		t.Fatal("Expecting", expected, "got", unit)
 	}
-	unit, err = (&MOV{Uint64(0xffffffff), r14}).Encode()
+	unit, err = (&MOV{Uint64(0xffffffff), R14}).Encode()
 	if err != nil {
 		t.Fatal(err)
 	}
