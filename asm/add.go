@@ -33,5 +33,5 @@ func (i *ADD) Encode() (MachineCode, error) {
 }
 
 func (i *ADD) String() string {
-	return "add " + i.Source.String() + " " + i.Dest.String()
+	return "add " + i.Source.String() + ", " + i.Dest.String()
 }

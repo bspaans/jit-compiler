@@ -105,7 +105,7 @@ func init() {
 		&ADD{Uint32(2), rax},
 		&PUSH{rax},
 		&POP{rax},
-		&PUSH{rdx},
+		&PUSHFQ{},
 		&POP{rdx},
 		&MOV{rax, &DisplacedRegister{rsp, 8}},
 		&RET{},

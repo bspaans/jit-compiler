@@ -43,3 +43,14 @@ func (i *POP) Encode() (MachineCode, error) {
 func (i *POP) String() string {
 	return "pop " + i.Source.String()
 }
+
+type PUSHFQ struct {
+}
+
+func (i *PUSHFQ) Encode() (MachineCode, error) {
+	return []uint8{0x9C}, nil
+}
+
+func (i *PUSHFQ) String() string {
+	return "pushfq"
+}

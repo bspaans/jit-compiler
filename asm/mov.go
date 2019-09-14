@@ -64,5 +64,5 @@ func (i *MOV) Encode() (MachineCode, error) {
 	return nil, errors.New("Unsupported mov operation")
 }
 func (i *MOV) String() string {
-	return "mov " + i.Source.String() + " " + i.Dest.String()
+	return "mov " + i.Source.String() + ", " + i.Dest.String()
 }
