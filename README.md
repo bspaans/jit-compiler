@@ -35,6 +35,16 @@ some code generation to make it easier to add more complete coverage.
 Register allocation is really noddy and works until you run out of registers;
 there is no allocating on the stack or heap yet.
 
+In the higher level language the following constructs work:
+
+* Unsigned 64bit integers
+* Booleans
+* Assigning to variables
+* If statements
+* Return
+
+I know, it's a bit much.
+
 ## Next steps
 
 * Adding float support
