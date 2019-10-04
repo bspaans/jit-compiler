@@ -43,6 +43,9 @@ func (i *IR_Assignment) Encode(ctx *IR_Context) ([]asm.Instruction, error) {
 func (i *IR_Assignment) String() string {
 	return fmt.Sprintf("%s = %s", i.Variable, i.Expr.String())
 }
+func (i *IR_Assignment) AddToDataSection(ctx *IR_Context) {
+	i.Expr.AddToDataSection(ctx)
+}
 
 type IR_If struct {
 	*BaseIR
@@ -104,6 +107,12 @@ func (i *IR_If) String() string {
 	return fmt.Sprintf("if %s; then %s; else %s;", i.Condition.String(), i.Stmt1.String(), i.Stmt2.String())
 }
 
+func (i *IR_If) AddToDataSection(ctx *IR_Context) {
+	i.Condition.AddToDataSection(ctx)
+	i.Stmt1.AddToDataSection(ctx)
+	i.Stmt2.AddToDataSection(ctx)
+}
+
 type IR_Return struct {
 	*BaseIR
 	Expr IRExpression
@@ -128,4 +137,8 @@ func (i *IR_Return) Encode(ctx *IR_Context) ([]asm.Instruction, error) {
 
 func (i *IR_Return) String() string {
 	return fmt.Sprintf("return %s", i.Expr.String())
+}
+
+func (i *IR_Return) AddToDataSection(ctx *IR_Context) {
+	i.Expr.AddToDataSection(ctx)
 }

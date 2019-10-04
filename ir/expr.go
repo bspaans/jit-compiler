@@ -10,16 +10,18 @@ import (
 type IRExpressionType int
 type IRExpression interface {
 	Type() IRExpressionType
+	AddToDataSection(ctx *IR_Context)
 	Encode(ctx *IR_Context, target *asm.Register) ([]asm.Instruction, error)
 	String() string
 }
 
 const (
-	Uint64   IRExpressionType = iota
-	Bool     IRExpressionType = iota
-	Add      IRExpressionType = iota
-	Variable IRExpressionType = iota
-	Equals   IRExpressionType = iota
+	Uint64    IRExpressionType = iota
+	ByteArray IRExpressionType = iota
+	Bool      IRExpressionType = iota
+	Add       IRExpressionType = iota
+	Variable  IRExpressionType = iota
+	Equals    IRExpressionType = iota
 )
 
 type BaseIRExpression struct {
@@ -35,6 +37,8 @@ func NewBaseIRExpression(typ IRExpressionType) *BaseIRExpression {
 func (b *BaseIRExpression) Type() IRExpressionType {
 	return b.typ
 }
+
+func (b *BaseIRExpression) AddToDataSection(ctx *IR_Context) {}
 
 type IR_Uint64 struct {
 	*BaseIRExpression
@@ -200,4 +204,37 @@ func (i *IR_Equals) Encode(ctx *IR_Context, target *asm.Register) ([]asm.Instruc
 
 func (i *IR_Equals) String() string {
 	return fmt.Sprintf("%s == %s", i.Op1.String(), i.Op2.String())
+}
+
+type IR_ByteArray struct {
+	*BaseIRExpression
+	Value   []uint8
+	address int
+}
+
+func NewIR_ByteArray(value []uint8) *IR_ByteArray {
+	return &IR_ByteArray{
+		BaseIRExpression: NewBaseIRExpression(ByteArray),
+		Value:            value,
+	}
+}
+
+func (i *IR_ByteArray) String() string {
+	return fmt.Sprintf("%v", i.Value)
+}
+
+func (i *IR_ByteArray) Encode(ctx *IR_Context, target *asm.Register) ([]asm.Instruction, error) {
+	// TODO: load the address into target
+	// how to work out the address?
+	// Work out effective address by adding the address offset stored in
+	// this struct to the value in the DS register
+	// Statement: we're not defining a proper data section when we execute within the context of another program; and so DS will be wrong regardless
+	// We need to be able to do MOV(Displaced, Register)
+	// We can also calculate the offset of RIP
+	// But that would require tracking the ctx.InstructionPointer properly after each new instruction
+	return []asm.Instruction{}, nil
+}
+
+func (b *IR_ByteArray) AddToDataSection(ctx *IR_Context) {
+	b.address = ctx.AddToDataSection(b.Value)
 }

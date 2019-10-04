@@ -57,17 +57,6 @@ type Instruction interface {
 	String() string
 }
 
-type RET struct {
-}
-
-func (i *RET) Encode() (MachineCode, error) {
-	return []uint8{0xc3}, nil
-}
-
-func (i *RET) String() string {
-	return "ret"
-}
-
 type Instructions []Instruction
 
 func (i Instructions) Encode() (MachineCode, error) {
