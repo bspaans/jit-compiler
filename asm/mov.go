@@ -35,6 +35,18 @@ func (i *MOV) Encode() (MachineCode, error) {
 				return result, nil
 			}
 		}
+	} else if i.Source.Type() == T_RIPRelative {
+		src := i.Source.(*RIPRelative)
+		if i.Dest.Type() == T_Register {
+			dest := i.Dest.(*Register)
+			rex := REXEncode(nil, dest)
+			modrm := NewModRM(IndirectRegisterMode, 5, 0).Encode()
+			result := []uint8{rex, 0x8b, modrm}
+			for _, c := range src.Displacement.Encode() {
+				result = append(result, c)
+			}
+			return result, nil
+		}
 	} else if i.Source.Type() == T_Uint64 {
 		src := i.Source.(Uint64)
 		if i.Dest.Type() == T_Register {
@@ -61,7 +73,7 @@ func (i *MOV) Encode() (MachineCode, error) {
 			return result, nil
 		}
 	}
-	return nil, errors.New("Unsupported mov operation")
+	return nil, errors.New("Unsupported mov operation: " + i.String())
 }
 func (i *MOV) String() string {
 	return "mov " + i.Source.String() + ", " + i.Dest.String()

@@ -22,6 +22,7 @@ const (
 	Add       IRExpressionType = iota
 	Variable  IRExpressionType = iota
 	Equals    IRExpressionType = iota
+	Syscall   IRExpressionType = iota
 )
 
 type BaseIRExpression struct {
@@ -36,6 +37,21 @@ func NewBaseIRExpression(typ IRExpressionType) *BaseIRExpression {
 
 func (b *BaseIRExpression) Type() IRExpressionType {
 	return b.typ
+}
+
+func IREXpression_length(expr IRExpression, ctx *IR_Context, target *asm.Register) (int, error) {
+	commit := ctx.Commit
+	ctx.Commit = false
+	instr, err := expr.Encode(ctx, target)
+	if err != nil {
+		return 0, err
+	}
+	code, err := asm.Instructions(instr).Encode()
+	if err != nil {
+		return 0, err
+	}
+	ctx.Commit = commit
+	return len(code), nil
 }
 
 func (b *BaseIRExpression) AddToDataSection(ctx *IR_Context) {}
@@ -57,7 +73,9 @@ func (i *IR_Uint64) String() string {
 }
 
 func (i *IR_Uint64) Encode(ctx *IR_Context, target *asm.Register) ([]asm.Instruction, error) {
-	return []asm.Instruction{&asm.MOV{asm.Uint64(i.Value), target}}, nil
+	result := []asm.Instruction{&asm.MOV{asm.Uint64(i.Value), target}}
+	ctx.AddInstructions(result)
+	return result, nil
 }
 
 type IR_Bool struct {
@@ -81,7 +99,9 @@ func (i *IR_Bool) Encode(ctx *IR_Context, target *asm.Register) ([]asm.Instructi
 	if i.Value {
 		value = 1
 	}
-	return []asm.Instruction{&asm.MOV{asm.Uint64(value), target}}, nil
+	result := []asm.Instruction{&asm.MOV{asm.Uint64(value), target}}
+	ctx.AddInstructions(result)
+	return result, nil
 }
 
 type IR_Variable struct {
@@ -102,7 +122,9 @@ func (i *IR_Variable) String() string {
 
 func (i *IR_Variable) Encode(ctx *IR_Context, target *asm.Register) ([]asm.Instruction, error) {
 	reg := asm.Get64BitRegisterByIndex(ctx.VariableMap[i.Value])
-	return []asm.Instruction{&asm.MOV{reg, target}}, nil
+	result := []asm.Instruction{&asm.MOV{reg, target}}
+	ctx.AddInstructions(result)
+	return result, nil
 }
 
 type IR_Add struct {
@@ -145,6 +167,7 @@ func (i *IR_Add) Encode(ctx *IR_Context, target *asm.Register) ([]asm.Instructio
 	} else {
 		return nil, errors.New("Unsupported add IR operation")
 	}
+	ctx.AddInstructions(result)
 	return result, nil
 }
 
@@ -199,6 +222,7 @@ func (i *IR_Equals) Encode(ctx *IR_Context, target *asm.Register) ([]asm.Instruc
 	result = append(result, &asm.CMP{reg1, reg2})
 	result = append(result, &asm.MOV{asm.Uint64(0), target})
 	result = append(result, &asm.SETE{target.Lower8BitRegister()})
+	ctx.AddInstructions(result)
 	return result, nil
 }
 
@@ -232,9 +256,70 @@ func (i *IR_ByteArray) Encode(ctx *IR_Context, target *asm.Register) ([]asm.Inst
 	// We need to be able to do MOV(Displaced, Register)
 	// We can also calculate the offset of RIP
 	// But that would require tracking the ctx.InstructionPointer properly after each new instruction
-	return []asm.Instruction{}, nil
+	ownLength := uint(7)
+	diff := uint(ctx.InstructionPointer+ownLength) - uint(i.address)
+	result := []asm.Instruction{&asm.LEA{&asm.RIPRelative{asm.Int32(int32(-diff))}, target}}
+	ctx.AddInstructions(result)
+	return result, nil
 }
 
 func (b *IR_ByteArray) AddToDataSection(ctx *IR_Context) {
 	b.address = ctx.AddToDataSection(b.Value)
+}
+
+type IR_Syscall_Linux uint
+
+const (
+	IR_Syscall_Linux_Read  IR_Syscall_Linux = 0
+	IR_Syscall_Linux_Write IR_Syscall_Linux = 1
+	IR_Syscall_Linux_Open  IR_Syscall_Linux = 2
+	IR_Syscall_Linux_Close IR_Syscall_Linux = 3
+)
+
+type IR_Syscall struct {
+	*BaseIRExpression
+	Syscall uint
+	Args    []IRExpression
+}
+
+func NewIR_Syscall(syscall_nr uint, args []IRExpression) *IR_Syscall {
+	return &IR_Syscall{
+		Syscall: syscall_nr,
+		Args:    args,
+	}
+}
+
+func (i *IR_Syscall) String() string {
+	return fmt.Sprintf("syscall(%v, %v)", i.Syscall, i.Args)
+}
+
+func (i *IR_Syscall) Encode(ctx *IR_Context, target *asm.Register) ([]asm.Instruction, error) {
+
+	// TODO push and pop registers that are in use
+
+	result := []asm.Instruction{}
+	targets := []*asm.Register{asm.Rdi, asm.Rsi, asm.Rdx, asm.R10, asm.R8, asm.R9}
+	for j, argTarget := range targets {
+		if j < len(i.Args) {
+			instr, err := i.Args[j].Encode(ctx, argTarget)
+			if err != nil {
+				return nil, err
+			}
+			for _, code := range instr {
+				result = append(result, code)
+			}
+		}
+	}
+
+	result = append(result, &asm.MOV{asm.Uint64(uint64(i.Syscall)), asm.Rax})
+	result = append(result, &asm.SYSCALL{})
+	result = append(result, &asm.MOV{asm.Rax, target})
+	ctx.AddInstructions(result)
+	return result, nil
+}
+
+func (b *IR_Syscall) AddToDataSection(ctx *IR_Context) {
+	for _, arg := range b.Args {
+		arg.AddToDataSection(ctx)
+	}
 }

@@ -27,16 +27,30 @@ func (b *BaseIR) Type() IRType {
 }
 func (b *BaseIR) AddToDataSection(ctx *IR_Context) {}
 
+func IR_Length(stmt IR, ctx *IR_Context) (int, error) {
+	commit := ctx.Commit
+	ctx.Commit = false
+	instr, err := stmt.Encode(ctx)
+	if err != nil {
+		return 0, err
+	}
+	code, err := asm.Instructions(instr).Encode()
+	if err != nil {
+		return 0, err
+	}
+	ctx.Commit = commit
+	return len(code), nil
+}
+
 func Compile(stmts []IR) (asm.MachineCode, error) {
 	ctx := NewIRContext()
-	address := uint(0)
 	result := []uint8{}
 	for _, stmt := range stmts {
 		stmt.AddToDataSection(ctx)
 	}
 	if len(ctx.DataSection) > 0 {
 		jmp := &asm.JMP{asm.Uint8(len(ctx.DataSection))}
-		fmt.Printf("0x%x: %s\n", address, jmp.String())
+		fmt.Printf("0x%x: %s\n", 0, jmp.String())
 		result_, err := jmp.Encode()
 		if err != nil {
 			return nil, err
@@ -46,10 +60,13 @@ func Compile(stmts []IR) (asm.MachineCode, error) {
 		for _, d := range ctx.DataSection {
 			result = append(result, d)
 		}
-		address += uint(len(ctx.DataSection))
+	} else {
+		ctx.DataSectionOffset = 0
+		ctx.InstructionPointer = 0
 	}
+	address := uint(ctx.DataSectionOffset + len(ctx.DataSection))
 	for _, stmt := range stmts {
-		ctx.InstructionPointer = address
+		fmt.Println("RIP:", ctx.InstructionPointer)
 		code, err := stmt.Encode(ctx)
 		if err != nil {
 			return nil, err
@@ -74,28 +91,18 @@ func Compile(stmts []IR) (asm.MachineCode, error) {
 
 func CompileIR(stmts []IR) ([]asm.Instruction, error) {
 	ctx := NewIRContext()
-	result := []asm.Instruction{}
 	for _, stmt := range stmts {
-		code, err := stmt.Encode(ctx)
+		_, err := stmt.Encode(ctx)
 		if err != nil {
 			return nil, err
 		}
-		fmt.Println(stmt)
-		fmt.Println(code)
-		for _, i := range code {
-			result = append(result, i)
-		}
 	}
-	return result, nil
+	return ctx.GetInstructions(), nil
 }
 
 func init() {
 	i := []IR{
-		NewIR_Assignment("b", NewIR_ByteArray([]uint8("test"))),
-		NewIR_If(NewIR_Equals(NewIR_Uint64(53), NewIR_Uint64(53)),
-			NewIR_Assignment("f", NewIR_Uint64(42)),
-			NewIR_Assignment("f", NewIR_Uint64(53)),
-		),
+		NewIR_Assignment("f", NewIR_Syscall(uint(IR_Syscall_Linux_Write), []IRExpression{NewIR_Uint64(1), NewIR_ByteArray([]uint8("hello world\n")), NewIR_Uint64(uint64(12))})),
 		NewIR_Return(NewIR_Variable("f")),
 	}
 	b, err := Compile(i)

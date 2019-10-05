@@ -29,7 +29,7 @@ func (i *ADD) Encode() (MachineCode, error) {
 			return EncodeOpcodeWithREXAndModRMAndImm(0x81, dest, nil, 0, src), nil
 		}
 	}
-	return nil, errors.New("Unsupported add operation")
+	return nil, errors.New("Unsupported sub operation")
 }
 
 func (i *ADD) String() string {

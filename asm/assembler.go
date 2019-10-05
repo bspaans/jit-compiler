@@ -33,7 +33,7 @@ func (m MachineCode) String() string {
 	return string(result)
 }
 
-func (m MachineCode) Execute() {
+func (m MachineCode) Execute() uint {
 	mmapFunc, err := syscall.Mmap(
 		-1,
 		0,
@@ -49,7 +49,10 @@ func (m MachineCode) Execute() {
 	type execFunc func() uint
 	unsafeFunc := (uintptr)(unsafe.Pointer(&mmapFunc))
 	f := *(*execFunc)(unsafe.Pointer(&unsafeFunc))
-	fmt.Println("Result:", f())
+	value := f()
+	fmt.Println("Result:", value)
+	fmt.Printf("Hex   : %x\n", value)
+	return value
 }
 
 type Instruction interface {
@@ -89,6 +92,15 @@ func CompileInstruction(instr []Instruction) (MachineCode, error) {
 		}
 	}
 	return result, nil
+}
+
+func Instruction_Length(instr Instruction) (int, error) {
+	b, err := instr.Encode()
+	if err != nil {
+		return 0, err
+	}
+	return len(b), nil
+
 }
 
 func init() {

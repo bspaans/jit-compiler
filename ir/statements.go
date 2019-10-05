@@ -43,6 +43,7 @@ func (i *IR_Assignment) Encode(ctx *IR_Context) ([]asm.Instruction, error) {
 func (i *IR_Assignment) String() string {
 	return fmt.Sprintf("%s = %s", i.Variable, i.Expr.String())
 }
+
 func (i *IR_Assignment) AddToDataSection(ctx *IR_Context) {
 	i.Expr.AddToDataSection(ctx)
 }
@@ -73,28 +74,37 @@ func (i *IR_If) Encode(ctx *IR_Context) ([]asm.Instruction, error) {
 		if err != nil {
 			return nil, err
 		}
+		stmt1Len, err := IR_Length(i.Stmt1, ctx)
+		if err != nil {
+			return nil, err
+		}
+		stmt2Len, err := IR_Length(i.Stmt2, ctx)
+		if err != nil {
+			return nil, err
+		}
+		instr := []asm.Instruction{
+			&asm.CMP{asm.Uint32(1), reg},
+			&asm.JNE{asm.Uint8(stmt1Len)},
+		}
+		for _, inst := range instr {
+			ctx.AddInstruction(inst)
+			result = append(result, inst)
+		}
 		s1, err := i.Stmt1.Encode(ctx)
 		if err != nil {
 			return nil, err
 		}
-		asmS1, err := asm.Instructions(s1).Encode()
-		if err != nil {
-			return nil, err
+		for _, instr := range s1 {
+			result = append(result, instr)
 		}
+		jmp := &asm.JMP{asm.Uint8(stmt2Len)}
+		ctx.AddInstruction(jmp)
+		result = append(result, jmp)
+
 		s2, err := i.Stmt2.Encode(ctx)
 		if err != nil {
 			return nil, err
 		}
-		asmS2, err := asm.Instructions(s2).Encode()
-		if err != nil {
-			return nil, err
-		}
-		result = append(result, &asm.CMP{asm.Uint32(1), reg})
-		result = append(result, &asm.JNE{asm.Uint8(len(asmS1))})
-		for _, instr := range s1 {
-			result = append(result, instr)
-		}
-		result = append(result, &asm.JMP{asm.Uint8(len(asmS2))})
 		for _, instr := range s2 {
 			result = append(result, instr)
 		}
@@ -130,8 +140,14 @@ func (i *IR_Return) Encode(ctx *IR_Context) ([]asm.Instruction, error) {
 	if err != nil {
 		return nil, err
 	}
-	result = append(result, &asm.MOV{asm.Rax, &asm.DisplacedRegister{asm.Rsp, 8}})
-	result = append(result, &asm.RET{})
+	instr := []asm.Instruction{
+		&asm.MOV{asm.Rax, &asm.DisplacedRegister{asm.Rsp, 8}},
+		&asm.RET{},
+	}
+	for _, inst := range instr {
+		ctx.AddInstruction(inst)
+		result = append(result, inst)
+	}
 	return result, nil
 }
 

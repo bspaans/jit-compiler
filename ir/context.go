@@ -1,11 +1,17 @@
 package ir
 
+import "github.com/bspaans/jit/asm"
+
 type IR_Context struct {
 	Registers          []bool
 	RegistersAllocated uint8
 	VariableMap        map[string]uint8
 	DataSection        []uint8
 	InstructionPointer uint
+	DataSectionOffset  int
+	Commit             bool // if false turns AddInstruction into a noop
+
+	instructions []asm.Instruction
 }
 
 func NewIRContext() *IR_Context {
@@ -14,13 +20,34 @@ func NewIRContext() *IR_Context {
 		RegistersAllocated: 0,
 		VariableMap:        map[string]uint8{},
 		DataSection:        []uint8{},
-		InstructionPointer: 0,
+		DataSectionOffset:  2,
+		InstructionPointer: 2,
+		Commit:             true,
+		instructions:       []asm.Instruction{},
 	}
 	// Always allocate rsp
 	// Should track usage?
 	ctx.Registers[4] = true
 	ctx.RegistersAllocated = 1
 	return ctx
+}
+
+func (i *IR_Context) AddInstruction(instr asm.Instruction) {
+	if i.Commit {
+		i.instructions = append(i.instructions, instr)
+		length, _ := asm.Instruction_Length(instr)
+		i.InstructionPointer += uint(length)
+	}
+}
+
+func (i *IR_Context) AddInstructions(instr []asm.Instruction) {
+	for _, inst := range instr {
+		i.AddInstruction(inst)
+	}
+}
+
+func (i *IR_Context) GetInstructions() []asm.Instruction {
+	return i.instructions
 }
 
 func (i *IR_Context) AllocateRegister() uint8 {
@@ -46,7 +73,7 @@ func (i *IR_Context) AddToDataSection(value []uint8) int {
 	address := len(i.DataSection)
 	for _, v := range value {
 		i.DataSection = append(i.DataSection, v)
+		i.InstructionPointer += 1
 	}
-	DataSectionOffset := 2
-	return address + DataSectionOffset
+	return address + i.DataSectionOffset
 }

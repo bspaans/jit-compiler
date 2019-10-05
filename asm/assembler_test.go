@@ -1,6 +1,9 @@
 package asm
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+)
 
 func Test_EncodeREXPrefix(t *testing.T) {
 	unit := NewREXPrefix(true, true, true, true).Encode()
@@ -199,4 +202,30 @@ func Test_JMP(t *testing.T) {
 	if unit.String() != expected {
 		t.Fatal("Expecting", expected, "got", unit)
 	}
+}
+
+func Test_Execute(t *testing.T) {
+	units := [][]Instruction{
+		[]Instruction{
+			&MOV{Uint64(5), &DisplacedRegister{Rsp, 8}},
+			&RET{},
+		},
+		[]Instruction{
+			&MOV{Uint64(5), Rax},
+			&MOV{Rax, &DisplacedRegister{Rsp, 8}},
+			&RET{},
+		},
+	}
+	for _, unit := range units {
+		b, err := CompileInstruction(unit)
+		if err != nil {
+			t.Fatal(err)
+		}
+		fmt.Println(b)
+		value := b.Execute()
+		if value != uint(5) {
+			t.Error("Expecting 123 got", value, "in", unit)
+		}
+	}
+
 }
