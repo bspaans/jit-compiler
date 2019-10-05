@@ -2,6 +2,7 @@ package ir
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/bspaans/jit/asm"
 )
@@ -103,12 +104,14 @@ func CompileIR(stmts []IR) ([]asm.Instruction, error) {
 func init() {
 	i := []IR{
 		NewIR_Assignment("i", NewIR_Uint64(0)),
-		NewIR_While(NewIR_Not(NewIR_Equals(NewIR_Variable("i"), NewIR_Uint64(10))), NewIR_AndThen(
-			NewIR_Assignment("g", NewIR_LinuxWrite(uint64(1), []uint8("\n\nhowdy\n\n"), 9)),
+		NewIR_While(NewIR_Not(NewIR_Equals(NewIR_Variable("i"), NewIR_Uint64(5))), NewIR_AndThen(
+			NewIR_Assignment("g", NewIR_LinuxWrite(NewIR_Uint64(uint64(1)), []uint8("howdy\n"), 6)),
 			NewIR_Assignment("i", NewIR_Add(NewIR_Variable("i"), NewIR_Uint64(1))),
 		),
 		),
-		NewIR_Return(NewIR_Variable("i")),
+		NewIR_Assignment("j", NewIR_LinuxOpen("/tmp/test.txt", os.O_CREATE|os.O_WRONLY, 0644)),
+		NewIR_Assignment("g", NewIR_LinuxWrite(NewIR_Variable("j"), []uint8("howdy, how is it going\n"), 23)),
+		NewIR_Return(NewIR_Variable("g")),
 	}
 	b, err := Compile(i)
 	if err != nil {

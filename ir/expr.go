@@ -402,8 +402,11 @@ const (
 	IR_Syscall_Linux_Close IR_Syscall_Linux = 3
 )
 
-func NewIR_LinuxWrite(fid uint64, b []uint8, size int) IRExpression {
-	return NewIR_Syscall(uint(IR_Syscall_Linux_Write), []IRExpression{NewIR_Uint64(fid), NewIR_ByteArray(b), NewIR_Uint64(uint64(size))})
+func NewIR_LinuxWrite(fid IRExpression, b []uint8, size int) IRExpression {
+	return NewIR_Syscall(uint(IR_Syscall_Linux_Write), []IRExpression{fid, NewIR_ByteArray(b), NewIR_Uint64(uint64(size))})
+}
+func NewIR_LinuxOpen(filename string, flags, mode int) IRExpression {
+	return NewIR_Syscall(uint(IR_Syscall_Linux_Open), []IRExpression{NewIR_ByteArray([]uint8(filename + "\x00")), NewIR_Uint64(uint64(flags)), NewIR_Uint64(uint64(mode))})
 }
 func NewIR_LinuxClose(fid uint64) IRExpression {
 	return NewIR_Syscall(uint(IR_Syscall_Linux_Close), []IRExpression{NewIR_Uint64(fid)})
