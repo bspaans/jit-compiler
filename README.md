@@ -18,9 +18,10 @@ not achieving its original goal 👍
 Not an awful lot yet:
 
 * MOV
+* LEA
 * PUSH and POP
 * PUSHFQ
-* ADD
+* ADD and SUB
 * INC and DEC
 * CMP
 * SETE

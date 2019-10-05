@@ -66,7 +66,7 @@ func Compile(stmts []IR) (asm.MachineCode, error) {
 	}
 	address := uint(ctx.DataSectionOffset + len(ctx.DataSection))
 	for _, stmt := range stmts {
-		fmt.Println("RIP:", ctx.InstructionPointer)
+		fmt.Printf("RIP: %d 0x%x\n", ctx.InstructionPointer, ctx.InstructionPointer)
 		code, err := stmt.Encode(ctx)
 		if err != nil {
 			return nil, err
@@ -102,7 +102,14 @@ func CompileIR(stmts []IR) ([]asm.Instruction, error) {
 
 func init() {
 	i := []IR{
-		NewIR_Assignment("f", NewIR_Syscall(uint(IR_Syscall_Linux_Write), []IRExpression{NewIR_Uint64(1), NewIR_ByteArray([]uint8("hello world\n")), NewIR_Uint64(uint64(12))})),
+		NewIR_Assignment("f", NewIR_Uint64(5)),
+		NewIR_Assignment("a", NewIR_Uint64(5)),
+		NewIR_Assignment("b", NewIR_Uint64(5)),
+		NewIR_Assignment("c", NewIR_Uint64(5)),
+		NewIR_Assignment("d", NewIR_Uint64(5)),
+		NewIR_Assignment("e", NewIR_Uint64(5)),
+		NewIR_Assignment("f", NewIR_Uint64(5)),
+		NewIR_Assignment("g", NewIR_Syscall(uint(IR_Syscall_Linux_Write), []IRExpression{NewIR_Uint64(1), NewIR_ByteArray([]uint8("hello world\n")), NewIR_Uint64(uint64(12))})),
 		NewIR_Return(NewIR_Variable("f")),
 	}
 	b, err := Compile(i)

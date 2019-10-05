@@ -248,14 +248,9 @@ func (i *IR_ByteArray) String() string {
 }
 
 func (i *IR_ByteArray) Encode(ctx *IR_Context, target *asm.Register) ([]asm.Instruction, error) {
-	// TODO: load the address into target
-	// how to work out the address?
-	// Work out effective address by adding the address offset stored in
-	// this struct to the value in the DS register
-	// Statement: we're not defining a proper data section when we execute within the context of another program; and so DS will be wrong regardless
-	// We need to be able to do MOV(Displaced, Register)
-	// We can also calculate the offset of RIP
-	// But that would require tracking the ctx.InstructionPointer properly after each new instruction
+	// Calculate the displacement between RIP (the instruction pointer,
+	// pointing to the *next* instruction) and the address of our byte array,
+	// and load the resulting address into target using a LEA instruction.
 	ownLength := uint(7)
 	diff := uint(ctx.InstructionPointer+ownLength) - uint(i.address)
 	result := []asm.Instruction{&asm.LEA{&asm.RIPRelative{asm.Int32(int32(-diff))}, target}}
@@ -295,12 +290,25 @@ func (i *IR_Syscall) String() string {
 
 func (i *IR_Syscall) Encode(ctx *IR_Context, target *asm.Register) ([]asm.Instruction, error) {
 
-	// TODO push and pop registers that are in use
-
 	result := []asm.Instruction{}
+	if ctx.Registers[0] {
+		push := &asm.PUSH{asm.Rax}
+		result = append(result, push)
+		ctx.AddInstruction(push)
+	}
 	targets := []*asm.Register{asm.Rdi, asm.Rsi, asm.Rdx, asm.R10, asm.R8, asm.R9}
+	targetRegisterIndices := []uint8{7, 6, 2, 10, 8, 9}
+	clobbered := 0
 	for j, argTarget := range targets {
 		if j < len(i.Args) {
+			// Push registers on the stack if they are in use
+			registerIndex := targetRegisterIndices[j]
+			if ctx.Registers[registerIndex] {
+				reg := asm.Get64BitRegisterByIndex(registerIndex)
+				result = append(result, &asm.PUSH{reg})
+				ctx.AddInstruction(&asm.PUSH{reg})
+				clobbered += 1
+			}
 			instr, err := i.Args[j].Encode(ctx, argTarget)
 			if err != nil {
 				return nil, err
@@ -311,10 +319,25 @@ func (i *IR_Syscall) Encode(ctx *IR_Context, target *asm.Register) ([]asm.Instru
 		}
 	}
 
-	result = append(result, &asm.MOV{asm.Uint64(uint64(i.Syscall)), asm.Rax})
-	result = append(result, &asm.SYSCALL{})
-	result = append(result, &asm.MOV{asm.Rax, target})
-	ctx.AddInstructions(result)
+	instr := []asm.Instruction{
+		&asm.MOV{asm.Uint64(uint64(i.Syscall)), asm.Rax},
+		&asm.SYSCALL{},
+		&asm.MOV{asm.Rax, target},
+	}
+	// Restore registers from the stack
+	for j := clobbered; j > 0; j-- {
+		registerIndex := targetRegisterIndices[j-1]
+		reg := asm.Get64BitRegisterByIndex(registerIndex)
+		instr = append(instr, &asm.POP{reg})
+	}
+	// restore rax
+	if ctx.Registers[0] {
+		instr = append(instr, &asm.POP{asm.Rax})
+	}
+	for _, inst := range instr {
+		result = append(result, inst)
+		ctx.AddInstruction(inst)
+	}
 	return result, nil
 }
 

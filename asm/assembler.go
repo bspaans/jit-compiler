@@ -26,7 +26,7 @@ func (m MachineCode) String() string {
 		if i%2 == 1 && i+1 < len(h) {
 			result = append(result, ' ')
 		}
-		if i%14 == 13 && i+1 < len(h) {
+		if i%16 == 15 && i+1 < len(h) {
 			result = append(result, '\n', ' ', ' ')
 		}
 	}
