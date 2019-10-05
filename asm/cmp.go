@@ -37,7 +37,7 @@ func (i *CMP) Encode() (MachineCode, error) {
 			return result, nil
 		}
 	}
-	return nil, errors.New("Unsupported cmp operation")
+	return nil, errors.New("Unsupported cmp operation: " + i.String())
 }
 
 func (i *CMP) String() string {

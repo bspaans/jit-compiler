@@ -102,15 +102,13 @@ func CompileIR(stmts []IR) ([]asm.Instruction, error) {
 
 func init() {
 	i := []IR{
-		NewIR_Assignment("f", NewIR_Uint64(5)),
-		NewIR_Assignment("a", NewIR_Uint64(5)),
-		NewIR_Assignment("b", NewIR_Uint64(5)),
-		NewIR_Assignment("c", NewIR_Uint64(5)),
-		NewIR_Assignment("d", NewIR_Uint64(5)),
-		NewIR_Assignment("e", NewIR_Uint64(5)),
-		NewIR_Assignment("f", NewIR_Uint64(5)),
-		NewIR_Assignment("g", NewIR_Syscall(uint(IR_Syscall_Linux_Write), []IRExpression{NewIR_Uint64(1), NewIR_ByteArray([]uint8("hello world\n")), NewIR_Uint64(uint64(12))})),
-		NewIR_Return(NewIR_Variable("f")),
+		NewIR_Assignment("i", NewIR_Uint64(0)),
+		NewIR_While(NewIR_Not(NewIR_Equals(NewIR_Variable("i"), NewIR_Uint64(10))), NewIR_AndThen(
+			NewIR_Assignment("g", NewIR_LinuxWrite(uint64(1), []uint8("\n\nhowdy\n\n"), 9)),
+			NewIR_Assignment("i", NewIR_Add(NewIR_Variable("i"), NewIR_Uint64(1))),
+		),
+		),
+		NewIR_Return(NewIR_Variable("i")),
 	}
 	b, err := Compile(i)
 	if err != nil {

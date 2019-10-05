@@ -40,8 +40,13 @@ In the higher level language the following constructs work:
 
 * Unsigned 64bit integers
 * Booleans
+* Immutable byte arrays
 * Assigning to variables
 * If statements
+* While loops
+* Equals
+* NOT logic expression
+* Syscalls
 * Return
 
 I know, it's a bit much.

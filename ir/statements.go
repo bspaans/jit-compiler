@@ -12,7 +12,9 @@ type IRType int
 const (
 	Assignment IRType = iota
 	If         IRType = iota
+	While      IRType = iota
 	Return     IRType = iota
+	AndThen    IRType = iota
 )
 
 type IR_Assignment struct {
@@ -157,4 +159,100 @@ func (i *IR_Return) String() string {
 
 func (i *IR_Return) AddToDataSection(ctx *IR_Context) {
 	i.Expr.AddToDataSection(ctx)
+}
+
+type IR_While struct {
+	*BaseIR
+	Condition IRExpression
+	Stmt      IR
+}
+
+func NewIR_While(condition IRExpression, stmt IR) *IR_While {
+	return &IR_While{
+		BaseIR:    NewBaseIR(While),
+		Condition: condition,
+		Stmt:      stmt,
+	}
+}
+
+func (i *IR_While) Encode(ctx *IR_Context) ([]asm.Instruction, error) {
+	r := ctx.AllocateRegister()
+	defer ctx.DeallocateRegister(r)
+	reg := asm.Get64BitRegisterByIndex(r)
+	beginning := ctx.InstructionPointer
+	result, err := i.Condition.Encode(ctx, reg)
+	if err != nil {
+		return nil, err
+	}
+	stmtLen, err := IR_Length(i.Stmt, ctx)
+	if err != nil {
+		return nil, err
+	}
+	instr := []asm.Instruction{
+		&asm.CMP{asm.Uint32(1), reg},
+		&asm.JNE{asm.Uint8(stmtLen + 2)},
+	}
+	for _, inst := range instr {
+		ctx.AddInstruction(inst)
+		result = append(result, inst)
+	}
+	s1, err := i.Stmt.Encode(ctx)
+	if err != nil {
+		return nil, err
+	}
+	for _, instr := range s1 {
+		result = append(result, instr)
+	}
+	jmp := &asm.JMP{asm.Uint8(uint8(0xff - (int(ctx.InstructionPointer+1) - int(beginning))))}
+	result = append(result, jmp)
+	ctx.AddInstruction(jmp)
+	fmt.Println("InstructionPointer", ctx.InstructionPointer, beginning, ctx.InstructionPointer-beginning)
+	return result, nil
+}
+
+func (i *IR_While) String() string {
+	return fmt.Sprintf("while %s { %s }", i.Condition.String(), i.Stmt.String())
+}
+
+func (i *IR_While) AddToDataSection(ctx *IR_Context) {
+	i.Condition.AddToDataSection(ctx)
+	i.Stmt.AddToDataSection(ctx)
+}
+
+type IR_AndThen struct {
+	*BaseIR
+	Stmt1 IR
+	Stmt2 IR
+}
+
+func NewIR_AndThen(stmt1, stmt2 IR) *IR_AndThen {
+	return &IR_AndThen{
+		BaseIR: NewBaseIR(AndThen),
+		Stmt1:  stmt1,
+		Stmt2:  stmt2,
+	}
+}
+
+func (i *IR_AndThen) Encode(ctx *IR_Context) ([]asm.Instruction, error) {
+	result, err := i.Stmt1.Encode(ctx)
+	if err != nil {
+		return nil, err
+	}
+	s2, err := i.Stmt2.Encode(ctx)
+	if err != nil {
+		return nil, err
+	}
+	for _, instr := range s2 {
+		result = append(result, instr)
+	}
+	return result, nil
+}
+
+func (i *IR_AndThen) String() string {
+	return fmt.Sprintf("%s ; %s", i.Stmt1.String(), i.Stmt2.String())
+}
+
+func (i *IR_AndThen) AddToDataSection(ctx *IR_Context) {
+	i.Stmt1.AddToDataSection(ctx)
+	i.Stmt2.AddToDataSection(ctx)
 }

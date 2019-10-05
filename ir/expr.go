@@ -19,6 +19,7 @@ const (
 	Uint64    IRExpressionType = iota
 	ByteArray IRExpressionType = iota
 	Bool      IRExpressionType = iota
+	Not       IRExpressionType = iota
 	Add       IRExpressionType = iota
 	Variable  IRExpressionType = iota
 	Equals    IRExpressionType = iota
@@ -230,6 +231,60 @@ func (i *IR_Equals) String() string {
 	return fmt.Sprintf("%s == %s", i.Op1.String(), i.Op2.String())
 }
 
+type IR_Not struct {
+	*BaseIRExpression
+	Op1 IRExpression
+}
+
+func NewIR_Not(op1 IRExpression) *IR_Not {
+	return &IR_Not{
+		BaseIRExpression: NewBaseIRExpression(Not),
+		Op1:              op1,
+	}
+}
+
+func (i *IR_Not) Encode(ctx *IR_Context, target *asm.Register) ([]asm.Instruction, error) {
+
+	var reg1 *asm.Register
+
+	result := []asm.Instruction{}
+	if i.Op1.Type() == Variable {
+		variable := i.Op1.(*IR_Variable).Value
+		reg1 = asm.Get64BitRegisterByIndex(ctx.VariableMap[variable])
+	} else if i.Op1.Type() == Uint64 {
+		value := i.Op1.(*IR_Uint64).Value
+		r := ctx.AllocateRegister()
+		defer ctx.DeallocateRegister(r)
+		reg1 = asm.Get64BitRegisterByIndex(r)
+		result = append(result, &asm.MOV{asm.Uint64(value), reg1})
+	} else if i.Op1.Type() == Equals {
+		result_, err := i.Op1.Encode(ctx, target)
+		if err != nil {
+			return nil, err
+		}
+		for _, r := range result_ {
+			result = append(result, r)
+		}
+		reg1 = target
+	} else {
+		return nil, errors.New("Unsupported not IR operation: " + i.String())
+	}
+
+	instr := []asm.Instruction{}
+	instr = append(instr, &asm.CMP{asm.Uint32(0), reg1})
+	instr = append(instr, &asm.MOV{asm.Uint64(0), target})
+	instr = append(instr, &asm.SETE{target.Lower8BitRegister()})
+	for _, inst := range instr {
+		result = append(result, inst)
+		ctx.AddInstruction(inst)
+	}
+	return result, nil
+}
+
+func (i *IR_Not) String() string {
+	return fmt.Sprintf("!(%s)", i.Op1.String())
+}
+
 type IR_ByteArray struct {
 	*BaseIRExpression
 	Value   []uint8
@@ -261,15 +316,6 @@ func (i *IR_ByteArray) Encode(ctx *IR_Context, target *asm.Register) ([]asm.Inst
 func (b *IR_ByteArray) AddToDataSection(ctx *IR_Context) {
 	b.address = ctx.AddToDataSection(b.Value)
 }
-
-type IR_Syscall_Linux uint
-
-const (
-	IR_Syscall_Linux_Read  IR_Syscall_Linux = 0
-	IR_Syscall_Linux_Write IR_Syscall_Linux = 1
-	IR_Syscall_Linux_Open  IR_Syscall_Linux = 2
-	IR_Syscall_Linux_Close IR_Syscall_Linux = 3
-)
 
 type IR_Syscall struct {
 	*BaseIRExpression
@@ -345,4 +391,20 @@ func (b *IR_Syscall) AddToDataSection(ctx *IR_Context) {
 	for _, arg := range b.Args {
 		arg.AddToDataSection(ctx)
 	}
+}
+
+type IR_Syscall_Linux uint
+
+const (
+	IR_Syscall_Linux_Read  IR_Syscall_Linux = 0
+	IR_Syscall_Linux_Write IR_Syscall_Linux = 1
+	IR_Syscall_Linux_Open  IR_Syscall_Linux = 2
+	IR_Syscall_Linux_Close IR_Syscall_Linux = 3
+)
+
+func NewIR_LinuxWrite(fid uint64, b []uint8, size int) IRExpression {
+	return NewIR_Syscall(uint(IR_Syscall_Linux_Write), []IRExpression{NewIR_Uint64(fid), NewIR_ByteArray(b), NewIR_Uint64(uint64(size))})
+}
+func NewIR_LinuxClose(fid uint64) IRExpression {
+	return NewIR_Syscall(uint(IR_Syscall_Linux_Close), []IRExpression{NewIR_Uint64(fid)})
 }

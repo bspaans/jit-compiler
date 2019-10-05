@@ -40,6 +40,11 @@ func (j *JMP) Encode() (MachineCode, error) {
 		for _, b := range j.Dest.(Uint8).Encode() {
 			result = append(result, b)
 		}
+	} else if j.Dest.Type() == T_Uint32 {
+		result = []uint8{0xE9}
+		for _, b := range j.Dest.(Uint32).Encode() {
+			result = append(result, b)
+		}
 	} else {
 		return nil, errors.New("Unsupported destination")
 	}
