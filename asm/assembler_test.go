@@ -230,6 +230,16 @@ func Test_Execute(t *testing.T) {
 			&MOV{Rax, &DisplacedRegister{Rsp, 8}},
 			&RET{},
 		},
+		[]Instruction{
+			&MOV{Uint64(1), Rdi},
+			&CVTSI2SS{Rdi, Xmm5},
+			&MOV{Float64(4.0), Rdi},
+			&MOVQ{Rdi, Xmm4},
+			&ADDSD{Xmm5, Xmm4},
+			&CVTTSD2SI{Xmm4, Rax},
+			&MOV{Rax, &DisplacedRegister{Rsp, 8}},
+			&RET{},
+		},
 	}
 	for _, unit := range units {
 		b, err := CompileInstruction(unit)
