@@ -43,6 +43,11 @@ func Test_Execute_Result(t *testing.T) {
 		[]IR{NewIR_Assignment("f", NewIR_Uint64(53)),
 			NewIR_Assignment("g", NewIR_Syscall(uint(IR_Syscall_Linux_Write), []IRExpression{NewIR_Uint64(1), NewIR_ByteArray([]uint8("hello world\n")), NewIR_Uint64(uint64(12))})),
 		},
+		[]IR{NewIR_Assignment("f", NewIR_Uint64(0)),
+			NewIR_While(NewIR_Not(NewIR_Equals(NewIR_Variable("f"), NewIR_Uint64(53))),
+				NewIR_Assignment("f", NewIR_Add(NewIR_Variable("f"), NewIR_Uint64(1))),
+			),
+		},
 	}
 	for _, ir := range units {
 		i := append(ir, NewIR_Return(NewIR_Variable("f")))

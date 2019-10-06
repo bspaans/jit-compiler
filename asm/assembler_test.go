@@ -171,7 +171,7 @@ func Test_MOV(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	expected = "  48 b8 ff ff ff ff 00 \n  00 00 00"
+	expected = "  48 b8 ff ff ff ff 00 00 \n  00 00"
 	if unit.String() != expected {
 		t.Fatal("Expecting", expected, "got", unit)
 	}
@@ -179,7 +179,7 @@ func Test_MOV(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	expected = "  48 b9 ff ff ff ff 00 \n  00 00 00"
+	expected = "  48 b9 ff ff ff ff 00 00 \n  00 00"
 	if unit.String() != expected {
 		t.Fatal("Expecting", expected, "got", unit)
 	}
@@ -187,7 +187,7 @@ func Test_MOV(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	expected = "  49 be ff ff ff ff 00 \n  00 00 00"
+	expected = "  49 be ff ff ff ff 00 00 \n  00 00"
 	if unit.String() != expected {
 		t.Fatal("Expecting", expected, "got", unit)
 	}
@@ -212,6 +212,14 @@ func Test_Execute(t *testing.T) {
 		},
 		[]Instruction{
 			&MOV{Uint64(5), Rax},
+			&MOV{Rax, &DisplacedRegister{Rsp, 8}},
+			&RET{},
+		},
+		[]Instruction{
+			&MOV{Uint64(5), Rax},
+			&CVTSI2SS{Rax, Xmm4},
+			&MOV{Uint64(6), Rax},
+			&CVTTSD2SI{Xmm4, Rax},
 			&MOV{Rax, &DisplacedRegister{Rsp, 8}},
 			&RET{},
 		},

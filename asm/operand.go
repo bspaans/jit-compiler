@@ -11,6 +11,8 @@ const (
 	T_Uint32            Type = iota
 	T_Uint64            Type = iota
 	T_Int32             Type = iota
+	T_Float32           Type = iota
+	T_Float64           Type = iota
 )
 
 type Operand interface {
