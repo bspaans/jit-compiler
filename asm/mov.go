@@ -72,9 +72,56 @@ func (i *MOV) Encode() (MachineCode, error) {
 			}
 			return result, nil
 		}
+	} else if i.Source.Type() == T_Float64 {
+		src := i.Source.(Float64)
+		if i.Dest.Type() == T_Register {
+			dest := i.Dest.(*Register)
+			result := EncodeOpcodeWithREX(0xB8+(dest.Encode()&7), dest, nil)
+			for _, b := range src.Encode() {
+				result = append(result, b)
+			}
+			return result, nil
+		}
 	}
 	return nil, errors.New("Unsupported mov operation: " + i.String())
 }
 func (i *MOV) String() string {
 	return "mov " + i.Source.String() + ", " + i.Dest.String()
+}
+
+type MOVQ struct {
+	Source Operand
+	Dest   Operand
+}
+
+func (i *MOVQ) Encode() (MachineCode, error) {
+	if i.Dest == nil {
+		return nil, errors.New("Missing dest")
+	}
+	if i.Source == nil {
+		return nil, errors.New("Missing source")
+	}
+	if i.Source.Type() == T_Register {
+		src := i.Source.(*Register)
+		if i.Dest.Type() == T_Register {
+			dest := i.Dest.(*Register)
+			if dest.Size == QUADDOUBLE {
+				if src.Size == QUADWORD {
+					result := []uint8{0x66}
+					rex := REXEncode(src, dest)
+					result = append(result, rex)
+					result = append(result, 0x0f)
+					result = append(result, 0x6e)
+					modrm := NewModRM(DirectRegisterMode, src.Encode(), dest.Encode())
+					result = append(result, modrm.Encode())
+					return result, nil
+
+				}
+			}
+		}
+	}
+	return nil, errors.New("Unsupported movq operation: " + i.String())
+}
+func (i *MOVQ) String() string {
+	return "movq " + i.Source.String() + ", " + i.Dest.String()
 }

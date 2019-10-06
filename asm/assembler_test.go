@@ -216,9 +216,16 @@ func Test_Execute(t *testing.T) {
 			&RET{},
 		},
 		[]Instruction{
-			&MOV{Uint64(5), Rax},
-			&CVTSI2SS{Rax, Xmm4},
-			&MOV{Uint64(6), Rax},
+			&MOV{Uint64(5), Rdi},
+			&CVTSI2SS{Rdi, Xmm4},
+			&MOV{Uint64(6), Rdi},
+			&CVTTSD2SI{Xmm4, Rax},
+			&MOV{Rax, &DisplacedRegister{Rsp, 8}},
+			&RET{},
+		},
+		[]Instruction{
+			&MOV{Float64(5.0), Rdi},
+			&MOVQ{Rdi, Xmm4},
 			&CVTTSD2SI{Xmm4, Rax},
 			&MOV{Rax, &DisplacedRegister{Rsp, 8}},
 			&RET{},
@@ -232,7 +239,7 @@ func Test_Execute(t *testing.T) {
 		fmt.Println(b)
 		value := b.Execute()
 		if value != uint(5) {
-			t.Error("Expecting 123 got", value, "in", unit)
+			t.Error("Expecting 5 got", value, "in", unit)
 		}
 	}
 

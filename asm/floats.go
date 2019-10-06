@@ -1,6 +1,10 @@
 package asm
 
-import "fmt"
+import (
+	"bytes"
+	"encoding/binary"
+	"fmt"
+)
 
 type Float32 float32
 type Float64 float64
@@ -51,7 +55,9 @@ func (f Float32) String() string {
 	return fmt.Sprintf("$%f", f)
 }
 func (f Float32) Encode() []uint8 {
-	return []uint8{}
+	buf := new(bytes.Buffer)
+	binary.Write(buf, binary.LittleEndian, float32(f))
+	return buf.Bytes()
 }
 
 func (f Float64) Type() Type {
@@ -61,5 +67,7 @@ func (f Float64) String() string {
 	return fmt.Sprintf("$%f", f)
 }
 func (f Float64) Encode() []uint8 {
-	return []uint8{}
+	buf := new(bytes.Buffer)
+	binary.Write(buf, binary.LittleEndian, float64(f))
+	return buf.Bytes()
 }
