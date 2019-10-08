@@ -1,4 +1,4 @@
-package ir
+package shared
 
 type TypeNr int
 

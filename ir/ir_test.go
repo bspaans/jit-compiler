@@ -3,6 +3,9 @@ package ir
 import (
 	"fmt"
 	"testing"
+
+	. "github.com/bspaans/jit/ir/expr"
+	. "github.com/bspaans/jit/ir/shared"
 )
 
 var ShouldRun = [][]IR{

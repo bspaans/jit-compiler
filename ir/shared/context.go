@@ -1,4 +1,4 @@
-package ir
+package shared
 
 import "github.com/bspaans/jit/asm"
 
