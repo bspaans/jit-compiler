@@ -125,3 +125,36 @@ func (i *MOVQ) Encode() (MachineCode, error) {
 func (i *MOVQ) String() string {
 	return "movq " + i.Source.String() + ", " + i.Dest.String()
 }
+
+type MOVSD struct {
+	Source Operand
+	Dest   Operand
+}
+
+func (i *MOVSD) Encode() (MachineCode, error) {
+	if i.Dest == nil {
+		return nil, errors.New("Missing dest")
+	}
+	if i.Source == nil {
+		return nil, errors.New("Missing source")
+	}
+	if i.Source.Type() == T_Register {
+		src := i.Source.(*Register)
+		if i.Dest.Type() == T_Register {
+			dest := i.Dest.(*Register)
+			if dest.Size == QUADDOUBLE {
+				if src.Size == QUADDOUBLE {
+					result := []uint8{0xf2, 0x0f, 0x10}
+					modrm := NewModRM(DirectRegisterMode, src.Encode(), dest.Encode())
+					result = append(result, modrm.Encode())
+					return result, nil
+
+				}
+			}
+		}
+	}
+	return nil, errors.New("Unsupported movq operation: " + i.String())
+}
+func (i *MOVSD) String() string {
+	return "movsd " + i.Source.String() + ", " + i.Dest.String()
+}

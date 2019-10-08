@@ -24,6 +24,7 @@ const (
 	Variable  IRExpressionType = iota
 	Equals    IRExpressionType = iota
 	Syscall   IRExpressionType = iota
+	Cast      IRExpressionType = iota
 )
 
 type BaseIRExpression struct {

@@ -12,6 +12,7 @@ const (
 
 type Type interface {
 	Type() TypeNr
+	String() string
 }
 
 type BaseType struct {
@@ -20,6 +21,15 @@ type BaseType struct {
 
 func (b *BaseType) Type() TypeNr {
 	return b.TypeNr
+}
+
+func (b *BaseType) String() string {
+	return map[TypeNr]string{
+		T_Uint8:   "uint8",
+		T_Uint64:  "uint64",
+		T_Float64: "float64",
+		T_Bool:    "bool",
+	}[b.TypeNr]
 }
 
 var (
@@ -36,4 +46,7 @@ type TArray struct {
 
 func (t *TArray) Type() TypeNr {
 	return T_Array
+}
+func (b *TArray) String() string {
+	return "[" + b.ItemType.String() + "]"
 }
