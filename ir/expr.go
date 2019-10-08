@@ -106,7 +106,13 @@ func (i *IR_Float64) String() string {
 }
 
 func (i *IR_Float64) Encode(ctx *IR_Context, target *asm.Register) ([]asm.Instruction, error) {
-	result := []asm.Instruction{&asm.MOV{asm.Float64(i.Value), target}}
+	tmp := ctx.AllocateRegister()
+	defer ctx.DeallocateRegister(tmp)
+	tmpReg := asm.Get64BitRegisterByIndex(tmp)
+
+	result := []asm.Instruction{
+		&asm.MOV{asm.Float64(i.Value), tmpReg},
+		&asm.MOVQ{tmpReg, target}}
 	ctx.AddInstructions(result)
 	return result, nil
 }

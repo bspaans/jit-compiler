@@ -33,13 +33,25 @@ func NewIR_Assignment(variable string, expr IRExpression) *IR_Assignment {
 
 // Allocates a new register and assigns it the value of the expression.
 func (i *IR_Assignment) Encode(ctx *IR_Context) ([]asm.Instruction, error) {
+	returnType := i.Expr.ReturnType(ctx)
 	r, found := ctx.VariableMap[i.Variable]
 	if !found {
-		r = ctx.AllocateRegister()
-		ctx.VariableMap[i.Variable] = r
-		ctx.VariableTypes[i.Variable] = i.Expr.ReturnType(ctx)
+		if returnType == TFloat64 {
+			r = ctx.AllocateFloatRegister()
+			ctx.VariableMap[i.Variable] = r
+			ctx.VariableTypes[i.Variable] = returnType
+		} else {
+			r = ctx.AllocateRegister()
+			ctx.VariableMap[i.Variable] = r
+			ctx.VariableTypes[i.Variable] = returnType
+		}
 	}
-	reg := asm.Get64BitRegisterByIndex(r)
+	var reg *asm.Register
+	if returnType == TFloat64 {
+		reg = asm.GetFloatingPointRegisterByIndex(r)
+	} else {
+		reg = asm.Get64BitRegisterByIndex(r)
+	}
 	return i.Expr.Encode(ctx, reg)
 }
 
@@ -68,8 +80,7 @@ func NewIR_If(condition IRExpression, stmt1, stmt2 IR) *IR_If {
 }
 
 func (i *IR_If) Encode(ctx *IR_Context) ([]asm.Instruction, error) {
-	// TODO: introduce return type function
-	if i.Condition.Type() == Bool || i.Condition.Type() == Equals {
+	if i.Condition.ReturnType(ctx) == TBool {
 		r := ctx.AllocateRegister()
 		defer ctx.DeallocateRegister(r)
 		reg := asm.Get64BitRegisterByIndex(r)

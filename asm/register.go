@@ -41,6 +41,15 @@ func Get64BitRegisterByIndex(ix uint8) *Register {
 	return nil
 }
 
+func GetFloatingPointRegisterByIndex(ix uint8) *Register {
+	for _, reg := range RegistersSSE {
+		if reg.Register == ix {
+			return reg
+		}
+	}
+	return nil
+}
+
 var Registers64 []*Register = []*Register{
 	Rax, Rcx, Rdx, Rbx, Rsp, Rbp, Rsi, Rdi,
 	R8, R9, R10, R11, R12, R13, R14, R15,
@@ -56,6 +65,11 @@ var Registers16 []*Register = []*Register{
 var Registers8 []*Register = []*Register{
 	Al, Cl, Dl, Bl, Spl, Bpl, Sil, Dil,
 	R8b, R9b, R10b, R11b, R12b, R13b, R14b, R15b,
+}
+
+var RegistersSSE []*Register = []*Register{
+	Xmm0, Xmm1, Xmm2, Xmm3, Xmm4, Xmm5, Xmm6, Xmm7,
+	Xmm8, Xmm9, Xmm10, Xmm11, Xmm11, Xmm12, Xmm13, Xmm14, Xmm15,
 }
 
 var (

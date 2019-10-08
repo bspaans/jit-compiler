@@ -103,6 +103,7 @@ func CompileIR(stmts []IR) ([]asm.Instruction, error) {
 
 func init() {
 	i := []IR{
+		NewIR_Assignment("q", NewIR_Float64(3.1415)),
 		NewIR_Assignment("i", NewIR_Uint64(0)),
 		NewIR_While(NewIR_Not(NewIR_Equals(NewIR_Variable("i"), NewIR_Uint64(5))), NewIR_AndThen(
 			NewIR_Assignment("g", NewIR_LinuxWrite(NewIR_Uint64(uint64(1)), []uint8("howdy\n"), 6)),
