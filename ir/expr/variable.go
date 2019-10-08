@@ -26,7 +26,12 @@ func (i *IR_Variable) String() string {
 }
 
 func (i *IR_Variable) Encode(ctx *IR_Context, target *asm.Register) ([]asm.Instruction, error) {
-	reg := asm.Get64BitRegisterByIndex(ctx.VariableMap[i.Value])
+	var reg *asm.Register
+	if i.ReturnType(ctx) == TFloat64 {
+		reg = asm.GetFloatingPointRegisterByIndex(ctx.VariableMap[i.Value])
+	} else {
+		reg = asm.Get64BitRegisterByIndex(ctx.VariableMap[i.Value])
+	}
 	result := []asm.Instruction{&asm.MOV{reg, target}}
 	ctx.AddInstructions(result)
 	return result, nil

@@ -23,36 +23,75 @@ func NewIR_Add(op1, op2 IRExpression) *IR_Add {
 }
 
 func (i *IR_Add) ReturnType(ctx *IR_Context) Type {
-	return TUint64
+	return i.Op1.ReturnType(ctx)
 }
 
 func (i *IR_Add) Encode(ctx *IR_Context, target *asm.Register) ([]asm.Instruction, error) {
 	result := []asm.Instruction{}
-	if i.Op1.Type() == Variable {
-		variable := i.Op1.(*IR_Variable).Value
-		reg := asm.Get64BitRegisterByIndex(ctx.VariableMap[variable])
-		result = append(result, &asm.MOV{reg, target})
-	} else if i.Op1.Type() == Uint64 {
-		value := i.Op1.(*IR_Uint64).Value
-		result = append(result, &asm.MOV{asm.Uint64(value), target})
-	} else {
-		return nil, errors.New("Unsupported add IR operation")
-	}
+	if i.Op1.ReturnType(ctx) == TUint64 && i.Op2.ReturnType(ctx) == TUint64 {
+		expr, err := i.Op1.Encode(ctx, target)
+		if err != nil {
+			return nil, err
+		}
+		for _, code := range expr {
+			result = append(result, code)
+		}
 
-	if i.Op2.Type() == Variable {
-		variable := i.Op2.(*IR_Variable).Value
-		reg := asm.Get64BitRegisterByIndex(ctx.VariableMap[variable])
-		result = append(result, &asm.ADD{reg, target})
-	} else if i.Op2.Type() == Uint64 {
-		value := i.Op2.(*IR_Uint64).Value
-		reg := asm.Get64BitRegisterByIndex(ctx.AllocateRegister())
-		result = append(result, &asm.MOV{asm.Uint64(value), reg})
-		result = append(result, &asm.ADD{reg, target})
-		ctx.DeallocateRegister(reg.Register)
+		if i.Op2.Type() == Variable {
+			variable := i.Op2.(*IR_Variable).Value
+			reg := asm.Get64BitRegisterByIndex(ctx.VariableMap[variable])
+			add := &asm.ADD{reg, target}
+			ctx.AddInstruction(add)
+			result = append(result, add)
+		} else {
+			reg := asm.Get64BitRegisterByIndex(ctx.AllocateRegister())
+			defer ctx.DeallocateRegister(reg.Register)
+
+			expr, err := i.Op2.Encode(ctx, reg)
+			if err != nil {
+				return nil, err
+			}
+			for _, code := range expr {
+				result = append(result, code)
+			}
+			add := &asm.ADD{reg, target}
+			ctx.AddInstruction(add)
+			result = append(result, add)
+		}
+	} else if i.Op1.ReturnType(ctx) == TFloat64 && i.Op2.ReturnType(ctx) == TFloat64 {
+		expr, err := i.Op1.Encode(ctx, target)
+		if err != nil {
+			return nil, err
+		}
+		for _, code := range expr {
+			result = append(result, code)
+		}
+
+		if i.Op2.Type() == Variable {
+			variable := i.Op2.(*IR_Variable).Value
+			reg := asm.GetFloatingPointRegisterByIndex(ctx.VariableMap[variable])
+			addsd := &asm.ADDSD{reg, target}
+			ctx.AddInstruction(addsd)
+			result = append(result, addsd)
+		} else {
+			tmp := ctx.AllocateFloatRegister()
+			defer ctx.DeallocateRegister(tmp)
+			tmpReg := asm.GetFloatingPointRegisterByIndex(tmp)
+
+			expr, err := i.Op2.Encode(ctx, tmpReg)
+			if err != nil {
+				return nil, err
+			}
+			for _, code := range expr {
+				result = append(result, code)
+			}
+			addsd := &asm.ADDSD{tmpReg, target}
+			ctx.AddInstruction(addsd)
+			result = append(result, addsd)
+		}
 	} else {
-		return nil, errors.New("Unsupported add IR operation")
+		return nil, errors.New("Unsupported types in add IR operation" + i.String())
 	}
-	ctx.AddInstructions(result)
 	return result, nil
 }
 
