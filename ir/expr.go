@@ -10,6 +10,7 @@ import (
 type IRExpressionType int
 type IRExpression interface {
 	Type() IRExpressionType
+	ReturnType(ctx *IR_Context) Type
 	AddToDataSection(ctx *IR_Context)
 	Encode(ctx *IR_Context, target *asm.Register) ([]asm.Instruction, error)
 	String() string
@@ -17,6 +18,7 @@ type IRExpression interface {
 
 const (
 	Uint64    IRExpressionType = iota
+	Float64   IRExpressionType = iota
 	ByteArray IRExpressionType = iota
 	Bool      IRExpressionType = iota
 	Not       IRExpressionType = iota
@@ -69,12 +71,42 @@ func NewIR_Uint64(v uint64) *IR_Uint64 {
 	}
 }
 
+func (i *IR_Uint64) ReturnType(ctx *IR_Context) Type {
+	return TUint64
+}
+
 func (i *IR_Uint64) String() string {
 	return fmt.Sprintf("%d", i.Value)
 }
 
 func (i *IR_Uint64) Encode(ctx *IR_Context, target *asm.Register) ([]asm.Instruction, error) {
 	result := []asm.Instruction{&asm.MOV{asm.Uint64(i.Value), target}}
+	ctx.AddInstructions(result)
+	return result, nil
+}
+
+type IR_Float64 struct {
+	*BaseIRExpression
+	Value float64
+}
+
+func NewIR_Float64(v float64) *IR_Float64 {
+	return &IR_Float64{
+		BaseIRExpression: NewBaseIRExpression(Float64),
+		Value:            v,
+	}
+}
+
+func (i *IR_Float64) ReturnType(ctx *IR_Context) Type {
+	return TFloat64
+}
+
+func (i *IR_Float64) String() string {
+	return fmt.Sprintf("%f", i.Value)
+}
+
+func (i *IR_Float64) Encode(ctx *IR_Context, target *asm.Register) ([]asm.Instruction, error) {
+	result := []asm.Instruction{&asm.MOV{asm.Float64(i.Value), target}}
 	ctx.AddInstructions(result)
 	return result, nil
 }
@@ -89,6 +121,10 @@ func NewIR_Bool(v bool) *IR_Bool {
 		BaseIRExpression: NewBaseIRExpression(Bool),
 		Value:            v,
 	}
+}
+
+func (i *IR_Bool) ReturnType(ctx *IR_Context) Type {
+	return TBool
 }
 
 func (i *IR_Bool) String() string {
@@ -117,6 +153,10 @@ func NewIR_Variable(v string) *IR_Variable {
 	}
 }
 
+func (i *IR_Variable) ReturnType(ctx *IR_Context) Type {
+	return ctx.VariableTypes[i.Value]
+}
+
 func (i *IR_Variable) String() string {
 	return i.Value
 }
@@ -140,6 +180,10 @@ func NewIR_Add(op1, op2 IRExpression) *IR_Add {
 		Op1:              op1,
 		Op2:              op2,
 	}
+}
+
+func (i *IR_Add) ReturnType(ctx *IR_Context) Type {
+	return TUint64
 }
 
 func (i *IR_Add) Encode(ctx *IR_Context, target *asm.Register) ([]asm.Instruction, error) {
@@ -188,6 +232,10 @@ func NewIR_Equals(op1, op2 IRExpression) *IR_Equals {
 		Op1:              op1,
 		Op2:              op2,
 	}
+}
+
+func (i *IR_Equals) ReturnType(ctx *IR_Context) Type {
+	return TBool
 }
 
 func (i *IR_Equals) Encode(ctx *IR_Context, target *asm.Register) ([]asm.Instruction, error) {
@@ -241,6 +289,10 @@ func NewIR_Not(op1 IRExpression) *IR_Not {
 		BaseIRExpression: NewBaseIRExpression(Not),
 		Op1:              op1,
 	}
+}
+
+func (i *IR_Not) ReturnType(ctx *IR_Context) Type {
+	return TBool
 }
 
 func (i *IR_Not) Encode(ctx *IR_Context, target *asm.Register) ([]asm.Instruction, error) {
@@ -298,6 +350,10 @@ func NewIR_ByteArray(value []uint8) *IR_ByteArray {
 	}
 }
 
+func (i *IR_ByteArray) ReturnType(ctx *IR_Context) Type {
+	return &TArray{TUint8, len(i.Value)}
+}
+
 func (i *IR_ByteArray) String() string {
 	return fmt.Sprintf("%v", i.Value)
 }
@@ -328,6 +384,9 @@ func NewIR_Syscall(syscall_nr uint, args []IRExpression) *IR_Syscall {
 		Syscall: syscall_nr,
 		Args:    args,
 	}
+}
+func (i *IR_Syscall) ReturnType(ctx *IR_Context) Type {
+	return TUint64
 }
 
 func (i *IR_Syscall) String() string {

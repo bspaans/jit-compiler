@@ -6,6 +6,7 @@ type IR_Context struct {
 	Registers          []bool
 	RegistersAllocated uint8
 	VariableMap        map[string]uint8
+	VariableTypes      map[string]Type
 	DataSection        []uint8
 	InstructionPointer uint
 	DataSectionOffset  int
@@ -19,6 +20,7 @@ func NewIRContext() *IR_Context {
 		Registers:          make([]bool, 16),
 		RegistersAllocated: 0,
 		VariableMap:        map[string]uint8{},
+		VariableTypes:      map[string]Type{},
 		DataSection:        []uint8{},
 		DataSectionOffset:  2,
 		InstructionPointer: 2,

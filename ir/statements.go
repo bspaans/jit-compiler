@@ -37,6 +37,7 @@ func (i *IR_Assignment) Encode(ctx *IR_Context) ([]asm.Instruction, error) {
 	if !found {
 		r = ctx.AllocateRegister()
 		ctx.VariableMap[i.Variable] = r
+		ctx.VariableTypes[i.Variable] = i.Expr.ReturnType(ctx)
 	}
 	reg := asm.Get64BitRegisterByIndex(r)
 	return i.Expr.Encode(ctx, reg)
