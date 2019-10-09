@@ -46,7 +46,9 @@ func (i *IR_Function) Encode(ctx *IR_Context, target *asm.Register) ([]asm.Instr
 func (b *IR_Function) encodeFunction(ctx *IR_Context) ([]uint8, error) {
 
 	targets := []*asm.Register{asm.Rdi, asm.Rsi, asm.Rdx, asm.R10, asm.R8, asm.R9}
+	returnTarget := asm.Rax
 	registers := make([]bool, 16)
+	registers[returnTarget.Register] = true
 	variableMap := map[string]*asm.Register{}
 	variableTypes := map[string]Type{}
 	for i, arg := range b.Signature.Args {
@@ -60,19 +62,28 @@ func (b *IR_Function) encodeFunction(ctx *IR_Context) ([]uint8, error) {
 	}
 
 	ctx_ := ctx.Copy()
+	ctx_.PushReturnOperand(returnTarget)
 	ctx_.Commit = false
 	ctx_.Registers = registers
-	ctx_.RegistersAllocated = uint8(len(b.Signature.Args))
+	ctx_.RegistersAllocated = uint8(len(b.Signature.Args) + 1)
 	ctx_.VariableMap = variableMap
 	ctx_.VariableTypes = variableTypes
 	instr, err := b.Body.Encode(ctx_)
 	if err != nil {
 		return nil, err
 	}
+	//result := []uint8{}
+	for _, instr := range instr {
+		fmt.Println(instr)
+	}
 	return asm.Instructions(instr).Encode()
 }
 
 func (b *IR_Function) AddToDataSection(ctx *IR_Context) error {
+	if err := b.Body.AddToDataSection(ctx); err != nil {
+		return err
+	}
+
 	code, err := b.encodeFunction(ctx)
 	if err != nil {
 		return err

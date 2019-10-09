@@ -21,12 +21,15 @@ func NewIR_Return(expr IRExpression) *IR_Return {
 }
 
 func (i *IR_Return) Encode(ctx *IR_Context) ([]asm.Instruction, error) {
-	result, err := i.Expr.Encode(ctx, asm.Rax)
+	reg := ctx.AllocateRegister(i.Expr.ReturnType(ctx))
+	defer ctx.DeallocateRegister(reg)
+	result, err := i.Expr.Encode(ctx, reg)
 	if err != nil {
 		return nil, err
 	}
+	target := ctx.PeekReturn()
 	instr := []asm.Instruction{
-		&asm.MOV{asm.Rax, &asm.DisplacedRegister{asm.Rsp, 8}},
+		&asm.MOV{reg, target},
 		&asm.RET{},
 	}
 	for _, inst := range instr {

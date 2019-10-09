@@ -19,7 +19,7 @@ func Compile(stmts []IR) (asm.MachineCode, error) {
 			return nil, err
 		}
 		if len(ctx.DataSection) != currentOffset-2 {
-			fmt.Printf("0x%x: %s\n", currentOffset, stmt.String())
+			fmt.Printf("0x%x-0x%x: %s\n", currentOffset, len(ctx.DataSection), stmt.String())
 			fmt.Println(asm.MachineCode(ctx.DataSection[currentOffset-ctx.DataSectionOffset : len(ctx.DataSection)-1]))
 		}
 	}
@@ -83,7 +83,9 @@ func init() {
 				NewIR_Assignment("b", NewIR_Float64(3.0)),
 				NewIR_AndThen(
 					NewIR_Assignment("c", NewIR_Cast(NewIR_Variable("a"), TFloat64)),
-					NewIR_Assignment("d", NewIR_Mul(NewIR_Variable("b"), NewIR_Variable("c"))),
+					NewIR_AndThen(
+						NewIR_Assignment("d", NewIR_Mul(NewIR_Variable("b"), NewIR_Variable("c"))),
+						NewIR_Return(NewIR_Cast(NewIR_Variable("d"), TUint64))),
 				)),
 		)),
 		NewIR_Assignment("g", NewIR_Uint64(2)),

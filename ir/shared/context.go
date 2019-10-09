@@ -1,6 +1,10 @@
 package shared
 
-import "github.com/bspaans/jit/asm"
+import (
+	"fmt"
+
+	"github.com/bspaans/jit/asm"
+)
 
 type IR_Context struct {
 	Registers               []bool
@@ -9,6 +13,7 @@ type IR_Context struct {
 	FloatRegistersAllocated uint8
 	VariableMap             map[string]*asm.Register
 	VariableTypes           map[string]Type
+	ReturnOperandStack      []asm.Operand
 	DataSection             []uint8
 	InstructionPointer      uint
 	DataSectionOffset       int
@@ -25,6 +30,7 @@ func NewIRContext() *IR_Context {
 		FloatRegistersAllocated: 0,
 		VariableMap:             map[string]*asm.Register{},
 		VariableTypes:           map[string]Type{},
+		ReturnOperandStack:      []asm.Operand{&asm.DisplacedRegister{asm.Rsp, 8}},
 		DataSection:             []uint8{},
 		DataSectionOffset:       2,
 		InstructionPointer:      2,
@@ -36,6 +42,22 @@ func NewIRContext() *IR_Context {
 	ctx.Registers[4] = true
 	ctx.RegistersAllocated = 1
 	return ctx
+}
+
+func (i *IR_Context) PushReturnOperand(op asm.Operand) {
+	i.ReturnOperandStack = append(i.ReturnOperandStack, op)
+	fmt.Println(i.ReturnOperandStack)
+}
+func (i *IR_Context) PeekReturn() asm.Operand {
+	return i.ReturnOperandStack[len(i.ReturnOperandStack)-1]
+}
+
+func (i *IR_Context) PopReturn() asm.Operand {
+	fmt.Println(i.ReturnOperandStack)
+	op := i.ReturnOperandStack[len(i.ReturnOperandStack)-1]
+	i.ReturnOperandStack = i.ReturnOperandStack[:len(i.ReturnOperandStack)-1]
+	fmt.Println(i.ReturnOperandStack)
+	return op
 }
 
 func (i *IR_Context) Copy() *IR_Context {
@@ -61,6 +83,10 @@ func (i *IR_Context) Copy() *IR_Context {
 	for _, d := range i.instructions {
 		instructions = append(instructions, d)
 	}
+	returns := []asm.Operand{}
+	for _, d := range i.ReturnOperandStack {
+		returns = append(returns, d)
+	}
 	return &IR_Context{
 		Registers:               regs,
 		RegistersAllocated:      i.RegistersAllocated,
@@ -68,6 +94,7 @@ func (i *IR_Context) Copy() *IR_Context {
 		FloatRegistersAllocated: i.FloatRegistersAllocated,
 		VariableMap:             variableMap,
 		VariableTypes:           variableTypes,
+		ReturnOperandStack:      returns,
 		DataSection:             ds,
 		DataSectionOffset:       i.DataSectionOffset,
 		InstructionPointer:      i.InstructionPointer,
