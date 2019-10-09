@@ -1,7 +1,11 @@
 package main
 
-import "github.com/bspaans/jit/ir"
+import (
+	"github.com/bspaans/jit/ir"
+	"github.com/bspaans/jit/ir/statements"
+)
 
 func main() {
-	_ = []ir.IR{}
+	stmt := []statements.IR{}
+	ir.CompileIR(stmt)
 }

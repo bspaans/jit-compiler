@@ -64,6 +64,7 @@ there is no allocating on the stack or heap yet.
 In the higher level language the following constructs work:
 
 * Unsigned 64bit integers
+* 64bit floating point numbers
 * Booleans
 * Immutable byte arrays
 * Assigning to variables
@@ -73,13 +74,13 @@ In the higher level language the following constructs work:
 * NOT logic expression
 * Syscalls
 * Return
+* Int arithmetic `(+, -)`
+* Float arithmetic `(+, -, *, /)`
 
-I know, it's a bit much.
+I know, it's a bit much. Goodbye, Haskell.
 
 ## Next steps
 
-* Adding float support (supported in asm, not in IR)
-* Adding more arithmetic 
 * SIMD support 
 * Ability to define and call functions
 * Some sort of array (possibly only static size)
