@@ -39,6 +39,7 @@ func (i *IR_ByteArray) Encode(ctx *IR_Context, target *asm.Register) ([]asm.Inst
 	return result, nil
 }
 
-func (b *IR_ByteArray) AddToDataSection(ctx *IR_Context) {
+func (b *IR_ByteArray) AddToDataSection(ctx *IR_Context) error {
 	b.address = ctx.AddToDataSection(b.Value)
+	return nil
 }

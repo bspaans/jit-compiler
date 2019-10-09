@@ -76,8 +76,15 @@ func (i *IR_If) String() string {
 	return fmt.Sprintf("if %s; then %s; else %s;", i.Condition.String(), i.Stmt1.String(), i.Stmt2.String())
 }
 
-func (i *IR_If) AddToDataSection(ctx *IR_Context) {
-	i.Condition.AddToDataSection(ctx)
-	i.Stmt1.AddToDataSection(ctx)
-	i.Stmt2.AddToDataSection(ctx)
+func (i *IR_If) AddToDataSection(ctx *IR_Context) error {
+	if err := i.Condition.AddToDataSection(ctx); err != nil {
+		return err
+	}
+	if err := i.Stmt1.AddToDataSection(ctx); err != nil {
+		return err
+	}
+	if err := i.Stmt2.AddToDataSection(ctx); err != nil {
+		return err
+	}
+	return nil
 }

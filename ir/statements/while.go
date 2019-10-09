@@ -64,7 +64,12 @@ func (i *IR_While) String() string {
 	return fmt.Sprintf("while %s { %s }", i.Condition.String(), i.Stmt.String())
 }
 
-func (i *IR_While) AddToDataSection(ctx *IR_Context) {
-	i.Condition.AddToDataSection(ctx)
-	i.Stmt.AddToDataSection(ctx)
+func (i *IR_While) AddToDataSection(ctx *IR_Context) error {
+	if err := i.Condition.AddToDataSection(ctx); err != nil {
+		return err
+	}
+	if err := i.Stmt.AddToDataSection(ctx); err != nil {
+		return err
+	}
+	return nil
 }

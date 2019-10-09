@@ -9,7 +9,7 @@ type IRExpressionType int
 type IRExpression interface {
 	Type() IRExpressionType
 	ReturnType(ctx *IR_Context) Type
-	AddToDataSection(ctx *IR_Context)
+	AddToDataSection(ctx *IR_Context) error
 	Encode(ctx *IR_Context, target *asm.Register) ([]asm.Instruction, error)
 	String() string
 }
@@ -25,6 +25,7 @@ const (
 	Equals    IRExpressionType = iota
 	Syscall   IRExpressionType = iota
 	Cast      IRExpressionType = iota
+	Function  IRExpressionType = iota
 )
 
 type BaseIRExpression struct {
@@ -40,7 +41,9 @@ func NewBaseIRExpression(typ IRExpressionType) *BaseIRExpression {
 func (b *BaseIRExpression) Type() IRExpressionType {
 	return b.typ
 }
-func (b *BaseIRExpression) AddToDataSection(ctx *IR_Context) {}
+func (b *BaseIRExpression) AddToDataSection(ctx *IR_Context) error {
+	return nil
+}
 
 func IREXpression_length(expr IRExpression, ctx *IR_Context, target *asm.Register) (int, error) {
 	commit := ctx.Commit

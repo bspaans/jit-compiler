@@ -57,6 +57,7 @@ func (b *TArray) String() string {
 type TFunction struct {
 	ReturnType Type
 	Args       []Type
+	ArgNames   []string
 }
 
 func (t *TFunction) Type() TypeNr {

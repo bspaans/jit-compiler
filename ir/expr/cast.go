@@ -32,6 +32,9 @@ func (i *IR_Cast) String() string {
 func (i *IR_Cast) Encode(ctx *IR_Context, target *asm.Register) ([]asm.Instruction, error) {
 	result := []asm.Instruction{}
 	valueType := i.Value.ReturnType(ctx)
+	if valueType == nil {
+		return nil, fmt.Errorf("nil return type in %s", i.Value.String())
+	}
 	if i.CastToType == TUint64 {
 		if valueType == TUint64 {
 			return i.Value.Encode(ctx, target)
@@ -50,7 +53,7 @@ func (i *IR_Cast) Encode(ctx *IR_Context, target *asm.Register) ([]asm.Instructi
 			ctx.AddInstruction(cvt)
 			result = append(result, cvt)
 		} else {
-			return nil, fmt.Errorf("Unsupport cast operation: " + i.String())
+			return nil, fmt.Errorf("Unsupport cast operation %s,(%s) in: %s", valueType.String(), i.CastToType.String(), i.String())
 		}
 	} else if i.CastToType == TFloat64 {
 		if valueType == TFloat64 {
@@ -70,10 +73,13 @@ func (i *IR_Cast) Encode(ctx *IR_Context, target *asm.Register) ([]asm.Instructi
 			ctx.AddInstruction(cvt)
 			result = append(result, cvt)
 		} else {
-			return nil, fmt.Errorf("Unsupport cast operation: " + i.String())
+			return nil, fmt.Errorf("Unsupport cast operation %s,(%s) in: %s",
+				valueType.String(),
+				i.CastToType.String(),
+				i.String())
 		}
 	} else {
-		return nil, fmt.Errorf("Unsupport cast operation: " + i.String())
+		return nil, fmt.Errorf("Unsupport cast operation %s,(%s) in: %s", valueType.String(), i.CastToType.String(), i.String())
 	}
 	return result, nil
 }

@@ -40,6 +40,6 @@ func (i *IR_Return) String() string {
 	return fmt.Sprintf("return %s", i.Expr.String())
 }
 
-func (i *IR_Return) AddToDataSection(ctx *IR_Context) {
-	i.Expr.AddToDataSection(ctx)
+func (i *IR_Return) AddToDataSection(ctx *IR_Context) error {
+	return i.Expr.AddToDataSection(ctx)
 }

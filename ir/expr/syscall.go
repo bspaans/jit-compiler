@@ -80,10 +80,13 @@ func (i *IR_Syscall) Encode(ctx *IR_Context, target *asm.Register) ([]asm.Instru
 	return result, nil
 }
 
-func (b *IR_Syscall) AddToDataSection(ctx *IR_Context) {
+func (b *IR_Syscall) AddToDataSection(ctx *IR_Context) error {
 	for _, arg := range b.Args {
-		arg.AddToDataSection(ctx)
+		if err := arg.AddToDataSection(ctx); err != nil {
+			return err
+		}
 	}
+	return nil
 }
 
 type IR_Syscall_Linux uint

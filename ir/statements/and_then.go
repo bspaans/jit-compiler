@@ -40,7 +40,12 @@ func (i *IR_AndThen) String() string {
 	return fmt.Sprintf("%s ; %s", i.Stmt1.String(), i.Stmt2.String())
 }
 
-func (i *IR_AndThen) AddToDataSection(ctx *IR_Context) {
-	i.Stmt1.AddToDataSection(ctx)
-	i.Stmt2.AddToDataSection(ctx)
+func (i *IR_AndThen) AddToDataSection(ctx *IR_Context) error {
+	if err := i.Stmt1.AddToDataSection(ctx); err != nil {
+		return err
+	}
+	if err := i.Stmt2.AddToDataSection(ctx); err != nil {
+		return err
+	}
+	return nil
 }

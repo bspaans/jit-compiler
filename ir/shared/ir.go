@@ -1,8 +1,7 @@
-package statements
+package shared
 
 import (
 	"github.com/bspaans/jit/asm"
-	. "github.com/bspaans/jit/ir/shared"
 )
 
 type IRType int
@@ -18,7 +17,7 @@ const (
 type IR interface {
 	Type() IRType
 	String() string
-	AddToDataSection(ctx *IR_Context)
+	AddToDataSection(ctx *IR_Context) error
 	Encode(*IR_Context) ([]asm.Instruction, error)
 }
 
@@ -34,7 +33,9 @@ func NewBaseIR(typ IRType) *BaseIR {
 func (b *BaseIR) Type() IRType {
 	return b.typ
 }
-func (b *BaseIR) AddToDataSection(ctx *IR_Context) {}
+func (b *BaseIR) AddToDataSection(ctx *IR_Context) error {
+	return nil
+}
 
 func IR_Length(stmt IR, ctx *IR_Context) (int, error) {
 	commit := ctx.Commit

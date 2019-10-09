@@ -1,0 +1,92 @@
+0x0: mov $0, %rax
+  48 b8 00 00 00 00 00 00 
+  00 00
+0xa: mov $0, %rcx
+  48 b9 00 00 00 00 00 00 
+  00 00
+0x14: mov $0, %rdx
+  48 ba 00 00 00 00 00 00 
+  00 00
+0x1e: mov $0, %rbx
+  48 bb 00 00 00 00 00 00 
+  00 00
+0x28: mov $0, %rbp
+  48 bd 00 00 00 00 00 00 
+  00 00
+0x32: mov $0, %rsi
+  48 be 00 00 00 00 00 00 
+  00 00
+0x3c: mov $0, %rdi
+  48 bf 00 00 00 00 00 00 
+  00 00
+0x46: mov $0, 0x8(%rsp)
+  48 c7 44 24 08 00 00 00 
+  00
+0x4f: mov $65535, %rdi
+  48 bf ff ff 00 00 00 00 
+  00 00
+0x59: inc %rax
+  48 ff c0
+0x5c: cmp %rdi %rax
+  48 39 f8
+0x5f: jne $249
+  75 f9
+0x61: cmp %rdi %rax
+  48 39 f8
+0x64: sete %al
+  0f 94 c0
+0x67: mov $123, %rcx
+  48 b9 7b 00 00 00 00 00 
+  00 00
+0x71: add %rcx, %rax
+  48 03 c1
+0x74: add $2, %rax
+  48 81 c0 02 00 00 00
+0x7b: push %rax
+  50
+0x7c: pop %rax
+  58
+0x7d: pushfq
+  9c
+0x7e: pop %rdx
+  5a
+0x7f: mov %rax, 0x8(%rsp)
+  48 89 44 24 08
+0x84: ret
+  c3
+  48 b8 00 00 00 00 00 00 
+  00 00 48 b9 00 00 00 00 
+  00 00 00 00 48 ba 00 00 
+  00 00 00 00 00 00 48 bb 
+  00 00 00 00 00 00 00 00 
+  48 bd 00 00 00 00 00 00 
+  00 00 48 be 00 00 00 00 
+  00 00 00 00 48 bf 00 00 
+  00 00 00 00 00 00 48 c7 
+  44 24 08 00 00 00 00 48 
+  bf ff ff 00 00 00 00 00 
+  00 48 ff c0 48 39 f8 75 
+  f9 48 39 f8 0f 94 c0 48 
+  b9 7b 00 00 00 00 00 00 
+  00 48 03 c1 48 81 c0 02 
+  00 00 00 50 58 9c 5a 48 
+  89 44 24 08 c3
+
+Result : 65406
+Hex    : ff7e
+Size   : 133 bytes
+
+.data:
+0x2: a = func(args) { b = 3.000000 }
+  00 00 00 00 00 00 08 40 
+  66 48 0f 6e
+0x11: q = 2.141500
+panic: runtime error: slice bounds out of range
+
+goroutine 1 [running]:
+github.com/bspaans/jit/ir.Compile(0xc000055ee8, 0x8, 0x8, 0xc0000169a0, 0xe, 0x10, 0xe, 0x52ba80)
+	/home/bspaans/src/prototypes/assembly-synth/ir/ir.go:23 +0x1070
+github.com/bspaans/jit/ir.init.0()
+	/home/bspaans/src/prototypes/assembly-synth/ir/ir.go:95 +0x167c
+exit status 2
+FAIL	github.com/bspaans/jit/ir	0.004s

@@ -38,6 +38,6 @@ func (i *IR_Assignment) String() string {
 	return fmt.Sprintf("%s = %s", i.Variable, i.Expr.String())
 }
 
-func (i *IR_Assignment) AddToDataSection(ctx *IR_Context) {
-	i.Expr.AddToDataSection(ctx)
+func (i *IR_Assignment) AddToDataSection(ctx *IR_Context) error {
+	return i.Expr.AddToDataSection(ctx)
 }

@@ -38,6 +38,44 @@ func NewIRContext() *IR_Context {
 	return ctx
 }
 
+func (i *IR_Context) Copy() *IR_Context {
+	regs := make([]bool, 16)
+	floatRegs := make([]bool, 16)
+	for j := 0; j < 16; j++ {
+		regs[j] = i.Registers[j]
+		floatRegs[j] = i.FloatRegisters[j]
+	}
+	variableMap := map[string]*asm.Register{}
+	for arg, reg := range i.VariableMap {
+		variableMap[arg] = reg
+	}
+	variableTypes := map[string]Type{}
+	for arg, ty := range i.VariableTypes {
+		variableTypes[arg] = ty
+	}
+	ds := []uint8{}
+	for _, d := range i.DataSection {
+		ds = append(ds, d)
+	}
+	instructions := []asm.Instruction{}
+	for _, d := range i.instructions {
+		instructions = append(instructions, d)
+	}
+	return &IR_Context{
+		Registers:               regs,
+		RegistersAllocated:      i.RegistersAllocated,
+		FloatRegisters:          floatRegs,
+		FloatRegistersAllocated: i.FloatRegistersAllocated,
+		VariableMap:             variableMap,
+		VariableTypes:           variableTypes,
+		DataSection:             ds,
+		DataSectionOffset:       i.DataSectionOffset,
+		InstructionPointer:      i.InstructionPointer,
+		Commit:                  i.Commit,
+		instructions:            instructions,
+	}
+}
+
 func (i *IR_Context) AddInstruction(instr asm.Instruction) {
 	if i.Commit {
 		i.instructions = append(i.instructions, instr)
