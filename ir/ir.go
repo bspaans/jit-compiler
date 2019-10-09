@@ -88,7 +88,7 @@ func init() {
 						NewIR_Return(NewIR_Cast(NewIR_Variable("d"), TUint64))),
 				)),
 		)),
-		NewIR_Assignment("g", NewIR_Uint64(2)),
+		NewIR_Assignment("g", NewIR_Call("a", []IRExpression{NewIR_Uint64(3)})),
 		NewIR_Return(NewIR_Variable("g")),
 		/*
 			NewIR_Assignment("q", NewIR_Float64(2.1415)),

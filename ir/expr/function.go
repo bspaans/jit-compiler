@@ -45,6 +45,7 @@ func (i *IR_Function) Encode(ctx *IR_Context, target *asm.Register) ([]asm.Instr
 
 func (b *IR_Function) encodeFunction(ctx *IR_Context) ([]uint8, error) {
 
+	// TODO: restore rbx, rbp, r12-r15
 	targets := []*asm.Register{asm.Rdi, asm.Rsi, asm.Rdx, asm.R10, asm.R8, asm.R9}
 	returnTarget := asm.Rax
 	registers := make([]bool, 16)

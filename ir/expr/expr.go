@@ -26,6 +26,7 @@ const (
 	Syscall   IRExpressionType = iota
 	Cast      IRExpressionType = iota
 	Function  IRExpressionType = iota
+	Call      IRExpressionType = iota
 )
 
 type BaseIRExpression struct {
