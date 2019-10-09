@@ -2,12 +2,12 @@ package asm
 
 import "errors"
 
-type DIVSD struct {
+type DIV struct {
 	Source Operand
 	Dest   Operand
 }
 
-func (i *DIVSD) Encode() (MachineCode, error) {
+func (i *DIV) Encode() (MachineCode, error) {
 	if i.Dest == nil {
 		return nil, errors.New("Missing dest")
 	}
@@ -18,6 +18,7 @@ func (i *DIVSD) Encode() (MachineCode, error) {
 		src := i.Source.(*Register)
 		if i.Dest.Type() == T_Register {
 			dest := i.Dest.(*Register)
+			// divsd
 			if src.Size == QUADDOUBLE && dest.Size == QUADDOUBLE {
 				result := []uint8{0xf2, 0x0f, 0x5e}
 				modrm := NewModRM(DirectRegisterMode, src.Encode(), dest.Encode())
@@ -29,6 +30,6 @@ func (i *DIVSD) Encode() (MachineCode, error) {
 	return nil, errors.New("Unsupported divsd operation")
 }
 
-func (i *DIVSD) String() string {
+func (i *DIV) String() string {
 	return "div " + i.Source.String() + ", " + i.Dest.String()
 }

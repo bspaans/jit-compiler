@@ -54,6 +54,28 @@ func Test_Execute_Result(t *testing.T) {
 		},
 		[]IR{NewIR_Assignment("f", NewIR_Add(NewIR_Uint64(51), NewIR_Uint64(2)))},
 		[]IR{NewIR_Assignment("f", NewIR_Cast(NewIR_Add(NewIR_Float64(51), NewIR_Float64(2)), TUint64))},
+		[]IR{
+			NewIR_Assignment("g", NewIR_Float64(53.343)),
+			NewIR_Assignment("f", NewIR_Cast(NewIR_Variable("g"), TUint64)),
+		},
+		[]IR{
+			NewIR_Assignment("g", NewIR_Float64(26.5)),
+			NewIR_Assignment("h", NewIR_Float64(2.0)),
+			NewIR_Assignment("i", NewIR_Mul(NewIR_Variable("g"), NewIR_Variable("h"))),
+			NewIR_Assignment("f", NewIR_Cast(NewIR_Variable("i"), TUint64)),
+		},
+		[]IR{
+			NewIR_Assignment("g", NewIR_Float64(106)),
+			NewIR_Assignment("h", NewIR_Float64(2.0)),
+			NewIR_Assignment("i", NewIR_Div(NewIR_Variable("g"), NewIR_Variable("h"))),
+			NewIR_Assignment("f", NewIR_Cast(NewIR_Variable("i"), TUint64)),
+		},
+		[]IR{
+			NewIR_Assignment("g", NewIR_Float64(55)),
+			NewIR_Assignment("h", NewIR_Float64(2.0)),
+			NewIR_Assignment("i", NewIR_Sub(NewIR_Variable("g"), NewIR_Variable("h"))),
+			NewIR_Assignment("f", NewIR_Cast(NewIR_Variable("i"), TUint64)),
+		},
 	}
 	for _, ir := range units {
 		i := append(ir, NewIR_Return(NewIR_Variable("f")))

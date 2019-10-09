@@ -14,6 +14,19 @@ func (i *SUB) Encode() (MachineCode, error) {
 	if i.Source == nil {
 		return nil, errors.New("Missing source")
 	}
+	if i.Source.Type() == T_Register {
+		src := i.Source.(*Register)
+		if i.Dest.Type() == T_Register {
+			dest := i.Dest.(*Register)
+			// subsd
+			if src.Size == QUADDOUBLE && dest.Size == QUADDOUBLE {
+				result := []uint8{0xf2, 0x0f, 0x5c}
+				modrm := NewModRM(DirectRegisterMode, src.Encode(), dest.Encode())
+				result = append(result, modrm.Encode())
+				return result, nil
+			}
+		}
+	}
 	if i.Source.Type() == T_Uint32 {
 		src := i.Source.(Uint32)
 		if i.Dest.Type() == T_Register {
@@ -25,36 +38,15 @@ func (i *SUB) Encode() (MachineCode, error) {
 }
 
 func (i *SUB) String() string {
-	return "sub " + i.Source.String() + ", " + i.Dest.String()
-}
-
-type SUBSD struct {
-	Source Operand
-	Dest   Operand
-}
-
-func (i *SUBSD) Encode() (MachineCode, error) {
-	if i.Dest == nil {
-		return nil, errors.New("Missing dest")
-	}
-	if i.Source == nil {
-		return nil, errors.New("Missing source")
-	}
+	cmd := "sub"
 	if i.Source.Type() == T_Register {
 		src := i.Source.(*Register)
 		if i.Dest.Type() == T_Register {
 			dest := i.Dest.(*Register)
 			if src.Size == QUADDOUBLE && dest.Size == QUADDOUBLE {
-				result := []uint8{0xf2, 0x0f, 0x5c}
-				modrm := NewModRM(DirectRegisterMode, src.Encode(), dest.Encode())
-				result = append(result, modrm.Encode())
-				return result, nil
+				cmd = "subsd"
 			}
 		}
 	}
-	return nil, errors.New("Unsupported subsd operation")
-}
-
-func (i *SUBSD) String() string {
-	return "subsd " + i.Source.String() + ", " + i.Dest.String()
+	return cmd + " " + i.Source.String() + ", " + i.Dest.String()
 }

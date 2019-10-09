@@ -51,3 +51,7 @@ func (i *ADD) String() string {
 	}
 	return opcode + " " + i.Source.String() + ", " + i.Dest.String()
 }
+
+func (i *ADD) TwoOperands() (Operand, Operand) {
+	return i.Source, i.Dest
+}

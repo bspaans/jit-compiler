@@ -56,6 +56,12 @@ func (m MachineCode) Execute() uint {
 	fmt.Printf("Size   : %d bytes\n\n", len(m))
 	return value
 }
+func (m MachineCode) Add(m2 MachineCode) MachineCode {
+	for _, code := range m2 {
+		m = append(m, code)
+	}
+	return m
+}
 
 type Instruction interface {
 	Encode() (MachineCode, error)
@@ -76,6 +82,13 @@ func (i Instructions) Encode() (MachineCode, error) {
 		}
 	}
 	return result, nil
+}
+
+func (i Instructions) Add(i2 []Instruction) Instructions {
+	for _, instr := range i2 {
+		i = append(i, instr)
+	}
+	return i
 }
 
 func CompileInstruction(instr []Instruction) (MachineCode, error) {

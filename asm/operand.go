@@ -19,3 +19,11 @@ type Operand interface {
 	Type() Type
 	String() string
 }
+
+type OneOperand interface {
+	GetSingleOperand() Operand
+}
+
+type TwoOperands interface {
+	GetOperands() (Operand, Operand)
+}
