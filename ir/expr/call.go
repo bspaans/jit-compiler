@@ -44,6 +44,7 @@ func (i *IR_Call) String() string {
 func (i *IR_Call) Encode(ctx *IR_Context, target *asm.Register) ([]asm.Instruction, error) {
 
 	// TODO preserve arguments
+	// TODO result, clobbered, err := ABI_Call_Setup(ctx, args, i.ReturnType(ctx))
 	result := []asm.Instruction{}
 	targets := []*asm.Register{asm.Rdi, asm.Rsi, asm.Rdx, asm.R10, asm.R8, asm.R9}
 	for j, arg := range i.Args {
@@ -58,6 +59,7 @@ func (i *IR_Call) Encode(ctx *IR_Context, target *asm.Register) ([]asm.Instructi
 			result = append(result, inst)
 		}
 	}
+	// TODO: variable register could have been clobbered...!
 	function := ctx.VariableMap[i.Function]
 	if function == nil {
 		return nil, fmt.Errorf("Unknown function:" + i.Function)
@@ -69,4 +71,23 @@ func (i *IR_Call) Encode(ctx *IR_Context, target *asm.Register) ([]asm.Instructi
 	result = append(result, call)
 	result = append(result, mov)
 	return result, nil
+}
+
+// Sets up for a CALL or SYSCALL. Returns instructions and clobbered registers
+func ABI_Call_Setup(abi ABI, ctx *IR_Context, args []IRExpression, returnType Type) ([]asm.Instruction, []*asm.Register, error) {
+	argTypes := []Type{}
+	for _, arg := range args {
+		argTypes = append(argTypes, arg.ReturnType(ctx))
+	}
+	result, clobbered := PreserveRegisters(abi, ctx, argTypes, returnType)
+	targets := abi.GetRegistersForArgs(argTypes)
+
+	for i, arg := range args {
+		instr, err := arg.Encode(ctx, targets[i])
+		if err != nil {
+			return nil, clobbered, err
+		}
+		result = result.Add(instr)
+	}
+	return result, clobbered, nil
 }

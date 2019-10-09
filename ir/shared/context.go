@@ -7,6 +7,7 @@ import (
 )
 
 type IR_Context struct {
+	ABI                     ABI
 	Registers               []bool
 	RegistersAllocated      uint8
 	FloatRegisters          []bool
@@ -24,6 +25,7 @@ type IR_Context struct {
 
 func NewIRContext() *IR_Context {
 	ctx := &IR_Context{
+		ABI:                     NewABI_AMDSystemV(),
 		Registers:               make([]bool, 16),
 		RegistersAllocated:      0,
 		FloatRegisters:          make([]bool, 16),

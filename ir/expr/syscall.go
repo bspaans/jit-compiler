@@ -35,6 +35,8 @@ func (i *IR_Syscall) Encode(ctx *IR_Context, target *asm.Register) ([]asm.Instru
 		result = append(result, push)
 		ctx.AddInstruction(push)
 	}
+
+	// TODO result, clobbered, err := ABI_Call_Setup(ctx, args, i.ReturnType(ctx))
 	targets := []*asm.Register{asm.Rdi, asm.Rsi, asm.Rdx, asm.R10, asm.R8, asm.R9}
 	targetRegisterIndices := []uint8{7, 6, 2, 10, 8, 9}
 	clobbered := 0

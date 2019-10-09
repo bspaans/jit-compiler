@@ -50,8 +50,8 @@ Not an awful lot yet:
 * CVTSI2SS, CVTTSD2SI (convert int to and from float)
 * SETE
 * JMP and JMPE
+* CALL and SYSCALL
 * RET 
-* SYSCALL
 
 Immediate values, direct registers, displaced registers and RIP relative
 addressing are mostly supported, but not every opcode will be able to handle
@@ -70,6 +70,7 @@ In the higher level language the following constructs work:
 * Assigning to variables
 * If statements
 * While loops
+* Defining and calling functions
 * Equals
 * NOT logic expression
 * Syscalls
@@ -81,8 +82,8 @@ I know, it's a bit much. Goodbye, Haskell.
 
 ## Next steps
 
+* Making sure CALL and SYSCALL adhere to the platform's ABI
 * SIMD support 
-* Ability to define and call functions
 * Some sort of array (possibly only static size)
 * Possibly a higher level language that compiles down into the IR
 * A parser

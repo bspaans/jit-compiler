@@ -69,7 +69,7 @@ func (i *IR_Cast) Encode(ctx *IR_Context, target *asm.Register) ([]asm.Instructi
 			for _, code := range expr {
 				result = append(result, code)
 			}
-			cvt := &asm.CVTSI2SD{tmpReg, target}
+			cvt := &asm.CVTSI2SS{tmpReg, target}
 			ctx.AddInstruction(cvt)
 			result = append(result, cvt)
 		} else {

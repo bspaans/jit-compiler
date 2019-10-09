@@ -2,22 +2,6 @@ package asm
 
 import "errors"
 
-// Convert signed integer  to scalar double-precision floating point (float64)
-// The result is stored in the low quadword of the destination operand, and the
-// high quadword left unchanged
-type CVTSI2SD struct {
-	Source Operand
-	Dest   Operand
-}
-
-func (j *CVTSI2SD) Encode() (MachineCode, error) {
-	return []uint8{}, nil
-
-}
-func (j *CVTSI2SD) String() string {
-	return "cvtsi2sd " + j.Dest.String()
-}
-
 // Convert signed integer to scalar double-precision floating point (float64)
 type CVTSI2SS struct {
 	Source Operand
