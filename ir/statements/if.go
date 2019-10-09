@@ -1,0 +1,83 @@
+package statements
+
+import (
+	"errors"
+	"fmt"
+
+	"github.com/bspaans/jit/asm"
+	. "github.com/bspaans/jit/ir/expr"
+	. "github.com/bspaans/jit/ir/shared"
+)
+
+type IR_If struct {
+	*BaseIR
+	Condition IRExpression
+	Stmt1     IR
+	Stmt2     IR
+}
+
+func NewIR_If(condition IRExpression, stmt1, stmt2 IR) *IR_If {
+	return &IR_If{
+		BaseIR:    NewBaseIR(If),
+		Condition: condition,
+		Stmt1:     stmt1,
+		Stmt2:     stmt2,
+	}
+}
+
+func (i *IR_If) Encode(ctx *IR_Context) ([]asm.Instruction, error) {
+	if i.Condition.ReturnType(ctx) == TBool {
+		reg := ctx.AllocateRegister(TBool)
+		defer ctx.DeallocateRegister(reg)
+		result, err := i.Condition.Encode(ctx, reg)
+		if err != nil {
+			return nil, err
+		}
+		stmt1Len, err := IR_Length(i.Stmt1, ctx)
+		if err != nil {
+			return nil, err
+		}
+		stmt2Len, err := IR_Length(i.Stmt2, ctx)
+		if err != nil {
+			return nil, err
+		}
+		instr := []asm.Instruction{
+			&asm.CMP{asm.Uint32(1), reg},
+			&asm.JNE{asm.Uint8(stmt1Len)},
+		}
+		for _, inst := range instr {
+			ctx.AddInstruction(inst)
+			result = append(result, inst)
+		}
+		s1, err := i.Stmt1.Encode(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, instr := range s1 {
+			result = append(result, instr)
+		}
+		jmp := &asm.JMP{asm.Uint8(stmt2Len)}
+		ctx.AddInstruction(jmp)
+		result = append(result, jmp)
+
+		s2, err := i.Stmt2.Encode(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, instr := range s2 {
+			result = append(result, instr)
+		}
+		return result, nil
+	}
+	return nil, errors.New("Unsupported if IR expression")
+}
+
+func (i *IR_If) String() string {
+	return fmt.Sprintf("if %s; then %s; else %s;", i.Condition.String(), i.Stmt1.String(), i.Stmt2.String())
+}
+
+func (i *IR_If) AddToDataSection(ctx *IR_Context) {
+	i.Condition.AddToDataSection(ctx)
+	i.Stmt1.AddToDataSection(ctx)
+	i.Stmt2.AddToDataSection(ctx)
+}

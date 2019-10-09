@@ -51,8 +51,9 @@ func (m MachineCode) Execute() uint {
 	unsafeFunc := (uintptr)(unsafe.Pointer(&mmapFunc))
 	f := *(*execFunc)(unsafe.Pointer(&unsafeFunc))
 	value := f()
-	fmt.Println("Result:", value)
-	fmt.Printf("Hex   : %x\n", value)
+	fmt.Println("\nResult :", value)
+	fmt.Printf("Hex    : %x\n", value)
+	fmt.Printf("Size   : %d bytes\n\n", len(m))
 	return value
 }
 

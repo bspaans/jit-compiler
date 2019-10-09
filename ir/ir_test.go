@@ -6,6 +6,7 @@ import (
 
 	. "github.com/bspaans/jit/ir/expr"
 	. "github.com/bspaans/jit/ir/shared"
+	. "github.com/bspaans/jit/ir/statements"
 )
 
 var ShouldRun = [][]IR{

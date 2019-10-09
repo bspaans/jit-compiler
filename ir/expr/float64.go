@@ -28,13 +28,12 @@ func (i *IR_Float64) String() string {
 }
 
 func (i *IR_Float64) Encode(ctx *IR_Context, target *asm.Register) ([]asm.Instruction, error) {
-	tmp := ctx.AllocateRegister()
+	tmp := ctx.AllocateRegister(TUint64)
 	defer ctx.DeallocateRegister(tmp)
-	tmpReg := asm.Get64BitRegisterByIndex(tmp)
 
 	result := []asm.Instruction{
-		&asm.MOV{asm.Float64(i.Value), tmpReg},
-		&asm.MOVQ{tmpReg, target}}
+		&asm.MOV{asm.Float64(i.Value), tmp},
+		&asm.MOVQ{tmp, target}}
 	ctx.AddInstructions(result)
 	return result, nil
 }

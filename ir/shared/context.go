@@ -7,7 +7,7 @@ type IR_Context struct {
 	RegistersAllocated      uint8
 	FloatRegisters          []bool
 	FloatRegistersAllocated uint8
-	VariableMap             map[string]uint8
+	VariableMap             map[string]*asm.Register
 	VariableTypes           map[string]Type
 	DataSection             []uint8
 	InstructionPointer      uint
@@ -23,7 +23,7 @@ func NewIRContext() *IR_Context {
 		RegistersAllocated:      0,
 		FloatRegisters:          make([]bool, 16),
 		FloatRegistersAllocated: 0,
-		VariableMap:             map[string]uint8{},
+		VariableMap:             map[string]*asm.Register{},
 		VariableTypes:           map[string]Type{},
 		DataSection:             []uint8{},
 		DataSectionOffset:       2,
@@ -56,7 +56,22 @@ func (i *IR_Context) GetInstructions() []asm.Instruction {
 	return i.instructions
 }
 
-func (i *IR_Context) AllocateRegister() uint8 {
+func (i *IR_Context) AllocateRegister(typ Type) *asm.Register {
+	if typ == TFloat64 {
+		return asm.GetFloatingPointRegisterByIndex(i.allocateFloatRegister())
+	}
+	return asm.Get64BitRegisterByIndex(i.allocateRegister())
+}
+
+func (i *IR_Context) DeallocateRegister(reg *asm.Register) {
+	if reg.Size == asm.QUADDOUBLE {
+		i.deallocateFloatRegister(reg.Register)
+		return
+	}
+	i.deallocateRegister(reg.Register)
+}
+
+func (i *IR_Context) allocateRegister() uint8 {
 	if i.RegistersAllocated >= 16 {
 		panic("Register allocation limit. Needs stack handling")
 	}
@@ -70,12 +85,12 @@ func (i *IR_Context) AllocateRegister() uint8 {
 	panic("Register allocation limit reached with incorrect allocation counter. Needs stack handling")
 }
 
-func (i *IR_Context) DeallocateRegister(reg uint8) {
+func (i *IR_Context) deallocateRegister(reg uint8) {
 	i.Registers[reg] = false
 	i.RegistersAllocated -= 1
 }
 
-func (i *IR_Context) AllocateFloatRegister() uint8 {
+func (i *IR_Context) allocateFloatRegister() uint8 {
 	if i.FloatRegistersAllocated >= 16 {
 		panic("FloatRegister allocation limit. Needs stack handling")
 	}
@@ -89,7 +104,7 @@ func (i *IR_Context) AllocateFloatRegister() uint8 {
 	panic("FloatRegister allocation limit reached with incorrect allocation counter. Needs stack handling")
 }
 
-func (i *IR_Context) DeallocateFloatRegister(reg uint8) {
+func (i *IR_Context) deallocateFloatRegister(reg uint8) {
 	i.FloatRegisters[reg] = false
 	i.FloatRegistersAllocated -= 1
 }

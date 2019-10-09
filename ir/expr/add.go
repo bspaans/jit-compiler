@@ -39,13 +39,13 @@ func (i *IR_Add) Encode(ctx *IR_Context, target *asm.Register) ([]asm.Instructio
 
 		if i.Op2.Type() == Variable {
 			variable := i.Op2.(*IR_Variable).Value
-			reg := asm.Get64BitRegisterByIndex(ctx.VariableMap[variable])
+			reg := ctx.VariableMap[variable]
 			add := &asm.ADD{reg, target}
 			ctx.AddInstruction(add)
 			result = append(result, add)
 		} else {
-			reg := asm.Get64BitRegisterByIndex(ctx.AllocateRegister())
-			defer ctx.DeallocateRegister(reg.Register)
+			reg := ctx.AllocateRegister(TUint64)
+			defer ctx.DeallocateRegister(reg)
 
 			expr, err := i.Op2.Encode(ctx, reg)
 			if err != nil {
@@ -69,23 +69,22 @@ func (i *IR_Add) Encode(ctx *IR_Context, target *asm.Register) ([]asm.Instructio
 
 		if i.Op2.Type() == Variable {
 			variable := i.Op2.(*IR_Variable).Value
-			reg := asm.GetFloatingPointRegisterByIndex(ctx.VariableMap[variable])
+			reg := ctx.VariableMap[variable]
 			addsd := &asm.ADDSD{reg, target}
 			ctx.AddInstruction(addsd)
 			result = append(result, addsd)
 		} else {
-			tmp := ctx.AllocateFloatRegister()
-			defer ctx.DeallocateRegister(tmp)
-			tmpReg := asm.GetFloatingPointRegisterByIndex(tmp)
+			reg := ctx.AllocateRegister(TFloat64)
+			defer ctx.DeallocateRegister(reg)
 
-			expr, err := i.Op2.Encode(ctx, tmpReg)
+			expr, err := i.Op2.Encode(ctx, reg)
 			if err != nil {
 				return nil, err
 			}
 			for _, code := range expr {
 				result = append(result, code)
 			}
-			addsd := &asm.ADDSD{tmpReg, target}
+			addsd := &asm.ADDSD{reg, target}
 			ctx.AddInstruction(addsd)
 			result = append(result, addsd)
 		}

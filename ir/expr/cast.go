@@ -36,9 +36,8 @@ func (i *IR_Cast) Encode(ctx *IR_Context, target *asm.Register) ([]asm.Instructi
 		if valueType == TUint64 {
 			return i.Value.Encode(ctx, target)
 		} else if valueType == TFloat64 {
-			tmp := ctx.AllocateFloatRegister()
-			defer ctx.DeallocateFloatRegister(tmp)
-			tmpReg := asm.GetFloatingPointRegisterByIndex(tmp)
+			tmpReg := ctx.AllocateRegister(TFloat64)
+			defer ctx.DeallocateRegister(tmpReg)
 
 			expr, err := i.Value.Encode(ctx, tmpReg)
 			if err != nil {
@@ -57,9 +56,8 @@ func (i *IR_Cast) Encode(ctx *IR_Context, target *asm.Register) ([]asm.Instructi
 		if valueType == TFloat64 {
 			return i.Value.Encode(ctx, target)
 		} else if valueType == TUint64 {
-			tmp := ctx.AllocateRegister()
-			defer ctx.DeallocateRegister(tmp)
-			tmpReg := asm.Get64BitRegisterByIndex(tmp)
+			tmpReg := ctx.AllocateRegister(TUint64)
+			defer ctx.DeallocateRegister(tmpReg)
 
 			expr, err := i.Value.Encode(ctx, tmpReg)
 			if err != nil {

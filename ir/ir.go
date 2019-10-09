@@ -7,43 +7,8 @@ import (
 	"github.com/bspaans/jit/asm"
 	. "github.com/bspaans/jit/ir/expr"
 	. "github.com/bspaans/jit/ir/shared"
+	. "github.com/bspaans/jit/ir/statements"
 )
-
-type IR interface {
-	Type() IRType
-	String() string
-	AddToDataSection(ctx *IR_Context)
-	Encode(*IR_Context) ([]asm.Instruction, error)
-}
-
-type BaseIR struct {
-	typ IRType
-}
-
-func NewBaseIR(typ IRType) *BaseIR {
-	return &BaseIR{
-		typ: typ,
-	}
-}
-func (b *BaseIR) Type() IRType {
-	return b.typ
-}
-func (b *BaseIR) AddToDataSection(ctx *IR_Context) {}
-
-func IR_Length(stmt IR, ctx *IR_Context) (int, error) {
-	commit := ctx.Commit
-	ctx.Commit = false
-	instr, err := stmt.Encode(ctx)
-	if err != nil {
-		return 0, err
-	}
-	code, err := asm.Instructions(instr).Encode()
-	if err != nil {
-		return 0, err
-	}
-	ctx.Commit = commit
-	return len(code), nil
-}
 
 func Compile(stmts []IR) (asm.MachineCode, error) {
 	ctx := NewIRContext()
@@ -105,7 +70,7 @@ func CompileIR(stmts []IR) ([]asm.Instruction, error) {
 
 func init() {
 	i := []IR{
-		NewIR_Assignment("q", NewIR_Float64(3.1415)),
+		NewIR_Assignment("q", NewIR_Float64(2.1415)),
 		NewIR_Assignment("q", NewIR_Add(NewIR_Variable("q"), NewIR_Float64(1.5))),
 		NewIR_Assignment("i", NewIR_Uint64(0)),
 		NewIR_While(NewIR_Not(NewIR_Equals(NewIR_Variable("i"), NewIR_Uint64(5))), NewIR_AndThen(
