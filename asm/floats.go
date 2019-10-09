@@ -64,7 +64,7 @@ func (f Float64) Type() Type {
 	return T_Float64
 }
 func (f Float64) String() string {
-	return fmt.Sprintf("$%f", f)
+	return fmt.Sprintf("$f%f", f)
 }
 func (f Float64) Encode() []uint8 {
 	buf := new(bytes.Buffer)

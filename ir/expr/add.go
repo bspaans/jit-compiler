@@ -28,8 +28,8 @@ func (i *IR_Add) ReturnType(ctx *IR_Context) Type {
 
 func (i *IR_Add) Encode(ctx *IR_Context, target *asm.Register) ([]asm.Instruction, error) {
 	result := []asm.Instruction{}
-	if (i.Op1.ReturnType(ctx) == TUint64 && i.Op2.ReturnType(ctx) == TUint64) ||
-		(i.Op1.ReturnType(ctx) == TFloat64 && i.Op2.ReturnType(ctx) == TFloat64) {
+	returnType1, returnType2 := i.Op1.ReturnType(ctx), i.Op2.ReturnType(ctx)
+	if returnType1 == returnType2 && (returnType1 == TFloat64 || returnType1 == TUint64) {
 		expr, err := i.Op1.Encode(ctx, target)
 		if err != nil {
 			return nil, err
@@ -45,7 +45,7 @@ func (i *IR_Add) Encode(ctx *IR_Context, target *asm.Register) ([]asm.Instructio
 			ctx.AddInstruction(add)
 			result = append(result, add)
 		} else {
-			reg := ctx.AllocateRegister(TUint64)
+			reg := ctx.AllocateRegister(returnType1)
 			defer ctx.DeallocateRegister(reg)
 
 			expr, err := i.Op2.Encode(ctx, reg)
