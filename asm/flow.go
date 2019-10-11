@@ -35,6 +35,17 @@ func (i *CALL) Encode() (MachineCode, error) {
 		modrm := NewModRM(DirectRegisterMode, dest.Encode(), 2)
 		result = append(result, modrm.Encode())
 		return result, nil
+	} else if i.Dest.Type() == T_DisplacedRegister {
+		dest := i.Dest.(*DisplacedRegister)
+		result := []uint8{0xff}
+		modrm := NewModRM(IndirectRegisterByteDisplacedMode, dest.Encode(), 2)
+		result = append(result, modrm.Encode())
+		// Not sure why this is needed, but it is
+		if dest.Register == Rsp {
+			result = append(result, 0x24)
+		}
+		result = append(result, dest.Displacement)
+		return result, nil
 	}
 	return nil, errors.New("Unsupported call operation: " + i.String())
 }

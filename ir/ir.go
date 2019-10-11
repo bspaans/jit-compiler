@@ -78,6 +78,12 @@ func CompileIR(stmts []IR) ([]asm.Instruction, error) {
 
 func init() {
 	i := []IR{
+		NewIR_Assignment("b", NewIR_Uint64(3)),
+		NewIR_Assignment("c", NewIR_Uint64(3)),
+		NewIR_Assignment("d", NewIR_Uint64(3)),
+		NewIR_Assignment("e", NewIR_Uint64(3)),
+		NewIR_Assignment("h", NewIR_Uint64(3)),
+		NewIR_Assignment("z", NewIR_Uint64(3)),
 		NewIR_Assignment("a", NewIR_Function(&TFunction{TUint64, []Type{TUint64}, []string{"z"}},
 			NewIR_AndThen(
 				NewIR_Assignment("b", NewIR_Float64(3.0)),

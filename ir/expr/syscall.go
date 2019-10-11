@@ -27,7 +27,7 @@ func (i *IR_Syscall) String() string {
 	return fmt.Sprintf("syscall(%v, %v)", i.Syscall, i.Args)
 }
 
-func (i *IR_Syscall) Encode(ctx *IR_Context, target *asm.Register) ([]asm.Instruction, error) {
+func (i *IR_Syscall) Encode(ctx *IR_Context, target asm.Operand) ([]asm.Instruction, error) {
 
 	result := []asm.Instruction{}
 	if ctx.Registers[0] {

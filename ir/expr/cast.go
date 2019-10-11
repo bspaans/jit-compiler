@@ -29,7 +29,7 @@ func (i *IR_Cast) String() string {
 	return fmt.Sprintf("(%s).(%s)", i.Value.String(), i.CastToType.String())
 }
 
-func (i *IR_Cast) Encode(ctx *IR_Context, target *asm.Register) ([]asm.Instruction, error) {
+func (i *IR_Cast) Encode(ctx *IR_Context, target asm.Operand) ([]asm.Instruction, error) {
 	result := []asm.Instruction{}
 	valueType := i.Value.ReturnType(ctx)
 	if valueType == nil {

@@ -12,12 +12,13 @@ type IR_Context struct {
 	RegistersAllocated      uint8
 	FloatRegisters          []bool
 	FloatRegistersAllocated uint8
-	VariableMap             map[string]*asm.Register
+	VariableMap             map[string]asm.Operand
 	VariableTypes           map[string]Type
 	ReturnOperandStack      []asm.Operand
 	DataSection             []uint8
 	InstructionPointer      uint
 	DataSectionOffset       int
+	StackPointer            int
 	Commit                  bool // if false turns AddInstruction into a noop
 
 	instructions []asm.Instruction
@@ -30,12 +31,13 @@ func NewIRContext() *IR_Context {
 		RegistersAllocated:      0,
 		FloatRegisters:          make([]bool, 16),
 		FloatRegistersAllocated: 0,
-		VariableMap:             map[string]*asm.Register{},
+		VariableMap:             map[string]asm.Operand{},
 		VariableTypes:           map[string]Type{},
 		ReturnOperandStack:      []asm.Operand{&asm.DisplacedRegister{asm.Rsp, 8}},
 		DataSection:             []uint8{},
 		DataSectionOffset:       2,
 		InstructionPointer:      2,
+		StackPointer:            8,
 		Commit:                  true,
 		instructions:            []asm.Instruction{},
 	}
@@ -69,7 +71,7 @@ func (i *IR_Context) Copy() *IR_Context {
 		regs[j] = i.Registers[j]
 		floatRegs[j] = i.FloatRegisters[j]
 	}
-	variableMap := map[string]*asm.Register{}
+	variableMap := map[string]asm.Operand{}
 	for arg, reg := range i.VariableMap {
 		variableMap[arg] = reg
 	}
@@ -100,6 +102,7 @@ func (i *IR_Context) Copy() *IR_Context {
 		DataSection:             ds,
 		DataSectionOffset:       i.DataSectionOffset,
 		InstructionPointer:      i.InstructionPointer,
+		StackPointer:            i.StackPointer,
 		Commit:                  i.Commit,
 		instructions:            instructions,
 	}

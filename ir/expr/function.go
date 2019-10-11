@@ -35,7 +35,7 @@ func (i *IR_Function) String() string {
 	return fmt.Sprintf("func(%s) %s { %s }", strings.Join(args, ", "), i.Signature.ReturnType.String(), i.Body.String())
 }
 
-func (i *IR_Function) Encode(ctx *IR_Context, target *asm.Register) ([]asm.Instruction, error) {
+func (i *IR_Function) Encode(ctx *IR_Context, target asm.Operand) ([]asm.Instruction, error) {
 	ownLength := uint(7)
 	diff := uint(ctx.InstructionPointer+ownLength) - uint(i.address)
 	result := []asm.Instruction{&asm.LEA{&asm.RIPRelative{asm.Int32(int32(-diff))}, target}}
@@ -50,7 +50,7 @@ func (b *IR_Function) encodeFunction(ctx *IR_Context) ([]uint8, error) {
 	returnTarget := asm.Rax
 	registers := make([]bool, 16)
 	registers[returnTarget.Register] = true
-	variableMap := map[string]*asm.Register{}
+	variableMap := map[string]asm.Operand{}
 	variableTypes := map[string]Type{}
 	for i, arg := range b.Signature.Args {
 		if arg.Type() == T_Float64 {

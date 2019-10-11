@@ -31,7 +31,7 @@ func (i *IR_Operator) ReturnType(ctx *IR_Context) Type {
 	return i.Op1.ReturnType(ctx)
 }
 
-func (i *IR_Operator) Encode(ctx *IR_Context, target *asm.Register) ([]asm.Instruction, error) {
+func (i *IR_Operator) Encode(ctx *IR_Context, target asm.Operand) ([]asm.Instruction, error) {
 	returnType1, returnType2 := i.Op1.ReturnType(ctx), i.Op2.ReturnType(ctx)
 	if returnType1 == returnType2 && (returnType1 == TFloat64 || returnType1 == TUint64) {
 		result, err := i.Op1.Encode(ctx, target)
@@ -39,13 +39,13 @@ func (i *IR_Operator) Encode(ctx *IR_Context, target *asm.Register) ([]asm.Instr
 			return nil, err
 		}
 
-		var reg *asm.Register
+		var reg asm.Operand
 		if i.Op2.Type() == Variable {
 			variable := i.Op2.(*IR_Variable).Value
 			reg = ctx.VariableMap[variable]
 		} else {
 			reg = ctx.AllocateRegister(returnType1)
-			defer ctx.DeallocateRegister(reg)
+			defer ctx.DeallocateRegister(reg.(*asm.Register))
 
 			expr, err := i.Op2.Encode(ctx, reg)
 			if err != nil {

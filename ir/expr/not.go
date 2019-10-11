@@ -24,9 +24,9 @@ func (i *IR_Not) ReturnType(ctx *IR_Context) Type {
 	return TBool
 }
 
-func (i *IR_Not) Encode(ctx *IR_Context, target *asm.Register) ([]asm.Instruction, error) {
+func (i *IR_Not) Encode(ctx *IR_Context, target asm.Operand) ([]asm.Instruction, error) {
 
-	var reg1 *asm.Register
+	var reg1 asm.Operand
 
 	result := []asm.Instruction{}
 	if i.Op1.Type() == Variable {
@@ -35,7 +35,7 @@ func (i *IR_Not) Encode(ctx *IR_Context, target *asm.Register) ([]asm.Instructio
 	} else if i.Op1.Type() == Uint64 {
 		value := i.Op1.(*IR_Uint64).Value
 		reg1 = ctx.AllocateRegister(TUint64)
-		defer ctx.DeallocateRegister(reg1)
+		defer ctx.DeallocateRegister(reg1.(*asm.Register))
 		result = append(result, &asm.MOV{asm.Uint64(value), reg1})
 	} else if i.Op1.Type() == Equals {
 		result_, err := i.Op1.Encode(ctx, target)
@@ -50,10 +50,13 @@ func (i *IR_Not) Encode(ctx *IR_Context, target *asm.Register) ([]asm.Instructio
 		return nil, errors.New("Unsupported not IR operation: " + i.String())
 	}
 
+	tmpReg := ctx.AllocateRegister(TUint64)
+	defer ctx.DeallocateRegister(tmpReg)
 	instr := []asm.Instruction{}
 	instr = append(instr, &asm.CMP{asm.Uint32(0), reg1})
-	instr = append(instr, &asm.MOV{asm.Uint64(0), target})
-	instr = append(instr, &asm.SETE{target.Lower8BitRegister()})
+	instr = append(instr, &asm.MOV{asm.Uint64(0), tmpReg})
+	instr = append(instr, &asm.SETE{tmpReg.Lower8BitRegister()})
+	instr = append(instr, &asm.MOV{tmpReg, target})
 	for _, inst := range instr {
 		result = append(result, inst)
 		ctx.AddInstruction(inst)

@@ -28,7 +28,7 @@ func (i *IR_ByteArray) String() string {
 	return fmt.Sprintf("%v", i.Value)
 }
 
-func (i *IR_ByteArray) Encode(ctx *IR_Context, target *asm.Register) ([]asm.Instruction, error) {
+func (i *IR_ByteArray) Encode(ctx *IR_Context, target asm.Operand) ([]asm.Instruction, error) {
 	// Calculate the displacement between RIP (the instruction pointer,
 	// pointing to the *next* instruction) and the address of our byte array,
 	// and load the resulting address into target using a LEA instruction.

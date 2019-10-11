@@ -27,7 +27,7 @@ func (i *IR_Bool) String() string {
 	return fmt.Sprintf("%v", i.Value)
 }
 
-func (i *IR_Bool) Encode(ctx *IR_Context, target *asm.Register) ([]asm.Instruction, error) {
+func (i *IR_Bool) Encode(ctx *IR_Context, target asm.Operand) ([]asm.Instruction, error) {
 	value := 0
 	if i.Value {
 		value = 1

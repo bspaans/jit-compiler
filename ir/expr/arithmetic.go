@@ -2,6 +2,7 @@ package expr
 
 import (
 	"github.com/bspaans/jit/asm"
+	. "github.com/bspaans/jit/ir/shared"
 )
 
 func NewIR_Add(op1, op2 IRExpression) IRExpression {

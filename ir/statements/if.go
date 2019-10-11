@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/bspaans/jit/asm"
-	. "github.com/bspaans/jit/ir/expr"
 	. "github.com/bspaans/jit/ir/shared"
 )
 

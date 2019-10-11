@@ -25,7 +25,7 @@ func (i *IR_Variable) String() string {
 	return i.Value
 }
 
-func (i *IR_Variable) Encode(ctx *IR_Context, target *asm.Register) ([]asm.Instruction, error) {
+func (i *IR_Variable) Encode(ctx *IR_Context, target asm.Operand) ([]asm.Instruction, error) {
 	reg := ctx.VariableMap[i.Value]
 	var result []asm.Instruction
 	if i.ReturnType(ctx) == TFloat64 {

@@ -27,7 +27,7 @@ func (i *IR_Float64) String() string {
 	return fmt.Sprintf("%f", i.Value)
 }
 
-func (i *IR_Float64) Encode(ctx *IR_Context, target *asm.Register) ([]asm.Instruction, error) {
+func (i *IR_Float64) Encode(ctx *IR_Context, target asm.Operand) ([]asm.Instruction, error) {
 	tmp := ctx.AllocateRegister(TUint64)
 	defer ctx.DeallocateRegister(tmp)
 
