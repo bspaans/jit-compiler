@@ -54,7 +54,6 @@ func PreserveRegisters(ctx *IR_Context, argTypes []Type, returnType Type) (asm.I
 	result := []asm.Instruction{}
 	mapping := map[asm.Operand]asm.Operand{}
 	push := &asm.PUSH{returnOp}
-	ctx.StackPointer -= 4
 	result = append(result, push)
 	clobbered = append(clobbered, returnOp)
 	ctx.AddInstruction(push)
@@ -68,7 +67,6 @@ func PreserveRegisters(ctx *IR_Context, argTypes []Type, returnType Type) (asm.I
 		}
 		if inUse {
 			result = append(result, &asm.PUSH{reg})
-			ctx.StackPointer -= 4
 			ctx.AddInstruction(&asm.PUSH{reg})
 			clobbered = append(clobbered, reg)
 		}
@@ -118,6 +116,7 @@ func ABI_Call_Setup(ctx *IR_Context, args []IRExpression, returnType Type) (asm.
 		if err != nil {
 			return nil, nil, nil, err
 		}
+		ctx.AddInstructions(instr)
 		result = result.Add(instr)
 	}
 

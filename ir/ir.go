@@ -19,7 +19,7 @@ func Compile(stmts []IR) (asm.MachineCode, error) {
 			return nil, err
 		}
 		if len(ctx.DataSection) != currentOffset-2 {
-			fmt.Printf("0x%x-0x%x: %s\n", currentOffset, len(ctx.DataSection), stmt.String())
+			fmt.Printf("0x%x-0x%x: %s\n", currentOffset, len(ctx.DataSection)+2, stmt.String())
 			fmt.Println(asm.MachineCode(ctx.DataSection[currentOffset-ctx.DataSectionOffset : len(ctx.DataSection)-1]))
 		}
 	}
@@ -42,7 +42,6 @@ func Compile(stmts []IR) (asm.MachineCode, error) {
 	}
 	address := uint(ctx.DataSectionOffset + len(ctx.DataSection))
 	for _, stmt := range stmts {
-		fmt.Printf("RIP: %d 0x%x\n", ctx.InstructionPointer, ctx.InstructionPointer)
 		code, err := stmt.Encode(ctx)
 		if err != nil {
 			return nil, err
@@ -53,7 +52,7 @@ func Compile(stmts []IR) (asm.MachineCode, error) {
 			if err != nil {
 				return nil, err
 			}
-			fmt.Printf("0x%x: %s\n", address, i.String())
+			fmt.Printf("0x%x-0x%x 0x%x: %s\n", address, address+uint(len(b)), ctx.InstructionPointer, i.String())
 			address += uint(len(b))
 			fmt.Println(asm.MachineCode(b))
 			for _, code := range b {
@@ -83,7 +82,7 @@ func init() {
 		NewIR_Assignment("d", NewIR_Uint64(3)),
 		NewIR_Assignment("e", NewIR_Uint64(3)),
 		NewIR_Assignment("h", NewIR_Uint64(3)),
-		NewIR_Assignment("z", NewIR_Uint64(3)),
+		NewIR_Assignment("z", NewIR_Uint64(300)),
 		NewIR_Assignment("a", NewIR_Function(&TFunction{TUint64, []Type{TUint64}, []string{"z"}},
 			NewIR_AndThen(
 				NewIR_Assignment("b", NewIR_Float64(3.0)),
@@ -94,7 +93,8 @@ func init() {
 						NewIR_Return(NewIR_Cast(NewIR_Variable("d"), TUint64))),
 				)),
 		)),
-		NewIR_Assignment("g", NewIR_Call("a", []IRExpression{NewIR_Uint64(3)})),
+		NewIR_Assignment("g", NewIR_Call("a", []IRExpression{NewIR_Variable("z")})),
+		NewIR_Assignment("g", NewIR_LinuxWrite(NewIR_Uint64(uint64(1)), []uint8("howdy\n"), 6)),
 		NewIR_Return(NewIR_Variable("g")),
 		/*
 			NewIR_Assignment("q", NewIR_Float64(2.1415)),

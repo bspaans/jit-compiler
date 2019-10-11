@@ -29,35 +29,9 @@ func (i *IR_Syscall) String() string {
 
 func (i *IR_Syscall) Encode(ctx *IR_Context, target asm.Operand) ([]asm.Instruction, error) {
 
-	result := []asm.Instruction{}
-	if ctx.Registers[0] {
-		push := &asm.PUSH{asm.Rax}
-		result = append(result, push)
-		ctx.AddInstruction(push)
-	}
-
-	// TODO result, clobbered, err := ABI_Call_Setup(ctx, args, i.ReturnType(ctx))
-	targets := []*asm.Register{asm.Rdi, asm.Rsi, asm.Rdx, asm.R10, asm.R8, asm.R9}
-	targetRegisterIndices := []uint8{7, 6, 2, 10, 8, 9}
-	clobbered := 0
-	for j, argTarget := range targets {
-		if j < len(i.Args) {
-			// Push registers on the stack if they are in use
-			registerIndex := targetRegisterIndices[j]
-			if ctx.Registers[registerIndex] {
-				reg := asm.Get64BitRegisterByIndex(registerIndex)
-				result = append(result, &asm.PUSH{reg})
-				ctx.AddInstruction(&asm.PUSH{reg})
-				clobbered += 1
-			}
-			instr, err := i.Args[j].Encode(ctx, argTarget)
-			if err != nil {
-				return nil, err
-			}
-			for _, code := range instr {
-				result = append(result, code)
-			}
-		}
+	result, _, clobbered, err := ABI_Call_Setup(ctx, i.Args, TUint64)
+	if err != nil {
+		return nil, err
 	}
 
 	instr := []asm.Instruction{
@@ -65,20 +39,12 @@ func (i *IR_Syscall) Encode(ctx *IR_Context, target asm.Operand) ([]asm.Instruct
 		&asm.SYSCALL{},
 		&asm.MOV{asm.Rax, target},
 	}
-	// Restore registers from the stack
-	for j := clobbered; j > 0; j-- {
-		registerIndex := targetRegisterIndices[j-1]
-		reg := asm.Get64BitRegisterByIndex(registerIndex)
-		instr = append(instr, &asm.POP{reg})
-	}
-	// restore rax
-	if ctx.Registers[0] {
-		instr = append(instr, &asm.POP{asm.Rax})
-	}
 	for _, inst := range instr {
 		result = append(result, inst)
 		ctx.AddInstruction(inst)
 	}
+	restore := RestoreRegisters(ctx, clobbered)
+	result = result.Add(restore)
 	return result, nil
 }
 
