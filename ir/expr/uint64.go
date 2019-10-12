@@ -4,7 +4,9 @@ import (
 	"fmt"
 
 	"github.com/bspaans/jit/asm"
+	"github.com/bspaans/jit/asm/encoding"
 	. "github.com/bspaans/jit/ir/shared"
+	"github.com/bspaans/jit/lib"
 )
 
 type IR_Uint64 struct {
@@ -27,8 +29,8 @@ func (i *IR_Uint64) String() string {
 	return fmt.Sprintf("%d", i.Value)
 }
 
-func (i *IR_Uint64) Encode(ctx *IR_Context, target asm.Operand) ([]asm.Instruction, error) {
-	result := []asm.Instruction{&asm.MOV{asm.Uint64(i.Value), target}}
+func (i *IR_Uint64) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.Instruction, error) {
+	result := []lib.Instruction{&asm.MOV{encoding.Uint64(i.Value), target}}
 	ctx.AddInstructions(result)
 	return result, nil
 }

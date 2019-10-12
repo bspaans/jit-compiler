@@ -3,11 +3,13 @@ package expr
 import (
 	"fmt"
 
-	"github.com/bspaans/jit/asm"
+	"github.com/bspaans/jit/asm/encoding"
+	"github.com/bspaans/jit/lib"
+
 	. "github.com/bspaans/jit/ir/shared"
 )
 
-type operator func(op1, op2 asm.Operand) asm.Instruction
+type operator func(op1, op2 encoding.Operand) lib.Instruction
 
 type IR_Operator struct {
 	*BaseIRExpression
@@ -31,7 +33,7 @@ func (i *IR_Operator) ReturnType(ctx *IR_Context) Type {
 	return i.Op1.ReturnType(ctx)
 }
 
-func (i *IR_Operator) Encode(ctx *IR_Context, target asm.Operand) ([]asm.Instruction, error) {
+func (i *IR_Operator) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.Instruction, error) {
 	returnType1, returnType2 := i.Op1.ReturnType(ctx), i.Op2.ReturnType(ctx)
 	if returnType1 == returnType2 && (returnType1 == TFloat64 || returnType1 == TUint64) {
 		result, err := i.Op1.Encode(ctx, target)
@@ -39,19 +41,19 @@ func (i *IR_Operator) Encode(ctx *IR_Context, target asm.Operand) ([]asm.Instruc
 			return nil, err
 		}
 
-		var reg asm.Operand
+		var reg encoding.Operand
 		if i.Op2.Type() == Variable {
 			variable := i.Op2.(*IR_Variable).Value
 			reg = ctx.VariableMap[variable]
 		} else {
 			reg = ctx.AllocateRegister(returnType1)
-			defer ctx.DeallocateRegister(reg.(*asm.Register))
+			defer ctx.DeallocateRegister(reg.(*encoding.Register))
 
 			expr, err := i.Op2.Encode(ctx, reg)
 			if err != nil {
 				return nil, err
 			}
-			result = asm.Instructions(result).Add(expr)
+			result = lib.Instructions(result).Add(expr)
 		}
 		instr := i.Opcode(reg, target)
 		ctx.AddInstruction(instr)

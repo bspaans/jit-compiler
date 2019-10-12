@@ -3,8 +3,8 @@ package statements
 import (
 	"fmt"
 
-	"github.com/bspaans/jit/asm"
 	. "github.com/bspaans/jit/ir/shared"
+	"github.com/bspaans/jit/lib"
 )
 
 type IR_AndThen struct {
@@ -21,7 +21,7 @@ func NewIR_AndThen(stmt1, stmt2 IR) *IR_AndThen {
 	}
 }
 
-func (i *IR_AndThen) Encode(ctx *IR_Context) ([]asm.Instruction, error) {
+func (i *IR_AndThen) Encode(ctx *IR_Context) ([]lib.Instruction, error) {
 	result, err := i.Stmt1.Encode(ctx)
 	if err != nil {
 		return nil, err

@@ -5,6 +5,7 @@ import (
 
 	"github.com/bspaans/jit/asm"
 	. "github.com/bspaans/jit/ir/shared"
+	"github.com/bspaans/jit/lib"
 )
 
 type IR_Return struct {
@@ -19,7 +20,7 @@ func NewIR_Return(expr IRExpression) *IR_Return {
 	}
 }
 
-func (i *IR_Return) Encode(ctx *IR_Context) ([]asm.Instruction, error) {
+func (i *IR_Return) Encode(ctx *IR_Context) ([]lib.Instruction, error) {
 	reg := ctx.AllocateRegister(i.Expr.ReturnType(ctx))
 	defer ctx.DeallocateRegister(reg)
 	result, err := i.Expr.Encode(ctx, reg)
@@ -27,7 +28,7 @@ func (i *IR_Return) Encode(ctx *IR_Context) ([]asm.Instruction, error) {
 		return nil, err
 	}
 	target := ctx.PeekReturn()
-	instr := []asm.Instruction{
+	instr := []lib.Instruction{
 		&asm.MOV{reg, target},
 		&asm.RET{},
 	}

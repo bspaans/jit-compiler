@@ -1,8 +1,6 @@
 package shared
 
-import (
-	"github.com/bspaans/jit/asm"
-)
+import "github.com/bspaans/jit/lib"
 
 type IRType int
 
@@ -18,7 +16,7 @@ type IR interface {
 	Type() IRType
 	String() string
 	AddToDataSection(ctx *IR_Context) error
-	Encode(*IR_Context) ([]asm.Instruction, error)
+	Encode(*IR_Context) ([]lib.Instruction, error)
 }
 
 type BaseIR struct {
@@ -44,7 +42,7 @@ func IR_Length(stmt IR, ctx *IR_Context) (int, error) {
 	if err != nil {
 		return 0, err
 	}
-	code, err := asm.Instructions(instr).Encode()
+	code, err := lib.Instructions(instr).Encode()
 	if err != nil {
 		return 0, err
 	}

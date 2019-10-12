@@ -4,7 +4,9 @@ import (
 	"fmt"
 
 	"github.com/bspaans/jit/asm"
+	"github.com/bspaans/jit/asm/encoding"
 	. "github.com/bspaans/jit/ir/shared"
+	"github.com/bspaans/jit/lib"
 )
 
 type IR_Bool struct {
@@ -27,12 +29,12 @@ func (i *IR_Bool) String() string {
 	return fmt.Sprintf("%v", i.Value)
 }
 
-func (i *IR_Bool) Encode(ctx *IR_Context, target asm.Operand) ([]asm.Instruction, error) {
+func (i *IR_Bool) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.Instruction, error) {
 	value := 0
 	if i.Value {
 		value = 1
 	}
-	result := []asm.Instruction{&asm.MOV{asm.Uint64(value), target}}
+	result := []lib.Instruction{&asm.MOV{encoding.Uint64(value), target}}
 	ctx.AddInstructions(result)
 	return result, nil
 }

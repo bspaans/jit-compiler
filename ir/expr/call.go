@@ -5,7 +5,9 @@ import (
 	"strings"
 
 	"github.com/bspaans/jit/asm"
+	"github.com/bspaans/jit/asm/encoding"
 	. "github.com/bspaans/jit/ir/shared"
+	"github.com/bspaans/jit/lib"
 )
 
 type IR_Call struct {
@@ -41,7 +43,7 @@ func (i *IR_Call) String() string {
 	return fmt.Sprintf("%s(%s)", i.Function, strings.Join(args, ", "))
 }
 
-func (i *IR_Call) Encode(ctx *IR_Context, target asm.Operand) ([]asm.Instruction, error) {
+func (i *IR_Call) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.Instruction, error) {
 	result, mapping, clobbered, err := ABI_Call_Setup(ctx, i.Args, ctx.VariableTypes[i.Function].(*TFunction).ReturnType)
 	if err != nil {
 		return nil, err
@@ -62,7 +64,7 @@ func (i *IR_Call) Encode(ctx *IR_Context, target asm.Operand) ([]asm.Instruction
 	}
 
 	call := &asm.CALL{function}
-	mov := &asm.MOV{asm.Rax, target}
+	mov := &asm.MOV{encoding.Rax, target}
 	ctx.AddInstruction(call)
 	ctx.AddInstruction(mov)
 	result = append(result, call)

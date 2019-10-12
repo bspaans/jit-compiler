@@ -5,7 +5,9 @@ import (
 	"fmt"
 
 	"github.com/bspaans/jit/asm"
+	"github.com/bspaans/jit/asm/encoding"
 	. "github.com/bspaans/jit/ir/shared"
+	"github.com/bspaans/jit/lib"
 )
 
 type IR_While struct {
@@ -22,7 +24,7 @@ func NewIR_While(condition IRExpression, stmt IR) *IR_While {
 	}
 }
 
-func (i *IR_While) Encode(ctx *IR_Context) ([]asm.Instruction, error) {
+func (i *IR_While) Encode(ctx *IR_Context) ([]lib.Instruction, error) {
 	if i.Condition.ReturnType(ctx) == TBool {
 		reg := ctx.AllocateRegister(TBool)
 		defer ctx.DeallocateRegister(reg)
@@ -35,9 +37,9 @@ func (i *IR_While) Encode(ctx *IR_Context) ([]asm.Instruction, error) {
 		if err != nil {
 			return nil, err
 		}
-		instr := []asm.Instruction{
-			&asm.CMP{asm.Uint32(1), reg},
-			&asm.JNE{asm.Uint8(stmtLen + 2)},
+		instr := []lib.Instruction{
+			&asm.CMP{encoding.Uint32(1), reg},
+			&asm.JNE{encoding.Uint8(stmtLen + 2)},
 		}
 		for _, inst := range instr {
 			ctx.AddInstruction(inst)
@@ -50,7 +52,7 @@ func (i *IR_While) Encode(ctx *IR_Context) ([]asm.Instruction, error) {
 		for _, instr := range s1 {
 			result = append(result, instr)
 		}
-		jmp := &asm.JMP{asm.Uint8(uint8(0xff - (int(ctx.InstructionPointer+1) - int(beginning))))}
+		jmp := &asm.JMP{encoding.Uint8(uint8(0xff - (int(ctx.InstructionPointer+1) - int(beginning))))}
 		result = append(result, jmp)
 		ctx.AddInstruction(jmp)
 		fmt.Println("InstructionPointer", ctx.InstructionPointer, beginning, ctx.InstructionPointer-beginning)

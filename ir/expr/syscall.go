@@ -4,7 +4,9 @@ import (
 	"fmt"
 
 	"github.com/bspaans/jit/asm"
+	"github.com/bspaans/jit/asm/encoding"
 	. "github.com/bspaans/jit/ir/shared"
+	"github.com/bspaans/jit/lib"
 )
 
 type IR_Syscall struct {
@@ -27,17 +29,17 @@ func (i *IR_Syscall) String() string {
 	return fmt.Sprintf("syscall(%v, %v)", i.Syscall, i.Args)
 }
 
-func (i *IR_Syscall) Encode(ctx *IR_Context, target asm.Operand) ([]asm.Instruction, error) {
+func (i *IR_Syscall) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.Instruction, error) {
 
 	result, _, clobbered, err := ABI_Call_Setup(ctx, i.Args, TUint64)
 	if err != nil {
 		return nil, err
 	}
 
-	instr := []asm.Instruction{
-		&asm.MOV{asm.Uint64(uint64(i.Syscall)), asm.Rax},
+	instr := []lib.Instruction{
+		&asm.MOV{encoding.Uint64(uint64(i.Syscall)), encoding.Rax},
 		&asm.SYSCALL{},
-		&asm.MOV{asm.Rax, target},
+		&asm.MOV{encoding.Rax, target},
 	}
 	for _, inst := range instr {
 		result = append(result, inst)

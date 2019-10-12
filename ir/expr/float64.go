@@ -4,7 +4,9 @@ import (
 	"fmt"
 
 	"github.com/bspaans/jit/asm"
+	"github.com/bspaans/jit/asm/encoding"
 	. "github.com/bspaans/jit/ir/shared"
+	"github.com/bspaans/jit/lib"
 )
 
 type IR_Float64 struct {
@@ -27,12 +29,12 @@ func (i *IR_Float64) String() string {
 	return fmt.Sprintf("%f", i.Value)
 }
 
-func (i *IR_Float64) Encode(ctx *IR_Context, target asm.Operand) ([]asm.Instruction, error) {
+func (i *IR_Float64) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.Instruction, error) {
 	tmp := ctx.AllocateRegister(TUint64)
 	defer ctx.DeallocateRegister(tmp)
 
-	result := []asm.Instruction{
-		&asm.MOV{asm.Float64(i.Value), tmp},
+	result := []lib.Instruction{
+		&asm.MOV{encoding.Float64(i.Value), tmp},
 		&asm.MOVQ{tmp, target}}
 	ctx.AddInstructions(result)
 	return result, nil

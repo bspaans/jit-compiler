@@ -4,7 +4,9 @@ import (
 	"fmt"
 
 	"github.com/bspaans/jit/asm"
+	"github.com/bspaans/jit/asm/encoding"
 	. "github.com/bspaans/jit/ir/shared"
+	"github.com/bspaans/jit/lib"
 )
 
 type IR_ByteArray struct {
@@ -28,14 +30,14 @@ func (i *IR_ByteArray) String() string {
 	return fmt.Sprintf("%v", i.Value)
 }
 
-func (i *IR_ByteArray) Encode(ctx *IR_Context, target asm.Operand) ([]asm.Instruction, error) {
+func (i *IR_ByteArray) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.Instruction, error) {
 	// Calculate the displacement between RIP (the instruction pointer,
 	// pointing to the *next* instruction) and the address of our byte array,
 	// and load the resulting address into target using a LEA instruction.
 	fmt.Println("Loading from ", i.address, ctx.InstructionPointer)
 	ownLength := uint(7)
 	diff := uint(ctx.InstructionPointer+ownLength) - uint(i.address)
-	result := []asm.Instruction{&asm.LEA{&asm.RIPRelative{asm.Int32(int32(-diff))}, target}}
+	result := []lib.Instruction{&asm.LEA{&encoding.RIPRelative{encoding.Int32(int32(-diff))}, target}}
 	ctx.AddInstructions(result)
 	return result, nil
 }

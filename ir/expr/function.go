@@ -5,7 +5,9 @@ import (
 	"strings"
 
 	"github.com/bspaans/jit/asm"
+	"github.com/bspaans/jit/asm/encoding"
 	. "github.com/bspaans/jit/ir/shared"
+	"github.com/bspaans/jit/lib"
 )
 
 type IR_Function struct {
@@ -35,10 +37,10 @@ func (i *IR_Function) String() string {
 	return fmt.Sprintf("func(%s) %s { %s }", strings.Join(args, ", "), i.Signature.ReturnType.String(), i.Body.String())
 }
 
-func (i *IR_Function) Encode(ctx *IR_Context, target asm.Operand) ([]asm.Instruction, error) {
+func (i *IR_Function) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.Instruction, error) {
 	ownLength := uint(7)
 	diff := uint(ctx.InstructionPointer+ownLength) - uint(i.address)
-	result := []asm.Instruction{&asm.LEA{&asm.RIPRelative{asm.Int32(int32(-diff))}, target}}
+	result := []lib.Instruction{&asm.LEA{&encoding.RIPRelative{encoding.Int32(int32(-diff))}, target}}
 	ctx.AddInstructions(result)
 	return result, nil
 }
@@ -46,11 +48,11 @@ func (i *IR_Function) Encode(ctx *IR_Context, target asm.Operand) ([]asm.Instruc
 func (b *IR_Function) encodeFunction(ctx *IR_Context) ([]uint8, error) {
 
 	// TODO: restore rbx, rbp, r12-r15
-	targets := []*asm.Register{asm.Rdi, asm.Rsi, asm.Rdx, asm.R10, asm.R8, asm.R9}
-	returnTarget := asm.Rax
+	targets := []*encoding.Register{encoding.Rdi, encoding.Rsi, encoding.Rdx, encoding.R10, encoding.R8, encoding.R9}
+	returnTarget := encoding.Rax
 	registers := make([]bool, 16)
 	registers[returnTarget.Register] = true
-	variableMap := map[string]asm.Operand{}
+	variableMap := map[string]encoding.Operand{}
 	variableTypes := map[string]Type{}
 	for i, arg := range b.Signature.Args {
 		if arg.Type() == T_Float64 {
@@ -77,7 +79,7 @@ func (b *IR_Function) encodeFunction(ctx *IR_Context) ([]uint8, error) {
 	for _, instr := range instr {
 		fmt.Println(instr)
 	}
-	return asm.Instructions(instr).Encode()
+	return lib.Instructions(instr).Encode()
 }
 
 func (b *IR_Function) AddToDataSection(ctx *IR_Context) error {

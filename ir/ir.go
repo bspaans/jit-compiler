@@ -4,12 +4,14 @@ import (
 	"fmt"
 
 	"github.com/bspaans/jit/asm"
+	"github.com/bspaans/jit/asm/encoding"
 	. "github.com/bspaans/jit/ir/expr"
 	. "github.com/bspaans/jit/ir/shared"
 	. "github.com/bspaans/jit/ir/statements"
+	"github.com/bspaans/jit/lib"
 )
 
-func Compile(stmts []IR) (asm.MachineCode, error) {
+func Compile(stmts []IR) (lib.MachineCode, error) {
 	ctx := NewIRContext()
 	result := []uint8{}
 	fmt.Println(".data:")
@@ -20,19 +22,19 @@ func Compile(stmts []IR) (asm.MachineCode, error) {
 		}
 		if len(ctx.DataSection) != currentOffset-2 {
 			fmt.Printf("0x%x-0x%x: %s\n", currentOffset, len(ctx.DataSection)+2, stmt.String())
-			fmt.Println(asm.MachineCode(ctx.DataSection[currentOffset-ctx.DataSectionOffset : len(ctx.DataSection)-1]))
+			fmt.Println(lib.MachineCode(ctx.DataSection[currentOffset-ctx.DataSectionOffset : len(ctx.DataSection)-1]))
 		}
 	}
 	fmt.Println(".start:")
 	if len(ctx.DataSection) > 0 {
-		jmp := &asm.JMP{asm.Uint8(len(ctx.DataSection))}
+		jmp := &asm.JMP{encoding.Uint8(len(ctx.DataSection))}
 		fmt.Printf("0x%x: %s\n", 0, jmp.String())
 		result_, err := jmp.Encode()
 		if err != nil {
 			return nil, err
 		}
 		result = result_
-		fmt.Println(asm.MachineCode(result_))
+		fmt.Println(lib.MachineCode(result_))
 		for _, d := range ctx.DataSection {
 			result = append(result, d)
 		}
@@ -54,7 +56,7 @@ func Compile(stmts []IR) (asm.MachineCode, error) {
 			}
 			fmt.Printf("0x%x-0x%x 0x%x: %s\n", address, address+uint(len(b)), ctx.InstructionPointer, i.String())
 			address += uint(len(b))
-			fmt.Println(asm.MachineCode(b))
+			fmt.Println(lib.MachineCode(b))
 			for _, code := range b {
 				result = append(result, code)
 			}
@@ -64,7 +66,7 @@ func Compile(stmts []IR) (asm.MachineCode, error) {
 	return result, nil
 }
 
-func CompileIR(stmts []IR) ([]asm.Instruction, error) {
+func CompileIR(stmts []IR) ([]lib.Instruction, error) {
 	ctx := NewIRContext()
 	for _, stmt := range stmts {
 		_, err := stmt.Encode(ctx)

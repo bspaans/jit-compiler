@@ -3,8 +3,8 @@ package statements
 import (
 	"fmt"
 
-	"github.com/bspaans/jit/asm"
 	. "github.com/bspaans/jit/ir/shared"
+	"github.com/bspaans/jit/lib"
 )
 
 type IR_Assignment struct {
@@ -22,7 +22,7 @@ func NewIR_Assignment(variable string, expr IRExpression) *IR_Assignment {
 }
 
 // Allocates a new register and assigns it the value of the expression.
-func (i *IR_Assignment) Encode(ctx *IR_Context) ([]asm.Instruction, error) {
+func (i *IR_Assignment) Encode(ctx *IR_Context) ([]lib.Instruction, error) {
 	returnType := i.Expr.ReturnType(ctx)
 	reg, found := ctx.VariableMap[i.Variable]
 	if !found {

@@ -2,30 +2,32 @@ package shared
 
 import (
 	"github.com/bspaans/jit/asm"
+	"github.com/bspaans/jit/asm/encoding"
+	"github.com/bspaans/jit/lib"
 )
 
 type ABI interface {
-	GetRegistersForArgs(args []Type) []*asm.Register
-	ReturnTypeToOperand(ty Type) asm.Operand
+	GetRegistersForArgs(args []Type) []*encoding.Register
+	ReturnTypeToOperand(ty Type) encoding.Operand
 }
 
 type ABI_AMDSystemV struct {
-	intTargets   []*asm.Register
-	floatTargets []*asm.Register
+	intTargets   []*encoding.Register
+	floatTargets []*encoding.Register
 }
 
 func NewABI_AMDSystemV() *ABI_AMDSystemV {
 	return &ABI_AMDSystemV{
-		intTargets:   []*asm.Register{asm.Rdi, asm.Rsi, asm.Rdx, asm.R10, asm.R8, asm.R9},
-		floatTargets: []*asm.Register{asm.Xmm0, asm.Xmm1, asm.Xmm2, asm.Xmm3, asm.Xmm4, asm.Xmm5},
+		intTargets:   []*encoding.Register{encoding.Rdi, encoding.Rsi, encoding.Rdx, encoding.R10, encoding.R8, encoding.R9},
+		floatTargets: []*encoding.Register{encoding.Xmm0, encoding.Xmm1, encoding.Xmm2, encoding.Xmm3, encoding.Xmm4, encoding.Xmm5},
 	}
 }
-func (a *ABI_AMDSystemV) GetRegistersForArgs(args []Type) []*asm.Register {
+func (a *ABI_AMDSystemV) GetRegistersForArgs(args []Type) []*encoding.Register {
 	intRegisterIx := 0
 	floatRegisterIx := 0
-	result := []*asm.Register{}
+	result := []*encoding.Register{}
 
-	var reg *asm.Register
+	var reg *encoding.Register
 	for _, arg := range args {
 		if arg.Type() == T_Float64 {
 			reg = a.floatTargets[floatRegisterIx]
@@ -39,20 +41,20 @@ func (a *ABI_AMDSystemV) GetRegistersForArgs(args []Type) []*asm.Register {
 	return result
 }
 
-func (a *ABI_AMDSystemV) ReturnTypeToOperand(arg Type) asm.Operand {
+func (a *ABI_AMDSystemV) ReturnTypeToOperand(arg Type) encoding.Operand {
 	if arg.Type() == T_Float64 {
-		return asm.Xmm0
+		return encoding.Xmm0
 	}
-	return asm.Rax
+	return encoding.Rax
 }
 
 // returns instructions and clobbered registers
-func PreserveRegisters(ctx *IR_Context, argTypes []Type, returnType Type) (asm.Instructions, map[asm.Operand]asm.Operand, []asm.Operand) {
+func PreserveRegisters(ctx *IR_Context, argTypes []Type, returnType Type) (lib.Instructions, map[encoding.Operand]encoding.Operand, []encoding.Operand) {
 	regs := ctx.ABI.GetRegistersForArgs(argTypes)
 	returnOp := ctx.ABI.ReturnTypeToOperand(returnType)
-	clobbered := []asm.Operand{}
-	result := []asm.Instruction{}
-	mapping := map[asm.Operand]asm.Operand{}
+	clobbered := []encoding.Operand{}
+	result := []lib.Instruction{}
+	mapping := map[encoding.Operand]encoding.Operand{}
 	push := &asm.PUSH{returnOp}
 	result = append(result, push)
 	clobbered = append(clobbered, returnOp)
@@ -79,13 +81,13 @@ func PreserveRegisters(ctx *IR_Context, argTypes []Type, returnType Type) (asm.I
 			inUse = ctx.Registers[reg.Register]
 		}
 		if inUse {
-			mapping[reg] = &asm.DisplacedRegister{asm.Rsp, uint8((len(clobbered) - 2 - i) * 4)}
+			mapping[reg] = &encoding.DisplacedRegister{encoding.Rsp, uint8((len(clobbered) - 2 - i) * 4)}
 		}
 	}
 	return result, mapping, clobbered
 }
 
-func ABI_Call_Setup(ctx *IR_Context, args []IRExpression, returnType Type) (asm.Instructions, map[asm.Operand]asm.Operand, []asm.Operand, error) {
+func ABI_Call_Setup(ctx *IR_Context, args []IRExpression, returnType Type) (lib.Instructions, map[encoding.Operand]encoding.Operand, []encoding.Operand, error) {
 	argTypes := make([]Type, len(args))
 	for i, arg := range args {
 		argTypes[i] = arg.ReturnType(ctx)
@@ -100,7 +102,7 @@ func ABI_Call_Setup(ctx *IR_Context, args []IRExpression, returnType Type) (asm.
 		}
 	}
 	for _, reg := range regs {
-		if reg.Size == asm.QUADDOUBLE {
+		if reg.Size == lib.QUADDOUBLE {
 			ctx_.FloatRegisters[reg.Register] = true
 			ctx_.FloatRegistersAllocated += 1
 		} else {
@@ -124,9 +126,9 @@ func ABI_Call_Setup(ctx *IR_Context, args []IRExpression, returnType Type) (asm.
 
 }
 
-func RestoreRegisters(ctx *IR_Context, clobbered []asm.Operand) asm.Instructions {
+func RestoreRegisters(ctx *IR_Context, clobbered []encoding.Operand) lib.Instructions {
 	// Pop in reverse order
-	result := []asm.Instruction{}
+	result := []lib.Instruction{}
 	for j := len(clobbered) - 1; j >= 0; j-- {
 		reg := clobbered[j]
 		result = append(result, &asm.POP{reg})

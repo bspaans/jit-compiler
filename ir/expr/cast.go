@@ -4,7 +4,9 @@ import (
 	"fmt"
 
 	"github.com/bspaans/jit/asm"
+	"github.com/bspaans/jit/asm/encoding"
 	. "github.com/bspaans/jit/ir/shared"
+	"github.com/bspaans/jit/lib"
 )
 
 type IR_Cast struct {
@@ -29,8 +31,8 @@ func (i *IR_Cast) String() string {
 	return fmt.Sprintf("(%s).(%s)", i.Value.String(), i.CastToType.String())
 }
 
-func (i *IR_Cast) Encode(ctx *IR_Context, target asm.Operand) ([]asm.Instruction, error) {
-	result := []asm.Instruction{}
+func (i *IR_Cast) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.Instruction, error) {
+	result := []lib.Instruction{}
 	valueType := i.Value.ReturnType(ctx)
 	if valueType == nil {
 		return nil, fmt.Errorf("nil return type in %s", i.Value.String())
@@ -69,7 +71,7 @@ func (i *IR_Cast) Encode(ctx *IR_Context, target asm.Operand) ([]asm.Instruction
 			for _, code := range expr {
 				result = append(result, code)
 			}
-			cvt := &asm.CVTSI2SS{tmpReg, target}
+			cvt := &asm.CVTSI2SD{tmpReg, target}
 			ctx.AddInstruction(cvt)
 			result = append(result, cvt)
 		} else {

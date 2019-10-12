@@ -3,7 +3,8 @@ package shared
 import (
 	"fmt"
 
-	"github.com/bspaans/jit/asm"
+	"github.com/bspaans/jit/asm/encoding"
+	"github.com/bspaans/jit/lib"
 )
 
 type IR_Context struct {
@@ -12,16 +13,16 @@ type IR_Context struct {
 	RegistersAllocated      uint8
 	FloatRegisters          []bool
 	FloatRegistersAllocated uint8
-	VariableMap             map[string]asm.Operand
+	VariableMap             map[string]encoding.Operand
 	VariableTypes           map[string]Type
-	ReturnOperandStack      []asm.Operand
+	ReturnOperandStack      []encoding.Operand
 	DataSection             []uint8
 	InstructionPointer      uint
 	DataSectionOffset       int
 	StackPointer            int
 	Commit                  bool // if false turns AddInstruction into a noop
 
-	instructions []asm.Instruction
+	instructions []lib.Instruction
 }
 
 func NewIRContext() *IR_Context {
@@ -31,15 +32,15 @@ func NewIRContext() *IR_Context {
 		RegistersAllocated:      0,
 		FloatRegisters:          make([]bool, 16),
 		FloatRegistersAllocated: 0,
-		VariableMap:             map[string]asm.Operand{},
+		VariableMap:             map[string]encoding.Operand{},
 		VariableTypes:           map[string]Type{},
-		ReturnOperandStack:      []asm.Operand{&asm.DisplacedRegister{asm.Rsp, 8}},
+		ReturnOperandStack:      []encoding.Operand{&encoding.DisplacedRegister{encoding.Rsp, 8}},
 		DataSection:             []uint8{},
 		DataSectionOffset:       2,
 		InstructionPointer:      2,
 		StackPointer:            8,
 		Commit:                  true,
-		instructions:            []asm.Instruction{},
+		instructions:            []lib.Instruction{},
 	}
 	// Always allocate rsp
 	// Should track usage?
@@ -48,15 +49,15 @@ func NewIRContext() *IR_Context {
 	return ctx
 }
 
-func (i *IR_Context) PushReturnOperand(op asm.Operand) {
+func (i *IR_Context) PushReturnOperand(op encoding.Operand) {
 	i.ReturnOperandStack = append(i.ReturnOperandStack, op)
 	fmt.Println(i.ReturnOperandStack)
 }
-func (i *IR_Context) PeekReturn() asm.Operand {
+func (i *IR_Context) PeekReturn() encoding.Operand {
 	return i.ReturnOperandStack[len(i.ReturnOperandStack)-1]
 }
 
-func (i *IR_Context) PopReturn() asm.Operand {
+func (i *IR_Context) PopReturn() encoding.Operand {
 	fmt.Println(i.ReturnOperandStack)
 	op := i.ReturnOperandStack[len(i.ReturnOperandStack)-1]
 	i.ReturnOperandStack = i.ReturnOperandStack[:len(i.ReturnOperandStack)-1]
@@ -71,7 +72,7 @@ func (i *IR_Context) Copy() *IR_Context {
 		regs[j] = i.Registers[j]
 		floatRegs[j] = i.FloatRegisters[j]
 	}
-	variableMap := map[string]asm.Operand{}
+	variableMap := map[string]encoding.Operand{}
 	for arg, reg := range i.VariableMap {
 		variableMap[arg] = reg
 	}
@@ -83,11 +84,11 @@ func (i *IR_Context) Copy() *IR_Context {
 	for _, d := range i.DataSection {
 		ds = append(ds, d)
 	}
-	instructions := []asm.Instruction{}
+	instructions := []lib.Instruction{}
 	for _, d := range i.instructions {
 		instructions = append(instructions, d)
 	}
-	returns := []asm.Operand{}
+	returns := []encoding.Operand{}
 	for _, d := range i.ReturnOperandStack {
 		returns = append(returns, d)
 	}
@@ -108,33 +109,33 @@ func (i *IR_Context) Copy() *IR_Context {
 	}
 }
 
-func (i *IR_Context) AddInstruction(instr asm.Instruction) {
+func (i *IR_Context) AddInstruction(instr lib.Instruction) {
 	if i.Commit {
 		i.instructions = append(i.instructions, instr)
-		length, _ := asm.Instruction_Length(instr)
+		length, _ := lib.Instruction_Length(instr)
 		i.InstructionPointer += uint(length)
 	}
 }
 
-func (i *IR_Context) AddInstructions(instr []asm.Instruction) {
+func (i *IR_Context) AddInstructions(instr []lib.Instruction) {
 	for _, inst := range instr {
 		i.AddInstruction(inst)
 	}
 }
 
-func (i *IR_Context) GetInstructions() []asm.Instruction {
+func (i *IR_Context) GetInstructions() []lib.Instruction {
 	return i.instructions
 }
 
-func (i *IR_Context) AllocateRegister(typ Type) *asm.Register {
+func (i *IR_Context) AllocateRegister(typ Type) *encoding.Register {
 	if typ == TFloat64 {
-		return asm.GetFloatingPointRegisterByIndex(i.allocateFloatRegister())
+		return encoding.GetFloatingPointRegisterByIndex(i.allocateFloatRegister())
 	}
-	return asm.Get64BitRegisterByIndex(i.allocateRegister())
+	return encoding.Get64BitRegisterByIndex(i.allocateRegister())
 }
 
-func (i *IR_Context) DeallocateRegister(reg *asm.Register) {
-	if reg.Size == asm.QUADDOUBLE {
+func (i *IR_Context) DeallocateRegister(reg *encoding.Register) {
+	if reg.Size == lib.QUADDOUBLE {
 		i.deallocateFloatRegister(reg.Register)
 		return
 	}

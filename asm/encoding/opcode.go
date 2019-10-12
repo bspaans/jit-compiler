@@ -163,22 +163,24 @@ func (o *Opcode) Encode(ops []Operand) ([]uint8, error) {
 		op := ops[i]
 		if opcodeOperand.TypeCheck(op) {
 			if op.Type() == T_Register {
+				oper := op.(*Register)
 				if opcodeOperand.Encoding == ModRM_rm_r || opcodeOperand.Encoding == ModRM_rm_rw {
 					if instr.ModRM == nil {
 						instr.ModRM = &ModRM{}
 					}
 					instr.ModRM.Mode = DirectRegisterMode
-					instr.ModRM.RM = op.(*Register).Encode()
+					instr.ModRM.RM = oper.Encode()
 					if exts[RexW] {
-						instr.REXPrefix.B = op.(*Register).Register > 7
+						instr.REXPrefix.B = oper.Register > 7
 					}
 				} else if opcodeOperand.Encoding == ModRM_reg_r || opcodeOperand.Encoding == ModRM_reg_rw {
 					if instr.ModRM == nil {
 						instr.ModRM = &ModRM{}
+						instr.ModRM.Mode = DirectRegisterMode
 					}
-					instr.ModRM.Reg = op.(*Register).Encode()
+					instr.ModRM.Reg = oper.Encode()
 					if exts[RexW] {
-						instr.REXPrefix.R = op.(*Register).Register > 7
+						instr.REXPrefix.R = oper.Register > 7
 					}
 				} else if opcodeOperand.Encoding == Opcode_plus_rd_r {
 					fmt.Println("encoding", instr.Opcode)
@@ -205,8 +207,8 @@ func (o *Opcode) Encode(ops []Operand) ([]uint8, error) {
 				} else if opcodeOperand.Encoding == ModRM_reg_r || opcodeOperand.Encoding == ModRM_reg_rw {
 					if instr.ModRM == nil {
 						instr.ModRM = &ModRM{}
+						instr.ModRM.Mode = IndirectRegisterByteDisplacedMode
 					}
-					instr.ModRM.Mode = IndirectRegisterByteDisplacedMode
 					instr.ModRM.Reg = oper.Encode()
 					instr.SetDisplacement(oper.Register, []uint8{oper.Displacement})
 					if exts[RexW] {
@@ -215,6 +217,26 @@ func (o *Opcode) Encode(ops []Operand) ([]uint8, error) {
 				} else {
 					return nil, fmt.Errorf("Unsupported encoding [%d] in %s", opcodeOperand.Encoding, o.String())
 				}
+			} else if op.Type() == T_RIPRelative {
+				oper := op.(*RIPRelative)
+				if opcodeOperand.Encoding == ModRM_rm_r || opcodeOperand.Encoding == ModRM_rm_rw {
+					if instr.ModRM == nil {
+						instr.ModRM = &ModRM{}
+					}
+					instr.ModRM.Mode = IndirectRegisterMode
+					instr.ModRM.RM = 5
+					instr.ModRM.Reg = 0
+					instr.SetDisplacement(op, oper.Displacement.Encode())
+				} else if opcodeOperand.Encoding == ModRM_reg_r || opcodeOperand.Encoding == ModRM_reg_rw {
+					if instr.ModRM == nil {
+						instr.ModRM = &ModRM{}
+					}
+					instr.ModRM.Mode = IndirectRegisterMode
+					instr.ModRM.RM = 5
+					instr.ModRM.Reg = 0
+					instr.SetDisplacement(op, oper.Displacement.Encode())
+				}
+
 			} else if op.Type() == T_Uint64 {
 				for _, b := range op.(Uint64).Encode() {
 					instr.Immediate = append(instr.Immediate, b)

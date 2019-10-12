@@ -5,7 +5,9 @@ import (
 	"fmt"
 
 	"github.com/bspaans/jit/asm"
+	"github.com/bspaans/jit/asm/encoding"
 	. "github.com/bspaans/jit/ir/shared"
+	"github.com/bspaans/jit/lib"
 )
 
 type IR_If struct {
@@ -24,7 +26,7 @@ func NewIR_If(condition IRExpression, stmt1, stmt2 IR) *IR_If {
 	}
 }
 
-func (i *IR_If) Encode(ctx *IR_Context) ([]asm.Instruction, error) {
+func (i *IR_If) Encode(ctx *IR_Context) ([]lib.Instruction, error) {
 	if i.Condition.ReturnType(ctx) == TBool {
 		reg := ctx.AllocateRegister(TBool)
 		defer ctx.DeallocateRegister(reg)
@@ -40,9 +42,9 @@ func (i *IR_If) Encode(ctx *IR_Context) ([]asm.Instruction, error) {
 		if err != nil {
 			return nil, err
 		}
-		instr := []asm.Instruction{
-			&asm.CMP{asm.Uint32(1), reg},
-			&asm.JNE{asm.Uint8(stmt1Len)},
+		instr := []lib.Instruction{
+			&asm.CMP{encoding.Uint32(1), reg},
+			&asm.JNE{encoding.Uint8(stmt1Len)},
 		}
 		for _, inst := range instr {
 			ctx.AddInstruction(inst)
@@ -55,7 +57,7 @@ func (i *IR_If) Encode(ctx *IR_Context) ([]asm.Instruction, error) {
 		for _, instr := range s1 {
 			result = append(result, instr)
 		}
-		jmp := &asm.JMP{asm.Uint8(stmt2Len)}
+		jmp := &asm.JMP{encoding.Uint8(stmt2Len)}
 		ctx.AddInstruction(jmp)
 		result = append(result, jmp)
 

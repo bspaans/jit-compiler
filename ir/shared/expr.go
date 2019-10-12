@@ -1,13 +1,16 @@
 package shared
 
-import "github.com/bspaans/jit/asm"
+import (
+	"github.com/bspaans/jit/asm/encoding"
+	"github.com/bspaans/jit/lib"
+)
 
 type IRExpressionType int
 type IRExpression interface {
 	Type() IRExpressionType
 	ReturnType(ctx *IR_Context) Type
 	AddToDataSection(ctx *IR_Context) error
-	Encode(ctx *IR_Context, target asm.Operand) ([]asm.Instruction, error)
+	Encode(ctx *IR_Context, target encoding.Operand) ([]lib.Instruction, error)
 	String() string
 }
 
@@ -43,14 +46,14 @@ func (b *BaseIRExpression) AddToDataSection(ctx *IR_Context) error {
 	return nil
 }
 
-func IREXpression_length(expr IRExpression, ctx *IR_Context, target asm.Operand) (int, error) {
+func IREXpression_length(expr IRExpression, ctx *IR_Context, target encoding.Operand) (int, error) {
 	commit := ctx.Commit
 	ctx.Commit = false
 	instr, err := expr.Encode(ctx, target)
 	if err != nil {
 		return 0, err
 	}
-	code, err := asm.Instructions(instr).Encode()
+	code, err := lib.Instructions(instr).Encode()
 	if err != nil {
 		return 0, err
 	}

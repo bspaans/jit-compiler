@@ -24,16 +24,8 @@ func (i *MOV) Encode() (lib.MachineCode, error) {
 			return encoding.MOV_rm64_r64.Encode([]encoding.Operand{i.Dest, i.Source})
 		}
 	} else if i.Source.Type() == encoding.T_RIPRelative {
-		src := i.Source.(*encoding.RIPRelative)
 		if i.Dest.Type() == encoding.T_Register {
-			dest := i.Dest.(*encoding.Register)
-			rex := REXEncode(nil, dest)
-			modrm := encoding.NewModRM(encoding.IndirectRegisterMode, 5, 0).Encode()
-			result := []uint8{rex, 0x8b, modrm}
-			for _, c := range src.Displacement.Encode() {
-				result = append(result, c)
-			}
-			return result, nil
+			return encoding.MOV_rm64_r64.Encode([]encoding.Operand{i.Dest, i.Source})
 		}
 	} else if i.Source.Type() == encoding.T_Uint64 || i.Source.Type() == encoding.T_Float64 {
 		if i.Dest.Type() == encoding.T_Register {
