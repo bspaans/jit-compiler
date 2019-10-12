@@ -51,7 +51,7 @@ func (i *IR_Cast) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.Instru
 			for _, code := range expr {
 				result = append(result, code)
 			}
-			cvt := &asm.CVTTSD2SI{tmpReg, target}
+			cvt := asm.CVTTSD2SI(tmpReg, target)
 			ctx.AddInstruction(cvt)
 			result = append(result, cvt)
 		} else {
@@ -71,7 +71,7 @@ func (i *IR_Cast) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.Instru
 			for _, code := range expr {
 				result = append(result, code)
 			}
-			cvt := &asm.CVTSI2SD{tmpReg, target}
+			cvt := asm.CVTSI2SD(tmpReg, target)
 			ctx.AddInstruction(cvt)
 			result = append(result, cvt)
 		} else {

@@ -37,7 +37,7 @@ func (i *IR_ByteArray) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.I
 	fmt.Println("Loading from ", i.address, ctx.InstructionPointer)
 	ownLength := uint(7)
 	diff := uint(ctx.InstructionPointer+ownLength) - uint(i.address)
-	result := []lib.Instruction{&asm.LEA{&encoding.RIPRelative{encoding.Int32(int32(-diff))}, target}}
+	result := []lib.Instruction{asm.LEA(&encoding.RIPRelative{encoding.Int32(int32(-diff))}, target)}
 	ctx.AddInstructions(result)
 	return result, nil
 }

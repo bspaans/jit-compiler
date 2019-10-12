@@ -29,12 +29,7 @@ func (i *IR_Variable) String() string {
 
 func (i *IR_Variable) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.Instruction, error) {
 	reg := ctx.VariableMap[i.Value]
-	var result []lib.Instruction
-	if i.ReturnType(ctx) == TFloat64 {
-		result = []lib.Instruction{&asm.MOVSD{reg, target}}
-	} else {
-		result = []lib.Instruction{&asm.MOV{reg, target}}
-	}
+	result := []lib.Instruction{asm.MOV(reg, target)}
 	ctx.AddInstructions(result)
 	return result, nil
 }

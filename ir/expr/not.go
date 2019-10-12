@@ -38,7 +38,7 @@ func (i *IR_Not) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.Instruc
 		value := i.Op1.(*IR_Uint64).Value
 		reg1 = ctx.AllocateRegister(TUint64)
 		defer ctx.DeallocateRegister(reg1.(*encoding.Register))
-		result = append(result, &asm.MOV{encoding.Uint64(value), reg1})
+		result = append(result, asm.MOV(encoding.Uint64(value), reg1))
 	} else if i.Op1.Type() == Equals {
 		result_, err := i.Op1.Encode(ctx, target)
 		if err != nil {
@@ -55,10 +55,10 @@ func (i *IR_Not) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.Instruc
 	tmpReg := ctx.AllocateRegister(TUint64)
 	defer ctx.DeallocateRegister(tmpReg)
 	instr := []lib.Instruction{}
-	instr = append(instr, &asm.CMP{encoding.Uint32(0), reg1})
-	instr = append(instr, &asm.MOV{encoding.Uint64(0), tmpReg})
-	instr = append(instr, &asm.SETE{tmpReg.Lower8BitRegister()})
-	instr = append(instr, &asm.MOV{tmpReg, target})
+	instr = append(instr, asm.CMP(encoding.Uint32(0), reg1))
+	instr = append(instr, asm.MOV(encoding.Uint64(0), tmpReg))
+	instr = append(instr, asm.SETE(tmpReg.Lower8BitRegister()))
+	instr = append(instr, asm.MOV(tmpReg, target))
 	for _, inst := range instr {
 		result = append(result, inst)
 		ctx.AddInstruction(inst)

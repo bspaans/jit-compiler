@@ -30,7 +30,7 @@ func (i *IR_Uint64) String() string {
 }
 
 func (i *IR_Uint64) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.Instruction, error) {
-	result := []lib.Instruction{&asm.MOV{encoding.Uint64(i.Value), target}}
+	result := []lib.Instruction{asm.MOV(encoding.Uint64(i.Value), target)}
 	ctx.AddInstructions(result)
 	return result, nil
 }

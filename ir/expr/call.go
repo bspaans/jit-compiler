@@ -63,8 +63,8 @@ func (i *IR_Call) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.Instru
 		fmt.Println(op1, "=>", op2)
 	}
 
-	call := &asm.CALL{function}
-	mov := &asm.MOV{encoding.Rax, target}
+	call := asm.CALL(function)
+	mov := asm.MOV(encoding.Rax, target)
 	ctx.AddInstruction(call)
 	ctx.AddInstruction(mov)
 	result = append(result, call)

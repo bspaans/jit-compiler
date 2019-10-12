@@ -94,7 +94,6 @@ type Opcode struct {
 }
 
 func (o *Opcode) Encode(ops []Operand) ([]uint8, error) {
-	fmt.Println(o.Opcode)
 	instr := NewInstructionFormat(o.Opcode)
 	exts := map[OpcodeExtensions]bool{}
 	for _, p := range o.Prefixes {
@@ -177,7 +176,6 @@ func (o *Opcode) Encode(ops []Operand) ([]uint8, error) {
 						instr.REXPrefix.R = oper.Register > 7
 					}
 				} else if opcodeOperand.Encoding == Opcode_plus_rd_r {
-					fmt.Println("encoding", instr.Opcode)
 					instr.Opcode[0] += op.(*Register).Register & 7
 					if exts[RexW] {
 						instr.REXPrefix.B = op.(*Register).Register > 7

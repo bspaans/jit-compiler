@@ -55,7 +55,7 @@ func PreserveRegisters(ctx *IR_Context, argTypes []Type, returnType Type) (lib.I
 	clobbered := []encoding.Operand{}
 	result := []lib.Instruction{}
 	mapping := map[encoding.Operand]encoding.Operand{}
-	push := &asm.PUSH{returnOp}
+	push := asm.PUSH(returnOp)
 	result = append(result, push)
 	clobbered = append(clobbered, returnOp)
 	ctx.AddInstruction(push)
@@ -68,8 +68,8 @@ func PreserveRegisters(ctx *IR_Context, argTypes []Type, returnType Type) (lib.I
 			inUse = ctx.Registers[reg.Register]
 		}
 		if inUse {
-			result = append(result, &asm.PUSH{reg})
-			ctx.AddInstruction(&asm.PUSH{reg})
+			result = append(result, asm.PUSH(reg))
+			ctx.AddInstruction(asm.PUSH(reg))
 			clobbered = append(clobbered, reg)
 		}
 	}
@@ -131,8 +131,8 @@ func RestoreRegisters(ctx *IR_Context, clobbered []encoding.Operand) lib.Instruc
 	result := []lib.Instruction{}
 	for j := len(clobbered) - 1; j >= 0; j-- {
 		reg := clobbered[j]
-		result = append(result, &asm.POP{reg})
-		ctx.AddInstruction(&asm.POP{reg})
+		result = append(result, asm.POP(reg))
+		ctx.AddInstruction(asm.POP(reg))
 	}
 	return result
 }

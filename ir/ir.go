@@ -27,7 +27,7 @@ func Compile(stmts []IR) (lib.MachineCode, error) {
 	}
 	fmt.Println(".start:")
 	if len(ctx.DataSection) > 0 {
-		jmp := &asm.JMP{encoding.Uint8(len(ctx.DataSection))}
+		jmp := asm.JMP(encoding.Uint8(len(ctx.DataSection)))
 		fmt.Printf("0x%x: %s\n", 0, jmp.String())
 		result_, err := jmp.Encode()
 		if err != nil {

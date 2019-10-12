@@ -34,8 +34,9 @@ func (i *IR_Float64) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.Ins
 	defer ctx.DeallocateRegister(tmp)
 
 	result := []lib.Instruction{
-		&asm.MOV{encoding.Float64(i.Value), tmp},
-		&asm.MOVQ{tmp, target}}
+		asm.MOV(encoding.Float64(i.Value), tmp),
+		asm.MOV(tmp, target),
+	}
 	ctx.AddInstructions(result)
 	return result, nil
 }

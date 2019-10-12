@@ -43,8 +43,8 @@ func (i *IR_If) Encode(ctx *IR_Context) ([]lib.Instruction, error) {
 			return nil, err
 		}
 		instr := []lib.Instruction{
-			&asm.CMP{encoding.Uint32(1), reg},
-			&asm.JNE{encoding.Uint8(stmt1Len)},
+			asm.CMP(encoding.Uint32(1), reg),
+			asm.JNE(encoding.Uint8(stmt1Len)),
 		}
 		for _, inst := range instr {
 			ctx.AddInstruction(inst)
@@ -57,7 +57,7 @@ func (i *IR_If) Encode(ctx *IR_Context) ([]lib.Instruction, error) {
 		for _, instr := range s1 {
 			result = append(result, instr)
 		}
-		jmp := &asm.JMP{encoding.Uint8(stmt2Len)}
+		jmp := asm.JMP(encoding.Uint8(stmt2Len))
 		ctx.AddInstruction(jmp)
 		result = append(result, jmp)
 

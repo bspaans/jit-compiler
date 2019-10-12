@@ -38,8 +38,8 @@ func (i *IR_While) Encode(ctx *IR_Context) ([]lib.Instruction, error) {
 			return nil, err
 		}
 		instr := []lib.Instruction{
-			&asm.CMP{encoding.Uint32(1), reg},
-			&asm.JNE{encoding.Uint8(stmtLen + 2)},
+			asm.CMP(encoding.Uint32(1), reg),
+			asm.JNE(encoding.Uint8(stmtLen + 2)),
 		}
 		for _, inst := range instr {
 			ctx.AddInstruction(inst)
@@ -52,7 +52,7 @@ func (i *IR_While) Encode(ctx *IR_Context) ([]lib.Instruction, error) {
 		for _, instr := range s1 {
 			result = append(result, instr)
 		}
-		jmp := &asm.JMP{encoding.Uint8(uint8(0xff - (int(ctx.InstructionPointer+1) - int(beginning))))}
+		jmp := asm.JMP(encoding.Uint8(uint8(0xff - (int(ctx.InstructionPointer+1) - int(beginning)))))
 		result = append(result, jmp)
 		ctx.AddInstruction(jmp)
 		fmt.Println("InstructionPointer", ctx.InstructionPointer, beginning, ctx.InstructionPointer-beginning)

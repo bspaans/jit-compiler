@@ -29,8 +29,8 @@ func (i *IR_Return) Encode(ctx *IR_Context) ([]lib.Instruction, error) {
 	}
 	target := ctx.PeekReturn()
 	instr := []lib.Instruction{
-		&asm.MOV{reg, target},
-		&asm.RET{},
+		asm.MOV(reg, target),
+		asm.RETURN(),
 	}
 	for _, inst := range instr {
 		ctx.AddInstruction(inst)

@@ -37,9 +37,9 @@ func (i *IR_Syscall) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.Ins
 	}
 
 	instr := []lib.Instruction{
-		&asm.MOV{encoding.Uint64(uint64(i.Syscall)), encoding.Rax},
-		&asm.SYSCALL{},
-		&asm.MOV{encoding.Rax, target},
+		asm.MOV(encoding.Uint64(uint64(i.Syscall)), encoding.Rax),
+		asm.SYSCALL(),
+		asm.MOV(encoding.Rax, target),
 	}
 	for _, inst := range instr {
 		result = append(result, inst)
