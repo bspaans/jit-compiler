@@ -111,6 +111,24 @@ var (
 			OpcodeOperand{OT_rel8, ImmediateValue},
 		},
 	}
+	MOV_rm64_r64 = &Opcode{"mov", []uint8{}, []uint8{0x89}, []OpcodeExtensions{RexW, SlashR},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_rm64, ModRM_rm_rw},
+			OpcodeOperand{OT_r64, ModRM_reg_r},
+		},
+	}
+	MOV_r64_rm64 = &Opcode{"mov", []uint8{}, []uint8{0x8b}, []OpcodeExtensions{RexW, SlashR},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_r64, ModRM_reg_rw},
+			OpcodeOperand{OT_rm64, ModRM_rm_r},
+		},
+	}
+	MOV_r64_imm64 = &Opcode{"mov", []uint8{}, []uint8{0xb8}, []OpcodeExtensions{RexW},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_r64, Opcode_plus_rd_r},
+			OpcodeOperand{OT_imm64, ImmediateValue},
+		},
+	}
 	// Performs an unsigned multiplication of the first operand (destination
 	// operand) and the second operand (source operand) and stores the result
 	// in the destination operand. The destination operand is an implied

@@ -2,6 +2,7 @@ package asm
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/bspaans/jit/asm/encoding"
 	"github.com/bspaans/jit/lib"
@@ -21,24 +22,8 @@ func (i *MOV) Encode() (lib.MachineCode, error) {
 	}
 	if i.Source.Type() == encoding.T_Register {
 		src := i.Source.(*encoding.Register)
-		if i.Dest.Type() == encoding.T_Register {
-			dest := i.Dest.(*encoding.Register)
-			if src.Size == lib.QUADWORD && dest.Size == lib.QUADWORD {
-				return EncodeOpcodeWithREXAndModRM(0x89, dest, src, 0), nil
-			}
-		} else if i.Dest.Type() == encoding.T_DisplacedRegister {
-			dest := i.Dest.(*encoding.DisplacedRegister)
-			if src.Size == lib.QUADWORD && dest.Size == lib.QUADWORD {
-				rex := REXEncode(src, dest.Register)
-				modrm := encoding.NewModRM(encoding.IndirectRegisterByteDisplacedMode, dest.Encode(), src.Encode()).Encode()
-				result := []uint8{rex, 0x89, modrm}
-				// Not sure why this is needed, but it is.
-				if dest.Register == encoding.Rsp {
-					result = append(result, 0x24)
-				}
-				result = append(result, dest.Displacement)
-				return result, nil
-			}
+		if i.Dest.Type() == encoding.T_Register || i.Dest.Type() == encoding.T_DisplacedRegister {
+			return encoding.MOV_rm64_r64.Encode([]encoding.Operand{i.Dest, src})
 		}
 	} else if i.Source.Type() == encoding.T_RIPRelative {
 		src := i.Source.(*encoding.RIPRelative)
@@ -55,12 +40,8 @@ func (i *MOV) Encode() (lib.MachineCode, error) {
 	} else if i.Source.Type() == encoding.T_Uint64 {
 		src := i.Source.(encoding.Uint64)
 		if i.Dest.Type() == encoding.T_Register {
-			dest := i.Dest.(*encoding.Register)
-			result := EncodeOpcodeWithREX(0xB8+(dest.Encode()&7), dest, nil)
-			for _, b := range src.Encode() {
-				result = append(result, b)
-			}
-			return result, nil
+			fmt.Println("hello", i.Dest, encoding.MOV_r64_imm64.Opcode)
+			return encoding.MOV_r64_imm64.Encode([]encoding.Operand{i.Dest, src})
 		} else if i.Dest.Type() == encoding.T_DisplacedRegister {
 			dest := i.Dest.(*encoding.DisplacedRegister)
 			result := EncodeOpcodeWithREX(0xC7, dest.Register, nil)

@@ -14,9 +14,13 @@ type InstructionFormat struct {
 }
 
 func NewInstructionFormat(opcode []uint8) *InstructionFormat {
+	o := make([]uint8, len(opcode))
+	for i, op := range opcode {
+		o[i] = op
+	}
 	return &InstructionFormat{
 		Prefixes:     []uint8{},
-		Opcode:       opcode,
+		Opcode:       o,
 		Displacement: []uint8{},
 		Immediate:    []uint8{},
 	}

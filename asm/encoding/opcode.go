@@ -98,6 +98,7 @@ type Opcode struct {
 }
 
 func (o *Opcode) Encode(ops []Operand) ([]uint8, error) {
+	fmt.Println(o.Opcode)
 	instr := NewInstructionFormat(o.Opcode)
 	exts := map[OpcodeExtensions]bool{}
 	for _, p := range o.Prefixes {
@@ -178,30 +179,43 @@ func (o *Opcode) Encode(ops []Operand) ([]uint8, error) {
 						instr.REXPrefix.R = op.(*Register).Register > 7
 					}
 				} else if opcodeOperand.Encoding == Opcode_plus_rd_r {
-					instr.Opcode[0] += op.(*Register).Encode()
+					fmt.Println("encoding", instr.Opcode)
+					instr.Opcode[0] += (op.(*Register).Register % 8)
+					if exts[RexW] {
+						instr.REXPrefix.B = op.(*Register).Register > 7
+					}
 				} else {
 					return nil, fmt.Errorf("Unsupported encoding [%d] in %s", opcodeOperand.Encoding, o.String())
 				}
 			} else if op.Type() == T_DisplacedRegister {
+				oper := op.(*DisplacedRegister)
 				if opcodeOperand.Encoding == ModRM_rm_r || opcodeOperand.Encoding == ModRM_rm_rw {
 					if instr.ModRM == nil {
 						instr.ModRM = &ModRM{}
 					}
-					instr.ModRM.Mode = DirectRegisterMode
-					instr.ModRM.RM = op.(*DisplacedRegister).Encode()
+					instr.ModRM.Mode = IndirectRegisterByteDisplacedMode
+					instr.ModRM.RM = oper.Encode()
+					instr.SetDisplacement(oper.Register, []uint8{oper.Displacement})
+
 					if exts[RexW] {
-						instr.REXPrefix.B = op.(*DisplacedRegister).Register.Register > 7
+						instr.REXPrefix.B = oper.Register.Register > 7
 					}
 				} else if opcodeOperand.Encoding == ModRM_reg_r || opcodeOperand.Encoding == ModRM_reg_rw {
 					if instr.ModRM == nil {
 						instr.ModRM = &ModRM{}
 					}
-					instr.ModRM.Reg = op.(*Register).Encode()
+					instr.ModRM.Mode = IndirectRegisterByteDisplacedMode
+					instr.ModRM.Reg = oper.Encode()
+					instr.SetDisplacement(oper.Register, []uint8{oper.Displacement})
 					if exts[RexW] {
-						instr.REXPrefix.R = op.(*DisplacedRegister).Register.Register > 7
+						instr.REXPrefix.R = oper.Register.Register > 7
 					}
 				} else {
 					return nil, fmt.Errorf("Unsupported encoding [%d] in %s", opcodeOperand.Encoding, o.String())
+				}
+			} else if op.Type() == T_Uint64 {
+				for _, b := range op.(Uint64).Encode() {
+					instr.Immediate = append(instr.Immediate, b)
 				}
 			} else if op.Type() == T_Uint32 {
 				for _, b := range op.(Uint32).Encode() {
