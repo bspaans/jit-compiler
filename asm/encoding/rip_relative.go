@@ -1,6 +1,10 @@
 package encoding
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/bspaans/jit/lib"
+)
 
 // Get address relative to instruction pointer
 type RIPRelative struct {
@@ -17,4 +21,7 @@ func (t *RIPRelative) String() string {
 	} else {
 		return fmt.Sprintf("$0x%x(%%rip)", t.Displacement)
 	}
+}
+func (t *RIPRelative) Width() lib.Size {
+	return lib.QUADWORD
 }

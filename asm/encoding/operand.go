@@ -1,5 +1,8 @@
 package encoding
 
+import "github.com/bspaans/jit/lib"
+
+//go:generate stringer -type=Type
 type Type uint8
 
 const (
@@ -18,12 +21,5 @@ const (
 type Operand interface {
 	Type() Type
 	String() string
-}
-
-type OneOperand interface {
-	GetSingleOperand() Operand
-}
-
-type TwoOperands interface {
-	GetOperands() (Operand, Operand)
+	Width() lib.Size
 }

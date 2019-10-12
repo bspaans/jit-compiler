@@ -2,6 +2,7 @@ package shared
 
 import "strings"
 
+//go:generate stringer -type=TypeNr
 type TypeNr int
 
 const (

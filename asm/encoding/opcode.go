@@ -5,6 +5,7 @@ import (
 	"strings"
 )
 
+//go:generate stringer -type=OperandType
 type OperandType int
 
 const (
@@ -33,6 +34,7 @@ const (
 	OT_xmm2m64 OperandType = iota
 )
 
+//go:generate stringer -type=OperandEncoding
 type OperandEncoding int
 
 const (
@@ -50,6 +52,7 @@ const (
 	Opcode_plus_rd_r = iota
 )
 
+//go:generate stringer -type=OpcodeExtensions
 type OpcodeExtensions int
 
 const (
@@ -75,15 +78,7 @@ type OpcodeOperand struct {
 }
 
 func (o *OpcodeOperand) String() string {
-	switch o.Type {
-	case OT_rm64:
-		return "r/m64"
-	case OT_r64:
-		return "r64"
-	case OT_imm32:
-		return "imm32"
-	}
-	return "?"
+	return o.Type.String()[3:]
 }
 
 func (o OpcodeOperand) TypeCheck(op Operand) bool {

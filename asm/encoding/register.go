@@ -27,6 +27,10 @@ func (r *Register) String() string {
 func (r *Register) Type() Type {
 	return T_Register
 }
+func (r *Register) Width() Size {
+	return r.Size
+}
+
 func (r *Register) Lower8BitRegister() *Register {
 	for _, reg := range Registers8 {
 		if reg.Register == r.Register {

@@ -4,12 +4,15 @@ import (
 	"bytes"
 	"encoding/binary"
 	"fmt"
+
+	"github.com/bspaans/jit/lib"
 )
 
 type Value interface {
 	Type() Type
 	String() string
 	Encode() []uint8
+	Width() lib.Size
 }
 
 type Uint8 uint8
@@ -29,6 +32,9 @@ func (i Uint8) Encode() []uint8 {
 	result[0] = uint8(i)
 	return result
 }
+func (t Uint8) Width() lib.Size {
+	return lib.BYTE
+}
 
 func (i Uint16) Type() Type {
 	return T_Uint16
@@ -40,6 +46,9 @@ func (i Uint16) Encode() []uint8 {
 	result := make([]byte, 2)
 	binary.LittleEndian.PutUint16(result, uint16(i))
 	return result
+}
+func (t Uint16) Width() lib.Size {
+	return lib.WORD
 }
 
 func (i Uint32) Type() Type {
@@ -53,6 +62,9 @@ func (i Uint32) Encode() []uint8 {
 	binary.LittleEndian.PutUint32(result, uint32(i))
 	return result
 }
+func (t Uint32) Width() lib.Size {
+	return lib.DOUBLE
+}
 
 func (i Uint64) Type() Type {
 	return T_Uint64
@@ -65,6 +77,9 @@ func (i Uint64) Encode() []uint8 {
 	binary.LittleEndian.PutUint64(result, uint64(i))
 	return result
 }
+func (t Uint64) Width() lib.Size {
+	return lib.QUADWORD
+}
 
 func (i Int32) Type() Type {
 	return T_Int32
@@ -76,4 +91,7 @@ func (i Int32) Encode() []uint8 {
 	buf := new(bytes.Buffer)
 	binary.Write(buf, binary.LittleEndian, int32(i))
 	return buf.Bytes()
+}
+func (t Int32) Width() lib.Size {
+	return lib.DOUBLE
 }

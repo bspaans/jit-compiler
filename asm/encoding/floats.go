@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"encoding/binary"
 	"fmt"
+
+	"github.com/bspaans/jit/lib"
 )
 
 type Float32 float32
@@ -59,6 +61,9 @@ func (f Float32) Encode() []uint8 {
 	binary.Write(buf, binary.LittleEndian, float32(f))
 	return buf.Bytes()
 }
+func (t Float32) Width() lib.Size {
+	return lib.DOUBLE
+}
 
 func (f Float64) Type() Type {
 	return T_Float64
@@ -70,4 +75,7 @@ func (f Float64) Encode() []uint8 {
 	buf := new(bytes.Buffer)
 	binary.Write(buf, binary.LittleEndian, float64(f))
 	return buf.Bytes()
+}
+func (t Float64) Width() lib.Size {
+	return lib.QUADWORD
 }
