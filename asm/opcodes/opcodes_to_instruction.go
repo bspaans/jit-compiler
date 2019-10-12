@@ -1,9 +1,10 @@
-package encoding
+package opcodes
 
 import (
 	"fmt"
 	"strings"
 
+	. "github.com/bspaans/jit/asm/encoding"
 	"github.com/bspaans/jit/lib"
 )
 

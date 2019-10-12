@@ -1,4 +1,8 @@
-package encoding
+package opcodes
+
+import (
+	. "github.com/bspaans/jit/asm/encoding"
+)
 
 var (
 	ADD_rm64_r64 = &Opcode{"add", []uint8{}, []uint8{0x01}, []OpcodeExtensions{RexW, SlashR},

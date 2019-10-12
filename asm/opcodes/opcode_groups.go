@@ -1,4 +1,8 @@
-package encoding
+package opcodes
+
+import (
+	. "github.com/bspaans/jit/asm/encoding"
+)
 
 var ADD = []*Opcode{ADD_rm64_r64, ADD_r64_rm64, ADD_rm64_imm32, ADDSD_xmm1_xmm2m64}
 var CALL = []*Opcode{CALL_rm64}
