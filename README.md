@@ -39,24 +39,23 @@ something about x86-64 and JIT compilation.
 
 Not an awful lot yet:
 
-* MOV, MOVQ
+* MOV, MOVQ, MOVSD
 * LEA
 * PUSH and POP
 * PUSHFQ
-* ADD, SUB 
+* ADD, SUB, DIV
 * ADDSD, SUBSD, MULSD and DIVSD
 * INC and DEC
 * CMP
-* CVTSI2SS, CVTTSD2SI (convert int to and from float)
-* SETE
+* CVTSI2SD, CVTTSD2SI (convert int to and from float)
+* SETA, SETAE, SETB, SETBE, SETE, SETNE
 * JMP and JMPE
 * CALL and SYSCALL
 * RET 
 
 Immediate values, direct registers, displaced registers and RIP relative
 addressing are mostly supported, but not every opcode will be able to handle
-all. I'm looking into some code generation to make it easier to add more
-complete coverage. 
+all.
 
 Register allocation is really noddy and works until you run out of registers;
 there is no allocating on the stack or heap yet.
