@@ -225,15 +225,13 @@ func (o *Opcode) Encode(ops []Operand) ([]uint8, error) {
 					}
 					instr.ModRM.Mode = IndirectRegisterMode
 					instr.ModRM.RM = 5
-					instr.ModRM.Reg = 0
 					instr.SetDisplacement(op, oper.Displacement.Encode())
 				} else if opcodeOperand.Encoding == ModRM_reg_r || opcodeOperand.Encoding == ModRM_reg_rw {
 					if instr.ModRM == nil {
 						instr.ModRM = &ModRM{}
 					}
 					instr.ModRM.Mode = IndirectRegisterMode
-					instr.ModRM.RM = 5
-					instr.ModRM.Reg = 0
+					instr.ModRM.Reg = 5
 					instr.SetDisplacement(op, oper.Displacement.Encode())
 				}
 

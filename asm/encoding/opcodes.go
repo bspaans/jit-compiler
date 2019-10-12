@@ -111,6 +111,12 @@ var (
 			OpcodeOperand{OT_rel8, ImmediateValue},
 		},
 	}
+	LEA_r64_m = &Opcode{"lea", []uint8{}, []uint8{0x8d}, []OpcodeExtensions{RexW, SlashR},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_r64, ModRM_reg_rw},
+			OpcodeOperand{OT_m, ModRM_rm_r},
+		},
+	}
 	MOV_rm64_r64 = &Opcode{"mov", []uint8{}, []uint8{0x89}, []OpcodeExtensions{RexW, SlashR},
 		[]OpcodeOperand{
 			OpcodeOperand{OT_rm64, ModRM_rm_rw},

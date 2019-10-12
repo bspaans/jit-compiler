@@ -20,16 +20,8 @@ func (i *LEA) Encode() (lib.MachineCode, error) {
 		return nil, errors.New("Missing source")
 	}
 	if i.Source.Type() == encoding.T_RIPRelative {
-		src := i.Source.(*encoding.RIPRelative)
 		if i.Dest.Type() == encoding.T_Register {
-			dest := i.Dest.(*encoding.Register)
-			rex := REXEncode(nil, dest)
-			modrm := encoding.NewModRM(encoding.IndirectRegisterMode, 5, dest.Encode()).Encode()
-			result := []uint8{rex, 0x8d, modrm}
-			for _, c := range src.Displacement.Encode() {
-				result = append(result, c)
-			}
-			return result, nil
+			return encoding.LEA_r64_m.Encode([]encoding.Operand{i.Dest, i.Source})
 		}
 	}
 	return nil, errors.New("Unsupported lea operation: " + i.String())
