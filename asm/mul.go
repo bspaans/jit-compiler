@@ -1,29 +1,31 @@
 package asm
 
-import "errors"
+import (
+	"errors"
+
+	"github.com/bspaans/jit/asm/encoding"
+	"github.com/bspaans/jit/lib"
+)
 
 type MUL struct {
-	Source Operand
-	Dest   Operand
+	Source encoding.Operand
+	Dest   encoding.Operand
 }
 
-func (i *MUL) Encode() (MachineCode, error) {
+func (i *MUL) Encode() (lib.MachineCode, error) {
 	if i.Dest == nil {
 		return nil, errors.New("Missing dest")
 	}
 	if i.Source == nil {
 		return nil, errors.New("Missing source")
 	}
-	if i.Source.Type() == T_Register {
-		src := i.Source.(*Register)
-		if i.Dest.Type() == T_Register {
-			dest := i.Dest.(*Register)
+	if i.Source.Type() == encoding.T_Register {
+		src := i.Source.(*encoding.Register)
+		if i.Dest.Type() == encoding.T_Register {
+			dest := i.Dest.(*encoding.Register)
 			// mulsd
-			if src.Size == QUADDOUBLE && dest.Size == QUADDOUBLE {
-				result := []uint8{0xf2, 0x0f, 0x59}
-				modrm := NewModRM(DirectRegisterMode, src.Encode(), dest.Encode())
-				result = append(result, modrm.Encode())
-				return result, nil
+			if src.Size == lib.QUADDOUBLE && dest.Size == lib.QUADDOUBLE {
+				return encoding.MULSD_xmm1_xmm2m64.Encode([]encoding.Operand{dest, src})
 			}
 		}
 	}

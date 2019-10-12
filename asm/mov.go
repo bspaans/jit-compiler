@@ -1,68 +1,73 @@
 package asm
 
-import "errors"
+import (
+	"errors"
+
+	"github.com/bspaans/jit/asm/encoding"
+	"github.com/bspaans/jit/lib"
+)
 
 type MOV struct {
-	Source Operand
-	Dest   Operand
+	Source encoding.Operand
+	Dest   encoding.Operand
 }
 
-func (i *MOV) Encode() (MachineCode, error) {
+func (i *MOV) Encode() (lib.MachineCode, error) {
 	if i.Dest == nil {
 		return nil, errors.New("Missing dest")
 	}
 	if i.Source == nil {
 		return nil, errors.New("Missing source")
 	}
-	if i.Source.Type() == T_Register {
-		src := i.Source.(*Register)
-		if i.Dest.Type() == T_Register {
-			dest := i.Dest.(*Register)
-			if src.Size == QUADWORD && dest.Size == QUADWORD {
+	if i.Source.Type() == encoding.T_Register {
+		src := i.Source.(*encoding.Register)
+		if i.Dest.Type() == encoding.T_Register {
+			dest := i.Dest.(*encoding.Register)
+			if src.Size == lib.QUADWORD && dest.Size == lib.QUADWORD {
 				return EncodeOpcodeWithREXAndModRM(0x89, dest, src, 0), nil
 			}
-		} else if i.Dest.Type() == T_DisplacedRegister {
-			dest := i.Dest.(*DisplacedRegister)
-			if src.Size == QUADWORD && dest.Size == QUADWORD {
+		} else if i.Dest.Type() == encoding.T_DisplacedRegister {
+			dest := i.Dest.(*encoding.DisplacedRegister)
+			if src.Size == lib.QUADWORD && dest.Size == lib.QUADWORD {
 				rex := REXEncode(src, dest.Register)
-				modrm := NewModRM(IndirectRegisterByteDisplacedMode, dest.Encode(), src.Encode()).Encode()
+				modrm := encoding.NewModRM(encoding.IndirectRegisterByteDisplacedMode, dest.Encode(), src.Encode()).Encode()
 				result := []uint8{rex, 0x89, modrm}
 				// Not sure why this is needed, but it is.
-				if dest.Register == Rsp {
+				if dest.Register == encoding.Rsp {
 					result = append(result, 0x24)
 				}
 				result = append(result, dest.Displacement)
 				return result, nil
 			}
 		}
-	} else if i.Source.Type() == T_RIPRelative {
-		src := i.Source.(*RIPRelative)
-		if i.Dest.Type() == T_Register {
-			dest := i.Dest.(*Register)
+	} else if i.Source.Type() == encoding.T_RIPRelative {
+		src := i.Source.(*encoding.RIPRelative)
+		if i.Dest.Type() == encoding.T_Register {
+			dest := i.Dest.(*encoding.Register)
 			rex := REXEncode(nil, dest)
-			modrm := NewModRM(IndirectRegisterMode, 5, 0).Encode()
+			modrm := encoding.NewModRM(encoding.IndirectRegisterMode, 5, 0).Encode()
 			result := []uint8{rex, 0x8b, modrm}
 			for _, c := range src.Displacement.Encode() {
 				result = append(result, c)
 			}
 			return result, nil
 		}
-	} else if i.Source.Type() == T_Uint64 {
-		src := i.Source.(Uint64)
-		if i.Dest.Type() == T_Register {
-			dest := i.Dest.(*Register)
+	} else if i.Source.Type() == encoding.T_Uint64 {
+		src := i.Source.(encoding.Uint64)
+		if i.Dest.Type() == encoding.T_Register {
+			dest := i.Dest.(*encoding.Register)
 			result := EncodeOpcodeWithREX(0xB8+(dest.Encode()&7), dest, nil)
 			for _, b := range src.Encode() {
 				result = append(result, b)
 			}
 			return result, nil
-		} else if i.Dest.Type() == T_DisplacedRegister {
-			dest := i.Dest.(*DisplacedRegister)
+		} else if i.Dest.Type() == encoding.T_DisplacedRegister {
+			dest := i.Dest.(*encoding.DisplacedRegister)
 			result := EncodeOpcodeWithREX(0xC7, dest.Register, nil)
-			modrm := NewModRM(IndirectRegisterByteDisplacedMode, dest.Encode(), 0).Encode()
+			modrm := encoding.NewModRM(encoding.IndirectRegisterByteDisplacedMode, dest.Encode(), 0).Encode()
 			result = append(result, modrm)
 			// Not sure why this is needed, but it is
-			if dest.Register == Rsp {
+			if dest.Register == encoding.Rsp {
 				result = append(result, 0x24)
 			}
 			result = append(result, dest.Displacement)
@@ -72,10 +77,10 @@ func (i *MOV) Encode() (MachineCode, error) {
 			}
 			return result, nil
 		}
-	} else if i.Source.Type() == T_Float64 {
-		src := i.Source.(Float64)
-		if i.Dest.Type() == T_Register {
-			dest := i.Dest.(*Register)
+	} else if i.Source.Type() == encoding.T_Float64 {
+		src := i.Source.(encoding.Float64)
+		if i.Dest.Type() == encoding.T_Register {
+			dest := i.Dest.(*encoding.Register)
 			result := EncodeOpcodeWithREX(0xB8+(dest.Encode()&7), dest, nil)
 			for _, b := range src.Encode() {
 				result = append(result, b)
@@ -90,29 +95,29 @@ func (i *MOV) String() string {
 }
 
 type MOVQ struct {
-	Source Operand
-	Dest   Operand
+	Source encoding.Operand
+	Dest   encoding.Operand
 }
 
-func (i *MOVQ) Encode() (MachineCode, error) {
+func (i *MOVQ) Encode() (lib.MachineCode, error) {
 	if i.Dest == nil {
 		return nil, errors.New("Missing dest")
 	}
 	if i.Source == nil {
 		return nil, errors.New("Missing source")
 	}
-	if i.Source.Type() == T_Register {
-		src := i.Source.(*Register)
-		if i.Dest.Type() == T_Register {
-			dest := i.Dest.(*Register)
-			if dest.Size == QUADDOUBLE {
-				if src.Size == QUADWORD {
+	if i.Source.Type() == encoding.T_Register {
+		src := i.Source.(*encoding.Register)
+		if i.Dest.Type() == encoding.T_Register {
+			dest := i.Dest.(*encoding.Register)
+			if dest.Size == lib.QUADDOUBLE {
+				if src.Size == lib.QUADWORD {
 					result := []uint8{0x66}
 					rex := REXEncode(src, dest)
 					result = append(result, rex)
 					result = append(result, 0x0f)
 					result = append(result, 0x6e)
-					modrm := NewModRM(DirectRegisterMode, src.Encode(), dest.Encode())
+					modrm := encoding.NewModRM(encoding.DirectRegisterMode, src.Encode(), dest.Encode())
 					result = append(result, modrm.Encode())
 					return result, nil
 
@@ -127,25 +132,25 @@ func (i *MOVQ) String() string {
 }
 
 type MOVSD struct {
-	Source Operand
-	Dest   Operand
+	Source encoding.Operand
+	Dest   encoding.Operand
 }
 
-func (i *MOVSD) Encode() (MachineCode, error) {
+func (i *MOVSD) Encode() (lib.MachineCode, error) {
 	if i.Dest == nil {
 		return nil, errors.New("Missing dest")
 	}
 	if i.Source == nil {
 		return nil, errors.New("Missing source")
 	}
-	if i.Source.Type() == T_Register {
-		src := i.Source.(*Register)
-		if i.Dest.Type() == T_Register {
-			dest := i.Dest.(*Register)
-			if dest.Size == QUADDOUBLE {
-				if src.Size == QUADDOUBLE {
+	if i.Source.Type() == encoding.T_Register {
+		src := i.Source.(*encoding.Register)
+		if i.Dest.Type() == encoding.T_Register {
+			dest := i.Dest.(*encoding.Register)
+			if dest.Size == lib.QUADDOUBLE {
+				if src.Size == lib.QUADDOUBLE {
 					result := []uint8{0xf2, 0x0f, 0x10}
-					modrm := NewModRM(DirectRegisterMode, src.Encode(), dest.Encode())
+					modrm := encoding.NewModRM(encoding.DirectRegisterMode, src.Encode(), dest.Encode())
 					result = append(result, modrm.Encode())
 					return result, nil
 

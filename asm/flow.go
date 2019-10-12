@@ -1,12 +1,17 @@
 package asm
 
-import "errors"
+import (
+	"errors"
+
+	"github.com/bspaans/jit/asm/encoding"
+	"github.com/bspaans/jit/lib"
+)
 
 type RET struct {
 }
 
-func (i *RET) Encode() (MachineCode, error) {
-	return []uint8{0xc3}, nil
+func (i *RET) Encode() (lib.MachineCode, error) {
+	return encoding.RETURN.Encode([]encoding.Operand{})
 }
 
 func (i *RET) String() string {
@@ -16,8 +21,8 @@ func (i *RET) String() string {
 type SYSCALL struct {
 }
 
-func (i *SYSCALL) Encode() (MachineCode, error) {
-	return []uint8{0x0f, 0x05}, nil
+func (i *SYSCALL) Encode() (lib.MachineCode, error) {
+	return encoding.SYSCALL.Encode([]encoding.Operand{})
 }
 
 func (i *SYSCALL) String() string {
@@ -25,27 +30,12 @@ func (i *SYSCALL) String() string {
 }
 
 type CALL struct {
-	Dest Operand
+	Dest encoding.Operand
 }
 
-func (i *CALL) Encode() (MachineCode, error) {
-	if i.Dest.Type() == T_Register {
-		dest := i.Dest.(*Register)
-		result := []uint8{0xff}
-		modrm := NewModRM(DirectRegisterMode, dest.Encode(), 2)
-		result = append(result, modrm.Encode())
-		return result, nil
-	} else if i.Dest.Type() == T_DisplacedRegister {
-		dest := i.Dest.(*DisplacedRegister)
-		result := []uint8{0xff}
-		modrm := NewModRM(IndirectRegisterByteDisplacedMode, dest.Encode(), 2)
-		result = append(result, modrm.Encode())
-		// Not sure why this is needed, but it is
-		if dest.Register == Rsp {
-			result = append(result, 0x24)
-		}
-		result = append(result, dest.Displacement)
-		return result, nil
+func (i *CALL) Encode() (lib.MachineCode, error) {
+	if i.Dest.Type() == encoding.T_Register || i.Dest.Type() == encoding.T_DisplacedRegister {
+		return encoding.CALL_rm64.Encode([]encoding.Operand{i.Dest})
 	}
 	return nil, errors.New("Unsupported call operation: " + i.String())
 }

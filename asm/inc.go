@@ -1,17 +1,22 @@
 package asm
 
-import "errors"
+import (
+	"errors"
+
+	"github.com/bspaans/jit/asm/encoding"
+	"github.com/bspaans/jit/lib"
+)
 
 type INC struct {
-	Register *Register
+	Register *encoding.Register
 }
 
-func (i *INC) Encode() (MachineCode, error) {
+func (i *INC) Encode() (lib.MachineCode, error) {
 	if i.Register == nil {
 		return nil, errors.New("Missing register")
 	}
-	if i.Register.Size == QUADWORD {
-		return EncodeOpcodeWithREXAndModRM(0xff, i.Register, nil, 0), nil
+	if i.Register.Size == lib.QUADWORD {
+		return encoding.INC_rm64.Encode([]encoding.Operand{i.Register})
 	}
 	return nil, errors.New("Unsupported register size")
 }
@@ -21,15 +26,15 @@ func (i *INC) String() string {
 }
 
 type DEC struct {
-	Register *Register
+	Register *encoding.Register
 }
 
-func (i *DEC) Encode() (MachineCode, error) {
+func (i *DEC) Encode() (lib.MachineCode, error) {
 	if i.Register == nil {
 		return nil, errors.New("Missing register")
 	}
-	if i.Register.Size == QUADWORD {
-		return EncodeOpcodeWithREXAndModRM(0xff, i.Register, nil, 1), nil
+	if i.Register.Size == lib.QUADWORD {
+		return encoding.DEC_rm64.Encode([]encoding.Operand{i.Register})
 	}
 	return nil, errors.New("Unsupported register size")
 }

@@ -1,21 +1,23 @@
 package asm
 
-import "errors"
+import (
+	"errors"
+
+	"github.com/bspaans/jit/asm/encoding"
+	"github.com/bspaans/jit/lib"
+)
 
 type JNE struct {
-	Dest Value
+	Dest encoding.Value
 }
 
-func (j *JNE) Encode() (MachineCode, error) {
+func (j *JNE) Encode() (lib.MachineCode, error) {
 	if j.Dest == nil {
 		return nil, errors.New("Missing destination")
 	}
 	var result []uint8
-	if j.Dest.Type() == T_Uint8 {
-		result = []uint8{0x75}
-		for _, b := range j.Dest.(Uint8).Encode() {
-			result = append(result, b)
-		}
+	if j.Dest.Type() == encoding.T_Uint8 {
+		return encoding.JNE_rel8.Encode([]encoding.Operand{j.Dest})
 	} else {
 		return nil, errors.New("Unsupported destination")
 	}
@@ -27,24 +29,18 @@ func (j *JNE) String() string {
 }
 
 type JMP struct {
-	Dest Value
+	Dest encoding.Value
 }
 
-func (j *JMP) Encode() (MachineCode, error) {
+func (j *JMP) Encode() (lib.MachineCode, error) {
 	if j.Dest == nil {
 		return nil, errors.New("Missing destination")
 	}
 	var result []uint8
-	if j.Dest.Type() == T_Uint8 {
-		result = []uint8{0xEB}
-		for _, b := range j.Dest.(Uint8).Encode() {
-			result = append(result, b)
-		}
-	} else if j.Dest.Type() == T_Uint32 {
-		result = []uint8{0xE9}
-		for _, b := range j.Dest.(Uint32).Encode() {
-			result = append(result, b)
-		}
+	if j.Dest.Type() == encoding.T_Uint8 {
+		return encoding.JMP_rel8.Encode([]encoding.Operand{j.Dest})
+	} else if j.Dest.Type() == encoding.T_Uint32 {
+		return encoding.JMP_rel32.Encode([]encoding.Operand{j.Dest})
 	} else {
 		return nil, errors.New("Unsupported destination")
 	}

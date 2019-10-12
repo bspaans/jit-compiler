@@ -1,4 +1,8 @@
-package asm
+package encoding
+
+import (
+	. "github.com/bspaans/jit/lib"
+)
 
 type Register struct {
 	Name     string

@@ -1,40 +1,37 @@
 package asm
 
-import "errors"
+import (
+	"errors"
+
+	"github.com/bspaans/jit/asm/encoding"
+	"github.com/bspaans/jit/lib"
+)
 
 type CMP struct {
-	Source Operand
-	Dest   Operand
+	Source encoding.Operand
+	Dest   encoding.Operand
 }
 
-func (i *CMP) Encode() (MachineCode, error) {
+func (i *CMP) Encode() (lib.MachineCode, error) {
 	if i.Dest == nil {
 		return nil, errors.New("Missing dest")
 	}
 	if i.Source == nil {
 		return nil, errors.New("Missing source")
 	}
-	if i.Source.Type() == T_Register {
-		src := i.Source.(*Register)
-		if i.Dest.Type() == T_Register {
-			dest := i.Dest.(*Register)
-			if src.Size == QUADWORD && dest.Size == QUADWORD {
-				return EncodeOpcodeWithREXAndModRM(0x39, dest, src, src.Register), nil
+	if i.Source.Type() == encoding.T_Register {
+		src := i.Source.(*encoding.Register)
+		if i.Dest.Type() == encoding.T_Register {
+			dest := i.Dest.(*encoding.Register)
+			if src.Size == lib.QUADWORD && dest.Size == lib.QUADWORD {
+				return encoding.CMP_rm64_r64.Encode([]encoding.Operand{dest, src})
 			}
 		}
 
-	} else if i.Source.Type() == T_Uint32 {
-		src := i.Source.(Uint32)
-		if i.Dest.Type() == T_Register {
-			dest := i.Dest.(*Register)
-			rexB := dest.Register > 7
-			rex := NewREXPrefix(true, false, false, rexB).Encode()
-			modrm := NewModRM(DirectRegisterMode, dest.Encode(), 7).Encode()
-			result := []uint8{rex, 0x81, modrm}
-			for _, b := range src.Encode() {
-				result = append(result, b)
-			}
-			return result, nil
+	} else if i.Source.Type() == encoding.T_Uint32 {
+		src := i.Source.(encoding.Uint32)
+		if i.Dest.Type() == encoding.T_Register {
+			return encoding.CMP_rm64_imm32.Encode([]encoding.Operand{i.Dest, src})
 		}
 	}
 	return nil, errors.New("Unsupported cmp operation: " + i.String())

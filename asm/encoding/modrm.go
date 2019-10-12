@@ -1,4 +1,4 @@
-package asm
+package encoding
 
 type Mode uint8
 

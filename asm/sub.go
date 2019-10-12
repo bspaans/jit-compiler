@@ -1,37 +1,40 @@
 package asm
 
-import "errors"
+import (
+	"errors"
+
+	"github.com/bspaans/jit/asm/encoding"
+	"github.com/bspaans/jit/lib"
+)
 
 type SUB struct {
-	Source Operand
-	Dest   Operand
+	Source encoding.Operand
+	Dest   encoding.Operand
 }
 
-func (i *SUB) Encode() (MachineCode, error) {
+func (i *SUB) Encode() (lib.MachineCode, error) {
 	if i.Dest == nil {
 		return nil, errors.New("Missing dest")
 	}
 	if i.Source == nil {
 		return nil, errors.New("Missing source")
 	}
-	if i.Source.Type() == T_Register {
-		src := i.Source.(*Register)
-		if i.Dest.Type() == T_Register {
-			dest := i.Dest.(*Register)
-			// subsd
-			if src.Size == QUADDOUBLE && dest.Size == QUADDOUBLE {
-				result := []uint8{0xf2, 0x0f, 0x5c}
-				modrm := NewModRM(DirectRegisterMode, src.Encode(), dest.Encode())
-				result = append(result, modrm.Encode())
-				return result, nil
+	if i.Source.Type() == encoding.T_Register {
+		src := i.Source.(*encoding.Register)
+		if i.Dest.Type() == encoding.T_Register {
+			dest := i.Dest.(*encoding.Register)
+			if src.Size == lib.QUADWORD && dest.Size == lib.QUADWORD {
+				return encoding.SUB_r64_rm64.Encode([]encoding.Operand{dest, src})
+			} else if src.Size == lib.QUADDOUBLE && dest.Size == lib.QUADDOUBLE {
+				return encoding.SUBSD_xmm1_xmm2m64.Encode([]encoding.Operand{dest, src})
 			}
 		}
 	}
-	if i.Source.Type() == T_Uint32 {
-		src := i.Source.(Uint32)
-		if i.Dest.Type() == T_Register {
-			dest := i.Dest.(*Register)
-			return EncodeOpcodeWithREXAndModRMAndImm(0x81, dest, nil, 5, src), nil
+	if i.Source.Type() == encoding.T_Uint32 {
+		src := i.Source.(encoding.Uint32)
+		if i.Dest.Type() == encoding.T_Register {
+			dest := i.Dest.(*encoding.Register)
+			return encoding.SUB_rm64_imm32.Encode([]encoding.Operand{dest, src})
 		}
 	}
 	return nil, errors.New("Unsupported sub operation")
@@ -39,11 +42,11 @@ func (i *SUB) Encode() (MachineCode, error) {
 
 func (i *SUB) String() string {
 	cmd := "sub"
-	if i.Source.Type() == T_Register {
-		src := i.Source.(*Register)
-		if i.Dest.Type() == T_Register {
-			dest := i.Dest.(*Register)
-			if src.Size == QUADDOUBLE && dest.Size == QUADDOUBLE {
+	if i.Source.Type() == encoding.T_Register {
+		src := i.Source.(*encoding.Register)
+		if i.Dest.Type() == encoding.T_Register {
+			dest := i.Dest.(*encoding.Register)
+			if src.Size == lib.QUADDOUBLE && dest.Size == lib.QUADDOUBLE {
 				cmd = "subsd"
 			}
 		}

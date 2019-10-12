@@ -1,20 +1,27 @@
 package asm
 
-import "errors"
+import (
+	"errors"
+
+	"github.com/bspaans/jit/asm/encoding"
+	"github.com/bspaans/jit/lib"
+)
 
 type PUSH struct {
-	Source Operand
+	Source encoding.Operand
 }
 
-func (i *PUSH) Encode() (MachineCode, error) {
+func (i *PUSH) Encode() (lib.MachineCode, error) {
 	if i.Source == nil {
 		return nil, errors.New("Missing source")
 	}
-	if i.Source.Type() == T_Register {
-		src := i.Source.(*Register)
-		if src.Size == QUADWORD {
-			return []uint8{0x50 + src.Register}, nil
+	if i.Source.Type() == encoding.T_Register {
+		src := i.Source.(*encoding.Register)
+		if src.Size == lib.QUADWORD {
+			return encoding.PUSH_r64.Encode([]encoding.Operand{src})
 		}
+	} else if i.Source.Type() == encoding.T_Uint32 {
+		return encoding.PUSH_imm32.Encode([]encoding.Operand{i.Source})
 	}
 	return nil, errors.New("Unsupported push operation")
 }
@@ -24,17 +31,17 @@ func (i *PUSH) String() string {
 }
 
 type POP struct {
-	Source Operand
+	Source encoding.Operand
 }
 
-func (i *POP) Encode() (MachineCode, error) {
+func (i *POP) Encode() (lib.MachineCode, error) {
 	if i.Source == nil {
 		return nil, errors.New("Missing source")
 	}
-	if i.Source.Type() == T_Register {
-		src := i.Source.(*Register)
-		if src.Size == QUADWORD {
-			return []uint8{0x58 + src.Register}, nil
+	if i.Source.Type() == encoding.T_Register {
+		src := i.Source.(*encoding.Register)
+		if src.Size == lib.QUADWORD {
+			return encoding.POP_r64.Encode([]encoding.Operand{src})
 		}
 	}
 	return nil, errors.New("Unsupported pop operation")
@@ -47,7 +54,7 @@ func (i *POP) String() string {
 type PUSHFQ struct {
 }
 
-func (i *PUSHFQ) Encode() (MachineCode, error) {
+func (i *PUSHFQ) Encode() (lib.MachineCode, error) {
 	return []uint8{0x9C}, nil
 }
 

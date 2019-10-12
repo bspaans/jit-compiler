@@ -1,20 +1,24 @@
 package asm
 
-import "errors"
+import (
+	"errors"
+
+	"github.com/bspaans/jit/asm/encoding"
+	"github.com/bspaans/jit/lib"
+)
 
 type SETE struct {
-	Dest Operand
+	Dest encoding.Operand
 }
 
-func (i *SETE) Encode() (MachineCode, error) {
+func (i *SETE) Encode() (lib.MachineCode, error) {
 	if i.Dest == nil {
 		return nil, errors.New("Missing dest")
 	}
-	if i.Dest.Type() == T_Register {
-		dest := i.Dest.(*Register)
-		if dest.Size == BYTE {
-			modrm := NewModRM(DirectRegisterMode, dest.Encode(), 0).Encode()
-			return []uint8{0x0f, 0x94, modrm}, nil
+	if i.Dest.Type() == encoding.T_Register {
+		dest := i.Dest.(*encoding.Register)
+		if dest.Size == lib.BYTE {
+			return encoding.SETE_rm8.Encode([]encoding.Operand{dest})
 		}
 	}
 	return nil, errors.New("Unsupported sete operation")

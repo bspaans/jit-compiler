@@ -1,4 +1,4 @@
-package asm
+package encoding
 
 import (
 	"bytes"
