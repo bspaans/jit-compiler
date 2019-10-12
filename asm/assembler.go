@@ -20,7 +20,7 @@ func init() {
 		&MOV{encoding.Uint64(0xffff), encoding.Rdi},
 		&INC{encoding.Rax},
 		&CMP{encoding.Rdi, encoding.Rax},
-		&JNE{encoding.Uint8(0xf9)},
+		JNE(encoding.Uint8(0xf9)),
 		&CMP{encoding.Rdi, encoding.Rax},
 		&SETE{encoding.Al},
 		&MOV{encoding.Uint64(123), encoding.Rcx},

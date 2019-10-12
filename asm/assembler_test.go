@@ -131,7 +131,7 @@ func Test_MOV(t *testing.T) {
 }
 
 func Test_JMP(t *testing.T) {
-	unit, err := (&JMP{encoding.Uint8(3)}).Encode()
+	unit, err := JMP(encoding.Uint8(3)).Encode()
 	if err != nil {
 		t.Fatal(err)
 	}

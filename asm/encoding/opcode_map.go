@@ -25,6 +25,9 @@ func (o OpcodeMaps) ResolveOpcode(operands []Operand) *Opcode {
 	for i, opcodeMap := range o {
 		fmt.Println(i, opcodeMap)
 		oper := operands[i]
+		if oper == nil {
+			return nil
+		}
 		matches := opcodeMap[oper.Type()][oper.Width()]
 		if len(matches) == 0 {
 			return nil
