@@ -144,7 +144,7 @@ func Test_JMP(t *testing.T) {
 func Test_Execute(t *testing.T) {
 	units := [][]lib.Instruction{
 		[]lib.Instruction{
-			&MOV{encoding.Uint64(5), &encoding.DisplacedRegister{encoding.Rsp, 8}},
+			&MOV{encoding.Uint32(uint32(5)), &encoding.DisplacedRegister{encoding.Rsp, 8}},
 			&RET{},
 		},
 		[]lib.Instruction{

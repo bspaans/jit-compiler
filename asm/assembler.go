@@ -16,7 +16,7 @@ func init() {
 		&MOV{encoding.Uint64(0), encoding.Rbp},
 		&MOV{encoding.Uint64(0), encoding.Rsi},
 		&MOV{encoding.Uint64(0), encoding.Rdi},
-		&MOV{encoding.Uint64(0), &encoding.DisplacedRegister{encoding.Rsp, 8}},
+		&MOV{encoding.Uint32(0), &encoding.DisplacedRegister{encoding.Rsp, 8}},
 		&MOV{encoding.Uint64(0xffff), encoding.Rdi},
 		&INC{encoding.Rax},
 		&CMP{encoding.Rdi, encoding.Rax},

@@ -29,6 +29,8 @@ const (
 	OT_imm32   OperandType = iota
 	OT_imm64   OperandType = iota
 	OT_xmm1    OperandType = iota
+	OT_xmm1m64 OperandType = iota
+	OT_xmm2    OperandType = iota
 	OT_xmm2m64 OperandType = iota
 )
 
@@ -180,7 +182,7 @@ func (o *Opcode) Encode(ops []Operand) ([]uint8, error) {
 					}
 				} else if opcodeOperand.Encoding == Opcode_plus_rd_r {
 					fmt.Println("encoding", instr.Opcode)
-					instr.Opcode[0] += (op.(*Register).Register % 8)
+					instr.Opcode[0] += op.(*Register).Register & 7
 					if exts[RexW] {
 						instr.REXPrefix.B = op.(*Register).Register > 7
 					}
@@ -215,6 +217,10 @@ func (o *Opcode) Encode(ops []Operand) ([]uint8, error) {
 				}
 			} else if op.Type() == T_Uint64 {
 				for _, b := range op.(Uint64).Encode() {
+					instr.Immediate = append(instr.Immediate, b)
+				}
+			} else if op.Type() == T_Float64 {
+				for _, b := range op.(Float64).Encode() {
 					instr.Immediate = append(instr.Immediate, b)
 				}
 			} else if op.Type() == T_Uint32 {
