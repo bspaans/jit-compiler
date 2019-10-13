@@ -9,20 +9,21 @@ func _() {
 	// Re-run the stringer command to generate them again.
 	var x [1]struct{}
 	_ = x[T_Register-0]
-	_ = x[T_DisplacedRegister-1]
-	_ = x[T_RIPRelative-2]
-	_ = x[T_Uint8-3]
-	_ = x[T_Uint16-4]
-	_ = x[T_Uint32-5]
-	_ = x[T_Uint64-6]
-	_ = x[T_Int32-7]
-	_ = x[T_Float32-8]
-	_ = x[T_Float64-9]
+	_ = x[T_IndirectRegister-1]
+	_ = x[T_DisplacedRegister-2]
+	_ = x[T_RIPRelative-3]
+	_ = x[T_Uint8-4]
+	_ = x[T_Uint16-5]
+	_ = x[T_Uint32-6]
+	_ = x[T_Uint64-7]
+	_ = x[T_Int32-8]
+	_ = x[T_Float32-9]
+	_ = x[T_Float64-10]
 }
 
-const _Type_name = "T_RegisterT_DisplacedRegisterT_RIPRelativeT_Uint8T_Uint16T_Uint32T_Uint64T_Int32T_Float32T_Float64"
+const _Type_name = "T_RegisterT_IndirectRegisterT_DisplacedRegisterT_RIPRelativeT_Uint8T_Uint16T_Uint32T_Uint64T_Int32T_Float32T_Float64"
 
-var _Type_index = [...]uint8{0, 10, 29, 42, 49, 57, 65, 73, 80, 89, 98}
+var _Type_index = [...]uint8{0, 10, 28, 47, 60, 67, 75, 83, 91, 98, 107, 116}
 
 func (i Type) String() string {
 	if i >= Type(len(_Type_index)-1) {

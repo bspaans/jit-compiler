@@ -54,8 +54,7 @@ Not an awful lot yet:
 * RET 
 
 Immediate values, direct registers, displaced registers and RIP relative
-addressing are mostly supported, but not every opcode will be able to handle
-all.
+addressing are supported.
 
 Register allocation is really noddy and works until you run out of registers;
 there is no allocating on the stack or heap yet.
@@ -81,7 +80,6 @@ I know, it's a bit much. Goodbye, Haskell.
 
 ## Next steps
 
-* Making sure CALL and SYSCALL adhere to the platform's ABI
 * SIMD support 
 * Some sort of array (possibly only static size)
 * Possibly a higher level language that compiles down into the IR

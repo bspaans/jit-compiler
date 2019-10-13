@@ -7,6 +7,7 @@ type Type uint8
 
 const (
 	T_Register          Type = iota
+	T_IndirectRegister  Type = iota
 	T_DisplacedRegister Type = iota
 	T_RIPRelative       Type = iota
 	T_Uint8             Type = iota

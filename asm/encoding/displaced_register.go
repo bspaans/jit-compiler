@@ -4,6 +4,7 @@ import "fmt"
 
 type DisplacedRegister struct {
 	*Register
+	// TODO: also support the 16 bit form
 	Displacement uint8
 }
 

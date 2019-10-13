@@ -209,6 +209,30 @@ func (o *Opcode) Encode(ops []Operand) ([]uint8, error) {
 				} else {
 					return nil, fmt.Errorf("Unsupported encoding [%d] in %s", opcodeOperand.Encoding, o.String())
 				}
+			} else if op.Type() == T_IndirectRegister {
+				oper := op.(*IndirectRegister)
+				if opcodeOperand.Encoding == ModRM_rm_r || opcodeOperand.Encoding == ModRM_rm_rw {
+					if instr.ModRM == nil {
+						instr.ModRM = &ModRM{}
+					}
+					instr.ModRM.Mode = IndirectRegisterMode
+					instr.ModRM.RM = oper.Encode()
+
+					if exts[RexW] {
+						instr.REXPrefix.B = oper.Register.Register > 7
+					}
+				} else if opcodeOperand.Encoding == ModRM_reg_r || opcodeOperand.Encoding == ModRM_reg_rw {
+					if instr.ModRM == nil {
+						instr.ModRM = &ModRM{}
+						instr.ModRM.Mode = IndirectRegisterMode
+					}
+					instr.ModRM.Reg = oper.Encode()
+					if exts[RexW] {
+						instr.REXPrefix.R = oper.Register.Register > 7
+					}
+				} else {
+					return nil, fmt.Errorf("Unsupported encoding [%d] in %s", opcodeOperand.Encoding, o.String())
+				}
 			} else if op.Type() == T_RIPRelative {
 				oper := op.(*RIPRelative)
 				if opcodeOperand.Encoding == ModRM_rm_r || opcodeOperand.Encoding == ModRM_rm_rw {
