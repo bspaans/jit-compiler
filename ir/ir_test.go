@@ -82,6 +82,10 @@ func Test_Execute_Result(t *testing.T) {
 					NewIR_Return(NewIR_Add(NewIR_Variable("z"), NewIR_Uint64(3))))),
 			NewIR_Assignment("f", NewIR_Call("a", []IRExpression{NewIR_Uint64(50)})),
 		},
+		[]IR{
+			NewIR_Assignment("a", NewIR_ByteArray([]uint8{50, 51, 52, 53})),
+			NewIR_Assignment("f", NewIR_ArrayIndex(NewIR_Variable("a"), NewIR_Uint64(3))),
+		},
 	}
 	for _, ir := range units {
 		i := append(ir, NewIR_Return(NewIR_Variable("f")))

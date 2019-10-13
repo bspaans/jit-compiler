@@ -97,6 +97,7 @@ func init() {
 		)),
 		NewIR_Assignment("g", NewIR_Call("a", []IRExpression{NewIR_Variable("z")})),
 		NewIR_Assignment("g", NewIR_LinuxWrite(NewIR_Uint64(uint64(1)), []uint8("howdy\n"), 6)),
+		NewIR_Assignment("g", NewIR_ArrayIndex(NewIR_ByteArray([]uint8("howdy\n")), NewIR_Uint64(2))),
 		NewIR_Return(NewIR_Variable("g")),
 		/*
 			NewIR_Assignment("q", NewIR_Float64(2.1415)),

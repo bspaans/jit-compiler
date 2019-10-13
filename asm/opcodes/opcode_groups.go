@@ -18,7 +18,14 @@ var INC = []*Opcode{INC_rm64}
 var JMP = []*Opcode{JMP_rel8, JMP_rel32, JMP_rm64}
 var JNE = []*Opcode{JNE_rel8}
 var LEA = []*Opcode{LEA_r64_m}
-var MOV = []*Opcode{MOV_rm64_r64, MOV_r64_rm64, MOV_r64_imm64, MOV_rm64_imm32, MOVQ_xmm_rm64, MOVSD_xmm1m64_xmm2}
+var MOV = []*Opcode{
+	MOV_rm8_r8, MOV_r8_rm8,
+	MOV_rm16_r16, MOV_r16_rm16,
+	MOV_rm32_r32, MOV_r32_rm32,
+	MOV_rm64_r64, MOV_r64_rm64,
+	MOV_r64_imm64, MOV_rm64_imm32,
+	MOVQ_xmm_rm64, MOVSD_xmm1m64_xmm2,
+}
 var MUL = []*Opcode{MULSD_xmm1_xmm2m64, IMUL_r64_rm64}
 var POP = []*Opcode{POP_r64}
 var PUSH = []*Opcode{PUSH_imm32, PUSH_r64}

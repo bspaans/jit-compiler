@@ -66,3 +66,10 @@ func (i *IR_Operator) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.In
 func (i *IR_Operator) String() string {
 	return fmt.Sprintf("%s %s %s", i.Op1.String(), i.Repr, i.Op2.String())
 }
+
+func (b *IR_Operator) AddToDataSection(ctx *IR_Context) error {
+	if err := b.Op1.AddToDataSection(ctx); err != nil {
+		return err
+	}
+	return b.Op2.AddToDataSection(ctx)
+}

@@ -69,6 +69,7 @@ const (
 	Slash6          OpcodeExtensions = iota
 	Slash7          OpcodeExtensions = iota
 	SlashR          OpcodeExtensions = iota
+	Rex             OpcodeExtensions = iota
 	RexW            OpcodeExtensions = iota
 )
 
@@ -145,6 +146,10 @@ func (o *Opcode) Encode(ops []Operand) ([]uint8, error) {
 				instr.REXPrefix = &REXPrefix{}
 			}
 			instr.REXPrefix.W = true
+		} else if ext == Rex {
+			if instr.REXPrefix == nil {
+				instr.REXPrefix = &REXPrefix{}
+			}
 		} else if ext == SlashR {
 			if instr.ModRM == nil {
 				instr.ModRM = &ModRM{}
@@ -163,7 +168,7 @@ func (o *Opcode) Encode(ops []Operand) ([]uint8, error) {
 					}
 					instr.ModRM.Mode = DirectRegisterMode
 					instr.ModRM.RM = oper.Encode()
-					if exts[RexW] {
+					if exts[RexW] || exts[Rex] {
 						instr.REXPrefix.B = oper.Register > 7
 					}
 				} else if opcodeOperand.Encoding == ModRM_reg_r || opcodeOperand.Encoding == ModRM_reg_rw {
@@ -172,12 +177,12 @@ func (o *Opcode) Encode(ops []Operand) ([]uint8, error) {
 						instr.ModRM.Mode = DirectRegisterMode
 					}
 					instr.ModRM.Reg = oper.Encode()
-					if exts[RexW] {
+					if exts[RexW] || exts[Rex] {
 						instr.REXPrefix.R = oper.Register > 7
 					}
 				} else if opcodeOperand.Encoding == Opcode_plus_rd_r {
 					instr.Opcode[0] += op.(*Register).Register & 7
-					if exts[RexW] {
+					if exts[RexW] || exts[Rex] {
 						instr.REXPrefix.B = op.(*Register).Register > 7
 					}
 				} else {
@@ -193,7 +198,7 @@ func (o *Opcode) Encode(ops []Operand) ([]uint8, error) {
 					instr.ModRM.RM = oper.Encode()
 					instr.SetDisplacement(oper.Register, []uint8{oper.Displacement})
 
-					if exts[RexW] {
+					if exts[RexW] || exts[Rex] {
 						instr.REXPrefix.B = oper.Register.Register > 7
 					}
 				} else if opcodeOperand.Encoding == ModRM_reg_r || opcodeOperand.Encoding == ModRM_reg_rw {
@@ -203,7 +208,7 @@ func (o *Opcode) Encode(ops []Operand) ([]uint8, error) {
 					}
 					instr.ModRM.Reg = oper.Encode()
 					instr.SetDisplacement(oper.Register, []uint8{oper.Displacement})
-					if exts[RexW] {
+					if exts[RexW] || exts[Rex] {
 						instr.REXPrefix.R = oper.Register.Register > 7
 					}
 				} else {
@@ -218,7 +223,7 @@ func (o *Opcode) Encode(ops []Operand) ([]uint8, error) {
 					instr.ModRM.Mode = IndirectRegisterMode
 					instr.ModRM.RM = oper.Encode()
 
-					if exts[RexW] {
+					if exts[RexW] || exts[Rex] {
 						instr.REXPrefix.B = oper.Register.Register > 7
 					}
 				} else if opcodeOperand.Encoding == ModRM_reg_r || opcodeOperand.Encoding == ModRM_reg_rw {
@@ -227,7 +232,7 @@ func (o *Opcode) Encode(ops []Operand) ([]uint8, error) {
 						instr.ModRM.Mode = IndirectRegisterMode
 					}
 					instr.ModRM.Reg = oper.Encode()
-					if exts[RexW] {
+					if exts[RexW] || exts[Rex] {
 						instr.REXPrefix.R = oper.Register.Register > 7
 					}
 				} else {

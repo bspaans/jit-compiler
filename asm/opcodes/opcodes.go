@@ -127,6 +127,42 @@ var (
 			OpcodeOperand{OT_m, ModRM_rm_r},
 		},
 	}
+	MOV_rm8_r8 = &Opcode{"mov", []uint8{}, []uint8{0x88}, []OpcodeExtensions{Rex, SlashR},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_rm8, ModRM_rm_rw},
+			OpcodeOperand{OT_r8, ModRM_reg_r},
+		},
+	}
+	MOV_r8_rm8 = &Opcode{"mov", []uint8{}, []uint8{0x8a}, []OpcodeExtensions{Rex, SlashR},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_r8, ModRM_reg_rw},
+			OpcodeOperand{OT_rm8, ModRM_rm_r},
+		},
+	}
+	MOV_rm16_r16 = &Opcode{"mov", []uint8{}, []uint8{0x89}, []OpcodeExtensions{SlashR},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_rm16, ModRM_rm_rw},
+			OpcodeOperand{OT_r16, ModRM_reg_r},
+		},
+	}
+	MOV_r16_rm16 = &Opcode{"mov", []uint8{}, []uint8{0x8b}, []OpcodeExtensions{SlashR},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_r16, ModRM_reg_rw},
+			OpcodeOperand{OT_rm16, ModRM_rm_r},
+		},
+	}
+	MOV_rm32_r32 = &Opcode{"mov", []uint8{}, []uint8{0x89}, []OpcodeExtensions{SlashR},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_rm32, ModRM_rm_rw},
+			OpcodeOperand{OT_r32, ModRM_reg_r},
+		},
+	}
+	MOV_r32_rm32 = &Opcode{"mov", []uint8{}, []uint8{0x8b}, []OpcodeExtensions{SlashR},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_r32, ModRM_reg_rw},
+			OpcodeOperand{OT_rm32, ModRM_rm_r},
+		},
+	}
 	MOV_rm64_r64 = &Opcode{"mov", []uint8{}, []uint8{0x89}, []OpcodeExtensions{RexW, SlashR},
 		[]OpcodeOperand{
 			OpcodeOperand{OT_rm64, ModRM_rm_rw},

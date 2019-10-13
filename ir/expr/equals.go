@@ -69,3 +69,10 @@ func (i *IR_Equals) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.Inst
 func (i *IR_Equals) String() string {
 	return fmt.Sprintf("%s == %s", i.Op1.String(), i.Op2.String())
 }
+
+func (b *IR_Equals) AddToDataSection(ctx *IR_Context) error {
+	if err := b.Op1.AddToDataSection(ctx); err != nil {
+		return err
+	}
+	return b.Op2.AddToDataSection(ctx)
+}

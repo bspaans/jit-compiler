@@ -1,8 +1,6 @@
 package opcodes
 
 import (
-	"fmt"
-
 	. "github.com/bspaans/jit/asm/encoding"
 	"github.com/bspaans/jit/lib"
 )
@@ -46,7 +44,7 @@ func (o OpcodeMaps) ResolveOpcode(operands []Operand) *Opcode {
 		picks = newPick
 	}
 	for pick, _ := range picks {
-		fmt.Println("Resolved", pick.String())
+		//fmt.Println("Resolved", pick.String())
 		return pick
 	}
 	return nil
@@ -55,6 +53,7 @@ func (o OpcodeMaps) ResolveOpcode(operands []Operand) *Opcode {
 func NewOpcodeMap() OpcodeMap {
 	return map[Type]map[lib.Size][]*Opcode{
 		T_Register:          map[lib.Size][]*Opcode{},
+		T_IndirectRegister:  map[lib.Size][]*Opcode{},
 		T_DisplacedRegister: map[lib.Size][]*Opcode{},
 		T_RIPRelative:       map[lib.Size][]*Opcode{},
 		T_Uint8:             map[lib.Size][]*Opcode{},
@@ -87,26 +86,33 @@ func OpcodesToOpcodeMap(opcodes []*Opcode, operand int) OpcodeMap {
 			opcodeMap.add(T_Uint32, lib.DOUBLE, opcode)
 		} else if opcode.Operands[operand].Type == OT_rm8 {
 			opcodeMap.add(T_Register, lib.BYTE, opcode)
+			opcodeMap.add(T_IndirectRegister, lib.BYTE, opcode)
 			opcodeMap.add(T_DisplacedRegister, lib.BYTE, opcode)
 			opcodeMap.add(T_RIPRelative, lib.BYTE, opcode)
 		} else if opcode.Operands[operand].Type == OT_rm16 {
 			opcodeMap.add(T_Register, lib.WORD, opcode)
+			opcodeMap.add(T_IndirectRegister, lib.WORD, opcode)
 			opcodeMap.add(T_DisplacedRegister, lib.WORD, opcode)
 			opcodeMap.add(T_RIPRelative, lib.WORD, opcode)
 		} else if opcode.Operands[operand].Type == OT_rm32 {
 			opcodeMap.add(T_Register, lib.DOUBLE, opcode)
+			opcodeMap.add(T_IndirectRegister, lib.DOUBLE, opcode)
 			opcodeMap.add(T_DisplacedRegister, lib.DOUBLE, opcode)
 			opcodeMap.add(T_RIPRelative, lib.DOUBLE, opcode)
 		} else if opcode.Operands[operand].Type == OT_rm64 {
 			opcodeMap.add(T_Register, lib.QUADWORD, opcode)
+			opcodeMap.add(T_IndirectRegister, lib.QUADWORD, opcode)
 			opcodeMap.add(T_DisplacedRegister, lib.QUADWORD, opcode)
 			opcodeMap.add(T_RIPRelative, lib.QUADWORD, opcode)
 		} else if opcode.Operands[operand].Type == OT_m {
 			opcodeMap.add(T_DisplacedRegister, lib.QUADWORD, opcode)
 			opcodeMap.add(T_RIPRelative, lib.QUADWORD, opcode)
 		} else if opcode.Operands[operand].Type == OT_m16 {
+			opcodeMap.add(T_IndirectRegister, lib.WORD, opcode)
 		} else if opcode.Operands[operand].Type == OT_m32 {
+			opcodeMap.add(T_IndirectRegister, lib.DOUBLE, opcode)
 		} else if opcode.Operands[operand].Type == OT_m64 {
+			opcodeMap.add(T_IndirectRegister, lib.QUADWORD, opcode)
 		} else if opcode.Operands[operand].Type == OT_imm8 {
 			opcodeMap.add(T_Uint8, lib.BYTE, opcode)
 		} else if opcode.Operands[operand].Type == OT_imm16 {

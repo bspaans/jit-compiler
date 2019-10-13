@@ -69,3 +69,7 @@ func (i *IR_Not) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.Instruc
 func (i *IR_Not) String() string {
 	return fmt.Sprintf("!(%s)", i.Op1.String())
 }
+
+func (b *IR_Not) AddToDataSection(ctx *IR_Context) error {
+	return b.Op1.AddToDataSection(ctx)
+}

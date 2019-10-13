@@ -74,3 +74,12 @@ func (i *IR_Call) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.Instru
 	result = result.Add(restore)
 	return result, nil
 }
+
+func (b *IR_Call) AddToDataSection(ctx *IR_Context) error {
+	for _, arg := range b.Args {
+		if err := arg.AddToDataSection(ctx); err != nil {
+			return err
+		}
+	}
+	return nil
+}

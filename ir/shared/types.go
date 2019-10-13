@@ -17,6 +17,7 @@ const (
 type Type interface {
 	Type() TypeNr
 	String() string
+	Width() int
 }
 
 type BaseType struct {
@@ -29,10 +30,21 @@ func (b *BaseType) Type() TypeNr {
 
 func (b *BaseType) String() string {
 	return map[TypeNr]string{
-		T_Uint8:   "uint8",
-		T_Uint64:  "uint64",
-		T_Float64: "float64",
-		T_Bool:    "bool",
+		T_Uint8:    "uint8",
+		T_Uint64:   "uint64",
+		T_Float64:  "float64",
+		T_Bool:     "bool",
+		T_Array:    "array",
+		T_Function: "func",
+	}[b.TypeNr]
+}
+
+func (b *BaseType) Width() int {
+	return map[TypeNr]int{
+		T_Uint8:   1,
+		T_Uint64:  4,
+		T_Float64: 4,
+		T_Bool:    1,
 	}[b.TypeNr]
 }
 
@@ -54,6 +66,9 @@ func (t *TArray) Type() TypeNr {
 func (b *TArray) String() string {
 	return "[" + b.ItemType.String() + "]"
 }
+func (b *TArray) Width() int {
+	return 4
+}
 
 type TFunction struct {
 	ReturnType Type
@@ -70,4 +85,7 @@ func (b *TFunction) String() string {
 		args = append(args, a.String())
 	}
 	return "(" + strings.Join(args, ", ") + ") " + b.ReturnType.String()
+}
+func (b *TFunction) Width() int {
+	return 4
 }
