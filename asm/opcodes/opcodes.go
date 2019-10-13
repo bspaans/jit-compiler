@@ -91,6 +91,12 @@ var (
 			OpcodeOperand{OT_rm64, ModRM_rm_rw},
 		},
 	}
+	IMUL_r64_rm64 = &Opcode{"imul", []uint8{}, []uint8{0x0f, 0xaf}, []OpcodeExtensions{RexW, Slash6},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_r64, ModRM_reg_rw},
+			OpcodeOperand{OT_rm64, ModRM_rm_rw},
+		},
+	}
 	// Jump short, RIP = RIP + 8 bit displacement sign extended to 64 bits
 	JMP_rel8 = &Opcode{"jmp", []uint8{}, []uint8{0xeb}, []OpcodeExtensions{ImmediateByte},
 		[]OpcodeOperand{
