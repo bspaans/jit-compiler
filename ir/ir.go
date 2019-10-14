@@ -21,8 +21,11 @@ func Compile(stmts []IR) (lib.MachineCode, error) {
 			return nil, err
 		}
 		if len(ctx.DataSection) != currentOffset-2 {
-			fmt.Printf("0x%x-0x%x: %s\n", currentOffset, len(ctx.DataSection)+2, stmt.String())
-			fmt.Println(lib.MachineCode(ctx.DataSection[currentOffset-ctx.DataSectionOffset : len(ctx.DataSection)-1]))
+			fmt.Printf("0x%x-0x%x (0x%x): %s\n",
+				currentOffset,
+				len(ctx.DataSection)+ctx.DataSectionOffset,
+				len(ctx.DataSection)+ctx.DataSectionOffset-currentOffset, stmt.String())
+			fmt.Println(lib.MachineCode(ctx.DataSection[currentOffset-ctx.DataSectionOffset : len(ctx.DataSection)]))
 		}
 	}
 	fmt.Println(".start:")
@@ -98,6 +101,9 @@ func init() {
 		NewIR_Assignment("g", NewIR_Call("a", []IRExpression{NewIR_Variable("z")})),
 		NewIR_Assignment("g", NewIR_LinuxWrite(NewIR_Uint64(uint64(1)), []uint8("howdy\n"), 6)),
 		NewIR_Assignment("g", NewIR_ArrayIndex(NewIR_ByteArray([]uint8("howdy\n")), NewIR_Uint64(2))),
+		NewIR_Assignment("g", NewIR_ArrayIndex(NewIR_StaticArray(TUint64,
+			[]encoding.Value{encoding.Uint64(0), encoding.Uint64(1), encoding.Uint64(2)},
+		), NewIR_Uint64(2))),
 		NewIR_Return(NewIR_Variable("g")),
 		/*
 			NewIR_Assignment("q", NewIR_Float64(2.1415)),

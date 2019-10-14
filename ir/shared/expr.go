@@ -15,19 +15,20 @@ type IRExpression interface {
 }
 
 const (
-	Uint64     IRExpressionType = iota
-	Float64    IRExpressionType = iota
-	ByteArray  IRExpressionType = iota
-	ArrayIndex IRExpressionType = iota
-	Bool       IRExpressionType = iota
-	Not        IRExpressionType = iota
-	Add        IRExpressionType = iota
-	Variable   IRExpressionType = iota
-	Equals     IRExpressionType = iota
-	Syscall    IRExpressionType = iota
-	Cast       IRExpressionType = iota
-	Function   IRExpressionType = iota
-	Call       IRExpressionType = iota
+	Uint64      IRExpressionType = iota
+	Float64     IRExpressionType = iota
+	ByteArray   IRExpressionType = iota
+	StaticArray IRExpressionType = iota
+	ArrayIndex  IRExpressionType = iota
+	Bool        IRExpressionType = iota
+	Not         IRExpressionType = iota
+	Add         IRExpressionType = iota
+	Variable    IRExpressionType = iota
+	Equals      IRExpressionType = iota
+	Syscall     IRExpressionType = iota
+	Cast        IRExpressionType = iota
+	Function    IRExpressionType = iota
+	Call        IRExpressionType = iota
 )
 
 type BaseIRExpression struct {

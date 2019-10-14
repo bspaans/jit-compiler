@@ -1,6 +1,10 @@
 package shared
 
-import "strings"
+import (
+	"strings"
+
+	"github.com/bspaans/jit/lib"
+)
 
 //go:generate stringer -type=TypeNr
 type TypeNr int
@@ -17,7 +21,7 @@ const (
 type Type interface {
 	Type() TypeNr
 	String() string
-	Width() int
+	Width() lib.Size
 }
 
 type BaseType struct {
@@ -39,12 +43,12 @@ func (b *BaseType) String() string {
 	}[b.TypeNr]
 }
 
-func (b *BaseType) Width() int {
-	return map[TypeNr]int{
-		T_Uint8:   1,
-		T_Uint64:  4,
-		T_Float64: 4,
-		T_Bool:    1,
+func (b *BaseType) Width() lib.Size {
+	return map[TypeNr]lib.Size{
+		T_Uint8:   lib.BYTE,
+		T_Uint64:  lib.QUADWORD,
+		T_Float64: lib.QUADWORD,
+		T_Bool:    lib.BYTE,
 	}[b.TypeNr]
 }
 
@@ -66,8 +70,8 @@ func (t *TArray) Type() TypeNr {
 func (b *TArray) String() string {
 	return "[" + b.ItemType.String() + "]"
 }
-func (b *TArray) Width() int {
-	return 4
+func (b *TArray) Width() lib.Size {
+	return lib.QUADWORD
 }
 
 type TFunction struct {
@@ -86,6 +90,6 @@ func (b *TFunction) String() string {
 	}
 	return "(" + strings.Join(args, ", ") + ") " + b.ReturnType.String()
 }
-func (b *TFunction) Width() int {
-	return 4
+func (b *TFunction) Width() lib.Size {
+	return lib.QUADWORD
 }

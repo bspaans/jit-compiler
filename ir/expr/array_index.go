@@ -25,6 +25,9 @@ func NewIR_ArrayIndex(array, index IRExpression) *IR_ArrayIndex {
 
 func (i *IR_ArrayIndex) ReturnType(ctx *IR_Context) Type {
 	ty := i.Array.ReturnType(ctx)
+	if ty == nil {
+		panic("Type is nil")
+	}
 	if ty.Type() != T_Array {
 		panic("Not an array")
 	}
@@ -49,10 +52,20 @@ func (i *IR_ArrayIndex) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.
 		return nil, err
 	}
 	result = lib.Instructions(result).Add(ix)
+	returnType := i.ReturnType(ctx)
+	if returnType == nil {
+		return nil, fmt.Errorf("Return type nil. wut")
+	}
 	itemWidth := i.ReturnType(ctx).Width()
+	fmt.Println(i.ReturnType(ctx), i.ReturnType(ctx).Width())
 	if itemWidth != 1 {
-		mul := asm.MUL(encoding.Uint32(itemWidth), target)
+		tmpReg3 := ctx.AllocateRegister(TUint64)
+		defer ctx.DeallocateRegister(tmpReg3)
+		mov := asm.MOV(encoding.Uint32(itemWidth), tmpReg3)
+		mul := asm.MUL(tmpReg3, target)
+		ctx.AddInstruction(mov)
 		ctx.AddInstruction(mul)
+		result = append(result, mov)
 		result = append(result, mul)
 	}
 	instr := lib.Instructions{
@@ -68,6 +81,7 @@ func (i *IR_ArrayIndex) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.
 		}
 
 		instr = append(instr, asm.MOV(encoding.Uint64(0), tmpReg2))
+		// TODO: replace Lower8BitRegister with GetRegisterForWidth(itemWidth)
 		instr = append(instr, asm.MOV(&encoding.IndirectRegister{tmpReg.Lower8BitRegister()}, tmpReg2.Lower8BitRegister()))
 		instr = append(instr, asm.MOV(tmpReg2, target))
 	} else {
