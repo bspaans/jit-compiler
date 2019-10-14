@@ -1,6 +1,8 @@
 package shared
 
 import (
+	"fmt"
+
 	"github.com/bspaans/jit/asm"
 	"github.com/bspaans/jit/asm/encoding"
 	"github.com/bspaans/jit/lib"
@@ -91,6 +93,9 @@ func ABI_Call_Setup(ctx *IR_Context, args []IRExpression, returnType Type) (lib.
 	argTypes := make([]Type, len(args))
 	for i, arg := range args {
 		argTypes[i] = arg.ReturnType(ctx)
+		if argTypes[i] == nil {
+			return nil, nil, nil, fmt.Errorf("Unknown type for value: %s", arg)
+		}
 	}
 	result, mapping, clobbered := PreserveRegisters(ctx, argTypes, returnType)
 	regs := ctx.ABI.GetRegistersForArgs(argTypes)
