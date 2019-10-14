@@ -1,7 +1,8 @@
 # jit-compiler
 
-Compiles a simple intermediate representation into x86-64 assembly and then
-machinecode, which can be executed in process.
+This is a Golang library containing an x86-64 assembler (see 'asm/') and a
+higher level intermediate representation that compiles down into x86-64 (see
+'ir/').
 
 ## Why Though?
 
@@ -35,9 +36,19 @@ could compile it all down into a single function on the fly? Maybe. This is a
 slightly unnecessary experiment to find out, whilst at the same time learning
 something about x86-64 and JIT compilation.
 
+## What is JIT compilation?
+
+Just In Time compilation is a method to convert, at runtime,  the execution of
+datastructures into machine code. This can be a a lot faster than interpreting
+the datastructures, as you are dealing directly with the processor and can
+apply optimisations that aren't usually possible in the source language. It
+does however mean you have to have some way to convert everything into binary;
+hence projects like these.
+
 ## What's supported
 
-Not an awful lot yet:
+The following x86-64 instructions are supported in the assembler. For a detailed 
+overview see `asm/opcodes/opcodes.go` and `asm/opcodes/opcode_groups.go`:
 
 * MOV, MOVQ, MOVSD
 * LEA
@@ -53,18 +64,16 @@ Not an awful lot yet:
 * CALL and SYSCALL
 * RET 
 
-Immediate values, direct registers, displaced registers and RIP relative
-addressing are supported.
-
-Register allocation is really noddy and works until you run out of registers;
-there is no allocating on the stack or heap yet.
+Immediate values, direct and indirect registers, displaced registers and RIP
+relative addressing are supported.
 
 In the higher level language the following constructs work:
 
 * Unsigned 64bit integers
 * 64bit floating point numbers
 * Booleans
-* Immutable byte arrays
+* Static size arrays
+* Array indexing
 * Assigning to variables
 * If statements
 * While loops
@@ -73,15 +82,17 @@ In the higher level language the following constructs work:
 * NOT logic expression
 * Syscalls
 * Return
-* Int arithmetic `(+, -)`
+* Int arithmetic `(+, -, *)`
 * Float arithmetic `(+, -, *, /)`
 
-I know, it's a bit much. Goodbye, Haskell.
+Register allocation is really noddy and works until you run out of registers;
+there is no allocating on the stack or heap yet; preserving registers across
+calls and syscalls is supported however.
 
 ## Next steps
 
 * SIMD support 
-* Some sort of array (possibly only static size)
+* Improve array support (SIMD, auto-vectorisation)
 * Possibly a higher level language that compiles down into the IR
 * A parser
 * Try and use it from bleep
