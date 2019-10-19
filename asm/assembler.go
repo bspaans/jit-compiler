@@ -134,5 +134,5 @@ func init() {
 		panic(err)
 	}
 	fmt.Println(b)
-	//b.Execute()
+	b.Execute()
 }

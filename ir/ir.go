@@ -6,6 +6,7 @@ import (
 	"github.com/bspaans/jit/asm"
 	"github.com/bspaans/jit/asm/encoding"
 	. "github.com/bspaans/jit/ir/expr"
+	"github.com/bspaans/jit/ir/shared"
 	. "github.com/bspaans/jit/ir/shared"
 	. "github.com/bspaans/jit/ir/statements"
 	"github.com/bspaans/jit/lib"
@@ -101,6 +102,10 @@ func init() {
 			[]IRExpression{NewIR_Uint64(0), NewIR_Uint64(1), NewIR_Uint64(4)},
 		), NewIR_Uint64(2))),
 		MustParseIR(`while g != 4 { g = g + 1 }`),
+		NewIR_Assignment("h", NewIR_Struct(
+			&TStruct{[]shared.Type{TUint64, TUint64}, []string{"a", "b"}},
+			[]IRExpression{NewIR_Uint64(3), NewIR_Uint64(21)},
+		)),
 		NewIR_Return(NewIR_Variable("g")),
 		/*
 			NewIR_Assignment("q", NewIR_Float64(2.1415)),

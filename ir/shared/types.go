@@ -16,6 +16,7 @@ const (
 	T_Bool     TypeNr = iota
 	T_Array    TypeNr = iota
 	T_Function TypeNr = iota
+	T_Struct   TypeNr = iota
 )
 
 type Type interface {
@@ -91,5 +92,24 @@ func (b *TFunction) String() string {
 	return "(" + strings.Join(args, ", ") + ") " + b.ReturnType.String()
 }
 func (b *TFunction) Width() lib.Size {
+	return lib.QUADWORD
+}
+
+type TStruct struct {
+	FieldTypes []Type
+	Fields     []string
+}
+
+func (t *TStruct) Type() TypeNr {
+	return T_Struct
+}
+func (b *TStruct) String() string {
+	args := []string{}
+	for i, a := range b.FieldTypes {
+		args = append(args, b.Fields[i]+" "+a.String())
+	}
+	return "struct {" + strings.Join(args, ", ") + "}"
+}
+func (b *TStruct) Width() lib.Size {
 	return lib.QUADWORD
 }

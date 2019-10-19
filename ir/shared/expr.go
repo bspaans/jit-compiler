@@ -21,6 +21,7 @@ const (
 	StaticArray IRExpressionType = iota
 	ArrayIndex  IRExpressionType = iota
 	Bool        IRExpressionType = iota
+	Struct      IRExpressionType = iota
 	Not         IRExpressionType = iota
 	Add         IRExpressionType = iota
 	Variable    IRExpressionType = iota

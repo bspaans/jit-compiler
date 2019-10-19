@@ -31,6 +31,9 @@ func Test_Parser_Happy(t *testing.T) {
 		"a123 = b() + c(  1  ,  2,  3 )",
 		"a123 = uint64(1)",
 		"a123 = float64(1)",
+		`a = 1; b = 2`,
+		`a = 1 
+         b = 2`,
 	}
 	for _, p := range shouldParse {
 		_, err := ParseIR(p)
