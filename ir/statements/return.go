@@ -4,6 +4,8 @@ import (
 	"fmt"
 
 	"github.com/bspaans/jit/asm"
+	"github.com/bspaans/jit/asm/encoding"
+	"github.com/bspaans/jit/ir/expr"
 	. "github.com/bspaans/jit/ir/shared"
 	"github.com/bspaans/jit/lib"
 )
@@ -21,11 +23,18 @@ func NewIR_Return(expr IRExpression) *IR_Return {
 }
 
 func (i *IR_Return) Encode(ctx *IR_Context) ([]lib.Instruction, error) {
-	reg := ctx.AllocateRegister(i.Expr.ReturnType(ctx))
-	defer ctx.DeallocateRegister(reg)
-	result, err := i.Expr.Encode(ctx, reg)
-	if err != nil {
-		return nil, err
+	result := []lib.Instruction{}
+	var reg encoding.Operand
+	if i.Expr.Type() == Variable {
+		reg = ctx.VariableMap[i.Expr.(*expr.IR_Variable).Value]
+	} else {
+		reg = ctx.AllocateRegister(i.Expr.ReturnType(ctx))
+		defer ctx.DeallocateRegister(reg.(*encoding.Register))
+		result_, err := i.Expr.Encode(ctx, reg)
+		if err != nil {
+			return nil, err
+		}
+		result = result_
 	}
 	target := ctx.PeekReturn()
 	instr := []lib.Instruction{

@@ -28,7 +28,7 @@ func (i *IR_Cast) ReturnType(ctx *IR_Context) Type {
 }
 
 func (i *IR_Cast) String() string {
-	return fmt.Sprintf("(%s).(%s)", i.Value.String(), i.CastToType.String())
+	return fmt.Sprintf("%s(%s)", i.CastToType.String(), i.Value.String())
 }
 
 func (i *IR_Cast) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.Instruction, error) {

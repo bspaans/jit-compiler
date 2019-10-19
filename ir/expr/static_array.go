@@ -13,11 +13,11 @@ import (
 type IR_StaticArray struct {
 	*BaseIRExpression
 	ElemType Type
-	Value    []encoding.Value
+	Value    []IRExpression
 	address  int
 }
 
-func NewIR_StaticArray(elemType Type, value []encoding.Value) *IR_StaticArray {
+func NewIR_StaticArray(elemType Type, value []IRExpression) *IR_StaticArray {
 	return &IR_StaticArray{
 		BaseIRExpression: NewBaseIRExpression(StaticArray),
 		ElemType:         elemType,
@@ -34,7 +34,7 @@ func (i *IR_StaticArray) String() string {
 	for _, v := range i.Value {
 		elems = append(elems, v.String())
 	}
-	return fmt.Sprintf("[%s]", strings.Join(elems, ", "))
+	return fmt.Sprintf("[]%s{%s}", i.ElemType.String(), strings.Join(elems, ", "))
 }
 
 func (i *IR_StaticArray) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.Instruction, error) {
@@ -51,7 +51,14 @@ func (i *IR_StaticArray) Encode(ctx *IR_Context, target encoding.Operand) ([]lib
 func (b *IR_StaticArray) AddToDataSection(ctx *IR_Context) error {
 	b.address = -1
 	for _, v := range b.Value {
-		bytes := v.Encode()
+		bytes := []uint8{}
+		if ir, ok := v.(*IR_Uint64); ok {
+			bytes = encoding.Uint64(ir.Value).Encode()
+		} else if ir, ok := v.(*IR_Float64); ok {
+			bytes = encoding.Float64(ir.Value).Encode()
+		} else {
+			return fmt.Errorf("Unsupported array type %s", v.Type())
+		}
 		addr := ctx.AddToDataSection(bytes)
 		if b.address == -1 {
 			b.address = addr

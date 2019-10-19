@@ -82,7 +82,8 @@ func CompileIR(stmts []IR) ([]lib.Instruction, error) {
 
 func init() {
 	i := []IR{
-		MustParseIR(`b = 3; c = 3; d = 3; e = 3; h = 3; z = 300`),
+		MustParseIR(`b = 0; c = 3; d = 3; e = 3; h = 3; z = 300`),
+		MustParseIR(`while b != 3 { b = b + 1 }`),
 		NewIR_Assignment("a", NewIR_Function(&TFunction{TUint64, []Type{TUint64}, []string{"z"}},
 			NewIR_AndThen(
 				NewIR_Assignment("b", NewIR_Float64(3.0)),
@@ -97,8 +98,9 @@ func init() {
 		NewIR_Assignment("g", NewIR_LinuxWrite(NewIR_Uint64(uint64(1)), []uint8("howdy\n"), 6)),
 		NewIR_Assignment("g", NewIR_ArrayIndex(NewIR_ByteArray([]uint8("howdy\n")), NewIR_Uint64(2))),
 		NewIR_Assignment("g", NewIR_ArrayIndex(NewIR_StaticArray(TUint64,
-			[]encoding.Value{encoding.Uint64(0), encoding.Uint64(1), encoding.Uint64(2)},
+			[]IRExpression{NewIR_Uint64(0), NewIR_Uint64(1), NewIR_Uint64(4)},
 		), NewIR_Uint64(2))),
+		MustParseIR(`while g != 4 { g = g + 1 }`),
 		NewIR_Return(NewIR_Variable("g")),
 		/*
 			NewIR_Assignment("q", NewIR_Float64(2.1415)),

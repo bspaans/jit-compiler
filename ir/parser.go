@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
+	"strings"
 
 	"github.com/bspaans/jit/ir/expr"
 	"github.com/bspaans/jit/ir/shared"
@@ -101,6 +102,30 @@ func (p Parser) Many1() Parser {
 	}
 }
 
+func ParseList(p Parser) Parser {
+	return func(str string) *ParseResult {
+		result := []interface{}{}
+		for {
+			sub := p(str)
+			if sub.Result == nil && len(result) == 0 {
+				return ParseSuccess(result, sub.Rest)
+			} else if sub.Result == nil {
+				return ParseError(errors.New("Expecting list element"))
+			} else if sub.Error != nil {
+				return sub
+			}
+			result = append(result, sub.Result)
+			str = sub.Rest
+
+			comma := ParseSpace().And(ParseByte(',')).And(ParseSpace())(str)
+			if comma.Result == nil || comma.Error != nil {
+				return ParseSuccess(result, sub.Rest)
+			}
+			str = comma.Rest
+		}
+	}
+}
+
 func OneOf(ps []Parser) Parser {
 	return func(str string) *ParseResult {
 		for _, p := range ps {
@@ -125,6 +150,62 @@ func ParseByte(char byte) Parser {
 	}
 }
 
+func ParseString(s string) Parser {
+	return func(str string) *ParseResult {
+		if !strings.HasPrefix(str, s) {
+			return NilParseResult(str)
+		}
+		return ParseSuccess(s, str[len(s):])
+	}
+}
+
+func ParseType() Parser {
+	return OneOf([]Parser{
+		ParseString("uint64"),
+		ParseString("float64"),
+	}).Fmap(func(b *ParseResult) *ParseResult {
+		if b.Result.(string) == "uint64" {
+			return ParseSuccess(shared.TUint64, b.Rest)
+		} else if b.Result.(string) == "float64" {
+			return ParseSuccess(shared.TFloat64, b.Rest)
+		}
+		return ParseError(errors.New("Unknown type"))
+	})
+}
+
+func ParseArrayItems() Parser {
+	itemParser := OneOf([]Parser{
+		ParseFloat64(),
+		ParseUint64(),
+		ParseBool(),
+	})
+	return ParseList(itemParser).Fmap(func(items *ParseResult) *ParseResult {
+		return ParseSuccess(InterfaceArrayToIRExpressionArray(items.Result), items.Rest)
+	})
+}
+
+func ParseArray() Parser {
+	return ParseString("[]").And(ParseType()).AndThen(func(elemType *ParseResult) Parser {
+		return ParseByte('{').And(ParseSpace()).And(ParseArrayItems()).AndThen(func(elems *ParseResult) Parser {
+			return ParseSpace().And(ParseByte('}')).Fmap(func(b *ParseResult) *ParseResult {
+				return ParseSuccess(expr.NewIR_StaticArray(elemType.Result.(shared.Type), elems.Result.([]shared.IRExpression)), b.Rest)
+			})
+		})
+	})
+}
+
+func ParseBool() Parser {
+	return OneOf([]Parser{
+		ParseString("true"),
+		ParseString("false"),
+	}).Fmap(func(b *ParseResult) *ParseResult {
+		if b.Result.(string) == "true" {
+			return ParseSuccess(expr.NewIR_Bool(true), b.Rest)
+		}
+		return ParseSuccess(expr.NewIR_Bool(false), b.Rest)
+	})
+}
+
 func ParseByteRange(start, end byte) Parser {
 	return func(str string) *ParseResult {
 		if len(str) == 0 {
@@ -146,6 +227,15 @@ func InterfaceArrayToByteArray(values interface{}) []byte {
 	return chars
 }
 
+func InterfaceArrayToIRExpressionArray(values interface{}) []shared.IRExpression {
+	valueArray := values.([]interface{})
+	chars := []shared.IRExpression{}
+	for _, v := range valueArray {
+		chars = append(chars, v.(shared.IRExpression))
+	}
+	return chars
+}
+
 func ParseUint64() Parser {
 	return ParseByteRange('0', '9').Many1().Fmap(func(sub *ParseResult) *ParseResult {
 		chars := InterfaceArrayToByteArray(sub.Result)
@@ -158,7 +248,23 @@ func ParseUint64() Parser {
 	})
 }
 
-func ParseVariable() Parser {
+func ParseFloat64() Parser {
+	return ParseByteRange('0', '9').Many1().AndThen(func(s *ParseResult) Parser {
+		return ParseByte('.').And(ParseByteRange('0', '9').Many1()).Fmap(func(r *ParseResult) *ParseResult {
+			chars := InterfaceArrayToByteArray(s.Result)
+			remainder := InterfaceArrayToByteArray(r.Result)
+			f := string(chars) + "." + string(remainder)
+			float, err := strconv.ParseFloat(f, 64)
+			return &ParseResult{
+				Result: expr.NewIR_Float64(float),
+				Rest:   r.Rest,
+				Error:  err,
+			}
+		})
+	})
+}
+
+func ParseIdent() Parser {
 	return OneOf([]Parser{
 		ParseByteRange('a', 'z'),
 		ParseByteRange('A', 'Z'),
@@ -169,8 +275,9 @@ func ParseVariable() Parser {
 			ParseByteRange('0', '9'),
 		}).Many().Fmap(func(sub2 *ParseResult) *ParseResult {
 			chars := InterfaceArrayToByteArray(sub2.Result)
+			result := string(sub1.Result.(byte)) + string(chars)
 			return &ParseResult{
-				Result: expr.NewIR_Variable(string(sub1.Result.(byte)) + string(chars)),
+				Result: result,
 				Rest:   sub2.Rest,
 				Error:  nil,
 			}
@@ -178,17 +285,49 @@ func ParseVariable() Parser {
 	})
 }
 
+func ParseVariable() Parser {
+	return ParseIdent().Fmap(func(ident *ParseResult) *ParseResult {
+		ReservedWords := map[string]bool{
+			"if":      true,
+			"while":   true,
+			"uint64":  true,
+			"float64": true,
+		}
+		result := ident.Result.(string)
+		if reserved := ReservedWords[result]; reserved {
+			return ParseError(fmt.Errorf("%v is a reserved word", reserved))
+		}
+		return &ParseResult{
+			Result: expr.NewIR_Variable(result),
+			Rest:   ident.Rest,
+			Error:  nil,
+		}
+	})
+}
+
 func ParseOperator() Parser {
-	return OneOf([]Parser{
-		ParseUint64(),
-		ParseVariable(),
-	}).AndThen(func(op1 *ParseResult) Parser {
+	return ParseSingleExpression().AndThen(func(op1 *ParseResult) Parser {
 		return ParseSpace().And(OneOf([]Parser{
-			ParseByte('+'),
+			ParseString("+"),
+			ParseString("-"),
+			ParseString("*"),
+			ParseString("/"),
+			ParseString("=="),
+			ParseString("!="),
 		})).AndThen(func(op *ParseResult) Parser {
 			return ParseSpace().And(ParseExpression()).Fmap(func(op2 *ParseResult) *ParseResult {
-				if op.Result.(byte) == '+' {
+				if op.Result.(string) == "+" {
 					return ParseSuccess(expr.NewIR_Add(op1.Result.(shared.IRExpression), op2.Result.(shared.IRExpression)), op2.Rest)
+				} else if op.Result.(string) == "-" {
+					return ParseSuccess(expr.NewIR_Sub(op1.Result.(shared.IRExpression), op2.Result.(shared.IRExpression)), op2.Rest)
+				} else if op.Result.(string) == "*" {
+					return ParseSuccess(expr.NewIR_Mul(op1.Result.(shared.IRExpression), op2.Result.(shared.IRExpression)), op2.Rest)
+				} else if op.Result.(string) == "/" {
+					return ParseSuccess(expr.NewIR_Div(op1.Result.(shared.IRExpression), op2.Result.(shared.IRExpression)), op2.Rest)
+				} else if op.Result.(string) == "==" {
+					return ParseSuccess(expr.NewIR_Equals(op1.Result.(shared.IRExpression), op2.Result.(shared.IRExpression)), op2.Rest)
+				} else if op.Result.(string) == "!=" {
+					return ParseSuccess(expr.NewIR_Not(expr.NewIR_Equals(op1.Result.(shared.IRExpression), op2.Result.(shared.IRExpression))), op2.Rest)
 				}
 				return ParseError(errors.New("Unknown operator"))
 			})
@@ -199,19 +338,43 @@ func ParseOperator() Parser {
 func ParseSpace() Parser {
 	return ParseByte(' ').Many()
 }
+func ParseSpace1() Parser {
+	return ParseByte(' ').Many1()
+}
+
+func ParseSingleExpression() Parser {
+	return OneOf([]Parser{
+		ParseArrayIndex(),
+		ParseBool(),
+		ParseFloat64(),
+		ParseUint64(),
+		ParseFunctionCall(),
+		ParseFunction(),
+		ParseVariable(),
+		ParseArray(),
+	})
+}
 
 func ParseExpression() Parser {
 	return OneOf([]Parser{
 		ParseOperator(),
-		ParseUint64(),
-		ParseVariable(),
+		ParseSingleExpression(),
 	})
+}
+
+func ParseSingleStatement() Parser {
+	return ParseSpace().And(OneOf([]Parser{
+		ParseIf(),
+		ParseAssigment(),
+		ParseReturn(),
+		ParseWhile(),
+	}))
 }
 
 func ParseStatement() Parser {
 	return ParseSpace().And(OneOf([]Parser{
 		ParseAndThen(),
-		ParseAssigment(),
+		ParseSingleStatement(),
 	}))
 }
 
@@ -224,15 +387,116 @@ func ParseAssigment() Parser {
 	})
 }
 
+func ParseFunctionDefArgs() Parser {
+	itemParser := ParseVariable().AndThen(func(variable *ParseResult) Parser {
+		return ParseSpace1().And(ParseType()).Fmap(func(typ *ParseResult) *ParseResult {
+			v := []interface{}{variable.Result.(*expr.IR_Variable).Value, typ.Result.(shared.Type)}
+			return ParseSuccess(v, typ.Rest)
+		})
+	})
+	return ParseList(itemParser)
+}
+
+func ParseFunction() Parser {
+	return ParseString("func").And(ParseSpace()).And(ParseByte('(')).And(ParseFunctionDefArgs()).AndThen(func(args *ParseResult) Parser {
+		return ParseByte(')').And(ParseSpace()).And(ParseType()).AndThen(func(returns *ParseResult) Parser {
+			return ParseBlock().Fmap(func(body *ParseResult) *ParseResult {
+				argNames := []string{}
+				argTypes := []shared.Type{}
+				for _, pair := range args.Result.([]interface{}) {
+					lst := pair.([]interface{})
+					argNames = append(argNames, lst[0].(string))
+					argTypes = append(argTypes, lst[1].(shared.Type))
+				}
+				signature := &shared.TFunction{
+					ReturnType: returns.Result.(shared.Type),
+					Args:       argTypes,
+					ArgNames:   argNames,
+				}
+				return ParseSuccess(expr.NewIR_Function(signature, body.Result.(shared.IR)), body.Rest)
+			})
+		})
+	})
+}
+
+func ParseFunctionArgs() Parser {
+	return ParseList(ParseExpression())
+}
+
+func ParseFunctionCall() Parser {
+	return ParseIdent().AndThen(func(v *ParseResult) Parser {
+		return ParseByte('(').And(ParseSpace()).And(ParseFunctionArgs()).AndThen(func(args *ParseResult) Parser {
+			return ParseSpace().And(ParseByte(')')).Fmap(func(r *ParseResult) *ParseResult {
+				args := InterfaceArrayToIRExpressionArray(args.Result)
+				function := v.Result.(string)
+				result := shared.IRExpression(expr.NewIR_Call(function, args))
+
+				if ty := ParseType()(function); ty.Result != nil && ty.Error == nil {
+					if len(args) == 1 {
+						result = expr.NewIR_Cast(args[0], ty.Result.(shared.Type))
+					} else {
+						return ParseError(fmt.Errorf("Too many parameters for call to %v", function))
+					}
+				}
+				return ParseSuccess(result, r.Rest)
+			})
+		})
+	})
+}
+
 func ParseAndThen() Parser {
-	return OneOf([]Parser{
-		ParseAssigment(),
-	}).AndThen(func(a *ParseResult) Parser {
+	return ParseSingleStatement().AndThen(func(a *ParseResult) Parser {
 		return ParseSpace().And(OneOf([]Parser{
 			ParseByte(';'),
 			ParseByte('\n'),
 		})).And(ParseSpace()).And(ParseStatement()).Fmap(func(a2 *ParseResult) *ParseResult {
 			return ParseSuccess(statements.NewIR_AndThen(a.Result.(shared.IR), a2.Result.(shared.IR)), a2.Rest)
+		})
+	})
+}
+
+func ParseReturn() Parser {
+	return ParseString("return").And(ParseSpace1()).And(ParseExpression()).Fmap(func(r *ParseResult) *ParseResult {
+		return ParseSuccess(statements.NewIR_Return(r.Result.(shared.IRExpression)), r.Rest)
+	})
+}
+
+func ParseBlock() Parser {
+	return ParseSpace().And(ParseByte('{')).And(ParseSpace()).And(ParseStatement()).AndThen(func(stmt *ParseResult) Parser {
+		return ParseSpace().And(ParseByte('}')).And(ParseSpace()).Fmap(func(b *ParseResult) *ParseResult {
+			return ParseSuccess(stmt.Result, b.Rest)
+		})
+	})
+
+}
+
+func ParseIf() Parser {
+	return ParseString("if").And(ParseSpace1()).And(ParseExpression()).AndThen(func(cond *ParseResult) Parser {
+		return ParseBlock().AndThen(func(stmt1 *ParseResult) Parser {
+			return ParseString("else").And(ParseBlock()).Fmap(func(stmt2 *ParseResult) *ParseResult {
+				return ParseSuccess(statements.NewIR_If(cond.Result.(shared.IRExpression), stmt1.Result.(shared.IR), stmt2.Result.(shared.IR)), stmt2.Rest)
+			})
+		})
+	})
+}
+
+func ParseWhile() Parser {
+	return ParseString("while").And(ParseSpace1()).And(ParseExpression()).AndThen(func(cond *ParseResult) Parser {
+		return ParseBlock().Fmap(func(stmt1 *ParseResult) *ParseResult {
+			return ParseSuccess(statements.NewIR_While(cond.Result.(shared.IRExpression), stmt1.Result.(shared.IR)), stmt1.Rest)
+		})
+	})
+}
+
+func ParseArrayIndex() Parser {
+	return OneOf([]Parser{
+		ParseVariable(),
+		ParseArray(),
+	}).AndThen(func(e *ParseResult) Parser {
+		return ParseByte('[').And(ParseSpace()).And(ParseExpression()).AndThen(func(e2 *ParseResult) Parser {
+			return ParseSpace().And(ParseByte(']')).Fmap(func(l *ParseResult) *ParseResult {
+				return ParseSuccess(expr.NewIR_ArrayIndex(e.Result.(shared.IRExpression), e2.Result.(shared.IRExpression)), l.Rest)
+			})
 		})
 	})
 }
@@ -245,7 +509,21 @@ func init() {
 	fmt.Println(ParseStatement()("a123 = 1234 + z + b"))
 	fmt.Println(ParseStatement()("a123 = 1234 + z + b; z = a + 2"))
 	fmt.Println(ParseStatement()("a123 = 1234 + z + b; z = a + 2"))
-	fmt.Println(ParseStatement()("a123 = 1234 + z + b; z = a + 2; b = 3"))
+	fmt.Println(ParseStatement()("a123 = 1234 + z + b; z = a + 2; b = 3; return b"))
+	fmt.Println(ParseStatement()("if a + 3 { b = 3 } else { z = 300 }"))
+	fmt.Println(ParseStatement()("while a != 3 { a = a * 1 }"))
+	fmt.Println(ParseStatement()("while a != 3 { a = a * 1; b = 3.1415 }"))
+	fmt.Println(ParseAssigment()("a123 = 1234 + b[3]"))
+	fmt.Println(ParseAssigment()("a123 = 1234 + b[3 + z]"))
+	fmt.Println(ParseAssigment()("a123 = []uint64{1,2,3,4,5}"))
+	fmt.Println(ParseAssigment()("a123 = []uint64{1,2,3,4,5}[i]"))
+	fmt.Println(ParseAssigment()("a123 = []float64{1.0,2.0,3.0,4.0,5.0}[i]"))
+	fmt.Println(ParseAssigment()("a123 = func(a uint64) uint64 { b = a * 2 }"))
+	fmt.Println(ParseAssigment()("a123 = func(a uint64, c float64) uint64 { b = a * 2 }"))
+	fmt.Println(ParseAssigment()("a123 = b() + c()"))
+	fmt.Println(ParseAssigment()("a123 = b(1, 2) + c(1, 2, 3)"))
+	fmt.Println(ParseAssigment()("a123 = uint64(3.0) + float64(3)"))
+	fmt.Println(ParseAssigment()("a123 = uint64(3.0) + float64(3, 123)"))
 }
 
 func ParseIR(str string) (shared.IR, error) {
@@ -257,7 +535,7 @@ func ParseIR(str string) (shared.IR, error) {
 		return nil, fmt.Errorf("Failed to parse: %s at %d", str, len(str)-len(result.Rest))
 	}
 	if result.Result == nil {
-		return nil, fmt.Errorf("Nil parse result", str, len(str)-len(result.Rest))
+		return nil, fmt.Errorf("Nil parse result %s at %d", str, len(str)-len(result.Rest))
 	}
 	return result.Result.(shared.IR), nil
 }
