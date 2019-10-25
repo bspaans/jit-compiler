@@ -2,6 +2,7 @@ package expr
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/bspaans/jit/asm"
 	"github.com/bspaans/jit/asm/encoding"
@@ -29,7 +30,11 @@ func (i *IR_Struct) ReturnType(ctx *IR_Context) Type {
 }
 
 func (i *IR_Struct) String() string {
-	return i.StructType.String()
+	values := []string{}
+	for _, v := range i.Values {
+		values = append(values, v.String())
+	}
+	return i.StructType.String() + "{" + strings.Join(values, ", ") + "}"
 }
 
 func (i *IR_Struct) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.Instruction, error) {

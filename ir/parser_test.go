@@ -34,6 +34,14 @@ func Test_Parser_Happy(t *testing.T) {
 		`a = 1; b = 2`,
 		`a = 1 
          b = 2`,
+		`a = struct { 
+			Field uint64
+			AnotherField uint64
+		 }{
+			 53,
+			 53,
+		 }`,
+		`a = b.Field`,
 	}
 	for _, p := range shouldParse {
 		_, err := ParseIR(p)

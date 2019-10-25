@@ -32,6 +32,37 @@ func Test_ShouldRun(t *testing.T) {
 	}
 }
 
+func Test_ParseExecute_Happy(t *testing.T) {
+	units := []string{
+		`f = 53`,
+		`f = 51 + 2`,
+		`f = 55 - 2`,
+		`f = 3 + 25 * 2`,
+		`f = 0; while f != 53 { f = f + 1 }`,
+		`if 15 == 15 { f = 53 } else { f = 100 }`,
+		`b = struct{Field uint64}{53}; f = b.Field`,
+		`b = struct{Field uint64
+		            Field2 uint64}{51, 53}; f = b.Field2`,
+		`b = func(i uint64) uint64 { return i - 2 }; f = b(55)`,
+	}
+	for _, ir := range units {
+		i, err := ParseIR(ir + "; return f")
+		if err != nil {
+			t.Fatal(err)
+		}
+		b, err := Compile([]IR{i})
+		if err != nil {
+			t.Fatal(err)
+		}
+		fmt.Println(b)
+		value := b.Execute()
+		if value != uint(53) {
+			t.Fatal("Expecting 53 got", value, "in", ir)
+		}
+	}
+
+}
+
 func Test_Execute_Result(t *testing.T) {
 	var units = [][]IR{
 		[]IR{NewIR_Assignment("f", NewIR_Uint64(53))},

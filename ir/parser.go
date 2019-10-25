@@ -102,7 +102,18 @@ func (p Parser) Many1() Parser {
 	}
 }
 
+func ParseEnclosed(open, p, closed Parser) Parser {
+	return open.And(p).AndThen(func(r *ParseResult) Parser {
+		return closed.Fmap(func(p *ParseResult) *ParseResult {
+			return ParseSuccess(r.Result, p.Rest)
+		})
+	})
+}
 func ParseList(p Parser) Parser {
+	return ParseListWithSeparator(p, ParseByte(','))
+}
+
+func ParseListWithSeparator(p, separator Parser) Parser {
 	return func(str string) *ParseResult {
 		result := []interface{}{}
 		for {
@@ -110,14 +121,14 @@ func ParseList(p Parser) Parser {
 			if sub.Result == nil && len(result) == 0 {
 				return ParseSuccess(result, sub.Rest)
 			} else if sub.Result == nil {
-				return ParseError(errors.New("Expecting list element"))
+				return ParseSuccess(result, sub.Rest)
 			} else if sub.Error != nil {
 				return sub
 			}
 			result = append(result, sub.Result)
 			str = sub.Rest
 
-			comma := ParseSpace().And(ParseByte(',')).And(ParseSpace())(str)
+			comma := ParseSpace().And(separator).And(ParseWhiteSpace())(str)
 			if comma.Result == nil || comma.Error != nil {
 				return ParseSuccess(result, sub.Rest)
 			}
@@ -336,7 +347,10 @@ func ParseOperator() Parser {
 }
 
 func ParseSpace() Parser {
-	return ParseByte(' ').Many()
+	return OneOf([]Parser{ParseByte(' '), ParseByte('\t')}).Many()
+}
+func ParseWhiteSpace() Parser {
+	return OneOf([]Parser{ParseByte(' '), ParseByte('\t'), ParseByte('\n')}).Many()
 }
 func ParseSpace1() Parser {
 	return ParseByte(' ').Many1()
@@ -344,6 +358,8 @@ func ParseSpace1() Parser {
 
 func ParseSingleExpression() Parser {
 	return OneOf([]Parser{
+		ParseStructField(),
+		ParseStruct(),
 		ParseArrayIndex(),
 		ParseBool(),
 		ParseFloat64(),
@@ -488,6 +504,43 @@ func ParseWhile() Parser {
 	})
 }
 
+func ParseStructType() Parser {
+	typ := ParseVariable().AndThen(func(field *ParseResult) Parser {
+		return ParseSpace1().And(ParseType()).Fmap(func(ty *ParseResult) *ParseResult {
+			return ParseSuccess([]interface{}{field.Result, ty.Result}, ty.Rest)
+		})
+	})
+	return ParseEnclosed(ParseByte('{').And(ParseWhiteSpace()), ParseListWithSeparator(typ, ParseByte('\n')).Fmap(func(fields *ParseResult) *ParseResult {
+		result := &shared.TStruct{
+			FieldTypes: []shared.Type{},
+			Fields:     []string{},
+		}
+		for _, f := range fields.Result.([]interface{}) {
+			field := f.([]interface{})[0].(*expr.IR_Variable).Value
+			typ := f.([]interface{})[1].(shared.Type)
+			result.Fields = append(result.Fields, field)
+			result.FieldTypes = append(result.FieldTypes, typ)
+		}
+		return ParseSuccess(result, fields.Rest)
+	}), ParseWhiteSpace().And(ParseByte('}')))
+}
+
+func ParseStruct() Parser {
+	return ParseString("struct").And(ParseSpace()).And(ParseStructType()).AndThen(func(fields *ParseResult) Parser {
+		return ParseEnclosed(ParseByte('{').And(ParseWhiteSpace()), ParseArrayItems().Fmap(func(items *ParseResult) *ParseResult {
+			return ParseSuccess(expr.NewIR_Struct(fields.Result.(*shared.TStruct), items.Result.([]shared.IRExpression)), items.Rest)
+		}), ParseWhiteSpace().And(ParseByte('}')))
+	})
+}
+
+func ParseStructField() Parser {
+	return ParseVariable().AndThen(func(v *ParseResult) Parser {
+		return ParseByte('.').And(ParseVariable()).Fmap(func(field *ParseResult) *ParseResult {
+			return ParseSuccess(expr.NewIR_StructField(v.Result.(shared.IRExpression), field.Result.(*expr.IR_Variable).Value), field.Rest)
+		})
+	})
+}
+
 func ParseArrayIndex() Parser {
 	return OneOf([]Parser{
 		ParseVariable(),
@@ -524,6 +577,13 @@ func init() {
 	fmt.Println(ParseAssigment()("a123 = b(1, 2) + c(1, 2, 3)"))
 	fmt.Println(ParseAssigment()("a123 = uint64(3.0) + float64(3)"))
 	fmt.Println(ParseAssigment()("a123 = uint64(3.0) + float64(3, 123)"))
+	fmt.Println(ParseStruct()(`struct { 
+        Field uint64 
+        Field2 uint64
+	}{
+		12, 
+		14 
+	}`))
 }
 
 func ParseIR(str string) (shared.IR, error) {
