@@ -22,6 +22,7 @@ const (
 	ArrayIndex  IRExpressionType = iota
 	Bool        IRExpressionType = iota
 	Struct      IRExpressionType = iota
+	StructField IRExpressionType = iota
 	Not         IRExpressionType = iota
 	Add         IRExpressionType = iota
 	Variable    IRExpressionType = iota

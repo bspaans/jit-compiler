@@ -87,6 +87,20 @@ func Test_Execute_Result(t *testing.T) {
 			NewIR_Assignment("a", NewIR_ByteArray([]uint8{50, 51, 52, 53})),
 			NewIR_Assignment("f", NewIR_ArrayIndex(NewIR_Variable("a"), NewIR_Uint64(3))),
 		},
+		[]IR{
+			NewIR_Assignment("b", NewIR_Struct(&TStruct{
+				FieldTypes: []Type{TUint64},
+				Fields:     []string{"first_field"},
+			}, []IRExpression{NewIR_Uint64(53)})),
+			NewIR_Assignment("f", NewIR_StructField(NewIR_Variable("b"), "first_field")),
+		},
+		[]IR{
+			NewIR_Assignment("b", NewIR_Struct(&TStruct{
+				FieldTypes: []Type{TUint64, TUint64},
+				Fields:     []string{"first_field", "second_field"},
+			}, []IRExpression{NewIR_Uint64(14), NewIR_Uint64(53)})),
+			NewIR_Assignment("f", NewIR_StructField(NewIR_Variable("b"), "second_field")),
+		},
 	}
 	for _, ir := range units {
 		i := append(ir, NewIR_Return(NewIR_Variable("f")))

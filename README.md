@@ -84,6 +84,7 @@ In the higher level language the following constructs work:
 * Return
 * Int arithmetic `(+, -, *)`
 * Float arithmetic `(+, -, *, /)`
+* Parsing
 
 Register allocation is really noddy and works until you run out of registers;
 there is no allocating on the stack or heap yet; preserving registers across
@@ -94,5 +95,4 @@ calls and syscalls is supported however.
 * SIMD support 
 * Improve array support (SIMD, auto-vectorisation)
 * Possibly a higher level language that compiles down into the IR
-* A parser
 * Try and use it from bleep
