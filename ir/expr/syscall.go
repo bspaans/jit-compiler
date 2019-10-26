@@ -11,13 +11,13 @@ import (
 
 type IR_Syscall struct {
 	*BaseIRExpression
-	Syscall uint
+	Syscall IRExpression
 	Args    []IRExpression
 }
 
-func NewIR_Syscall(syscall_nr uint, args []IRExpression) *IR_Syscall {
+func NewIR_Syscall(syscall IRExpression, args []IRExpression) *IR_Syscall {
 	return &IR_Syscall{
-		Syscall: syscall_nr,
+		Syscall: syscall,
 		Args:    args,
 	}
 }
@@ -35,9 +35,15 @@ func (i *IR_Syscall) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.Ins
 	if err != nil {
 		return nil, err
 	}
+	instr, err := i.Syscall.Encode(ctx, encoding.Rax)
+	if err != nil {
+		return nil, err
+	}
+	for _, inst := range instr {
+		result = append(result, inst)
+	}
 
-	instr := []lib.Instruction{
-		asm.MOV(encoding.Uint64(uint64(i.Syscall)), encoding.Rax),
+	instr = []lib.Instruction{
 		asm.SYSCALL(),
 		asm.MOV(encoding.Rax, target),
 	}
@@ -69,11 +75,11 @@ const (
 )
 
 func NewIR_LinuxWrite(fid IRExpression, b []uint8, size int) IRExpression {
-	return NewIR_Syscall(uint(IR_Syscall_Linux_Write), []IRExpression{fid, NewIR_ByteArray(b), NewIR_Uint64(uint64(size))})
+	return NewIR_Syscall(NewIR_Uint64(uint64(IR_Syscall_Linux_Write)), []IRExpression{fid, NewIR_ByteArray(b), NewIR_Uint64(uint64(size))})
 }
 func NewIR_LinuxOpen(filename string, flags, mode int) IRExpression {
-	return NewIR_Syscall(uint(IR_Syscall_Linux_Open), []IRExpression{NewIR_ByteArray([]uint8(filename + "\x00")), NewIR_Uint64(uint64(flags)), NewIR_Uint64(uint64(mode))})
+	return NewIR_Syscall(NewIR_Uint64(uint64(IR_Syscall_Linux_Open)), []IRExpression{NewIR_ByteArray([]uint8(filename + "\x00")), NewIR_Uint64(uint64(flags)), NewIR_Uint64(uint64(mode))})
 }
 func NewIR_LinuxClose(fid uint64) IRExpression {
-	return NewIR_Syscall(uint(IR_Syscall_Linux_Close), []IRExpression{NewIR_Uint64(fid)})
+	return NewIR_Syscall(NewIR_Uint64(uint64(IR_Syscall_Linux_Close)), []IRExpression{NewIR_Uint64(fid)})
 }

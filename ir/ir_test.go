@@ -38,12 +38,16 @@ func Test_ParseExecute_Happy(t *testing.T) {
 		`f = 51 + 2`,
 		`f = 55 - 2`,
 		`f = 3 + 25 * 2`,
+		`f = (2 * 25) + 3`,
+		`f = []uint64{42,52,53}[2]`,
+		`f = ([]uint64{42,52,53})[2]`,
 		`f = 0; while f != 53 { f = f + 1 }`,
 		`if 15 == 15 { f = 53 } else { f = 100 }`,
 		`b = struct{Field uint64}{53}; f = b.Field`,
 		`b = struct{Field uint64
 		            Field2 uint64}{51, 53}; f = b.Field2`,
 		`b = func(i uint64) uint64 { return i - 2 }; f = b(55)`,
+		`func b(i uint64) uint64 { return i - 2}; f = b(55)`,
 	}
 	for _, ir := range units {
 		i, err := ParseIR(ir + "; return f")

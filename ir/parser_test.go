@@ -42,6 +42,8 @@ func Test_Parser_Happy(t *testing.T) {
 			 53,
 		 }`,
 		`a = b.Field`,
+		`a = (5 + 4) * 6`,
+		`a = ([]uint64{1,2,3})[2]`,
 	}
 	for _, p := range shouldParse {
 		_, err := ParseIR(p)

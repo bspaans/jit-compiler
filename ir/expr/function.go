@@ -14,7 +14,7 @@ type IR_Function struct {
 	*BaseIRExpression
 	Signature *TFunction
 	Body      IR
-	address   int
+	Address   int
 }
 
 func NewIR_Function(signature *TFunction, body IR) *IR_Function {
@@ -39,7 +39,7 @@ func (i *IR_Function) String() string {
 
 func (i *IR_Function) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.Instruction, error) {
 	ownLength := uint(7)
-	diff := uint(ctx.InstructionPointer+ownLength) - uint(i.address)
+	diff := uint(ctx.InstructionPointer+ownLength) - uint(i.Address)
 	result := []lib.Instruction{asm.LEA(&encoding.RIPRelative{encoding.Int32(int32(-diff))}, target)}
 	ctx.AddInstructions(result)
 	return result, nil
@@ -92,6 +92,6 @@ func (b *IR_Function) AddToDataSection(ctx *IR_Context) error {
 		return err
 	}
 	_ = code
-	b.address = ctx.AddToDataSection(code)
+	b.Address = ctx.AddToDataSection(code)
 	return nil
 }

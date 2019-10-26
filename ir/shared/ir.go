@@ -5,11 +5,12 @@ import "github.com/bspaans/jit/lib"
 type IRType int
 
 const (
-	Assignment IRType = iota
-	If         IRType = iota
-	While      IRType = iota
-	Return     IRType = iota
-	AndThen    IRType = iota
+	Assignment  IRType = iota
+	If          IRType = iota
+	While       IRType = iota
+	Return      IRType = iota
+	AndThen     IRType = iota
+	FunctionDef IRType = iota
 )
 
 type IR interface {
