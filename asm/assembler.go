@@ -103,6 +103,9 @@ func SUB(src, dest encoding.Operand) lib.Instruction {
 func SYSCALL() lib.Instruction {
 	return opcodes.OpcodeToInstruction("syscall", opcodes.SYSCALL, 0)
 }
+func XOR(src, dest encoding.Operand) lib.Instruction {
+	return opcodes.OpcodesToInstruction("xor", opcodes.XOR, 2, dest, src)
+}
 
 func init() {
 	b, err := lib.CompileInstruction([]lib.Instruction{

@@ -9,29 +9,30 @@ import (
 type OperandType int
 
 const (
-	OT_rel8    OperandType = iota
-	OT_rel16   OperandType = iota
-	OT_rel32   OperandType = iota
-	OT_rm8     OperandType = iota
-	OT_rm16    OperandType = iota
-	OT_rm32    OperandType = iota
-	OT_rm64    OperandType = iota
-	OT_m       OperandType = iota
-	OT_m16     OperandType = iota
-	OT_m32     OperandType = iota
-	OT_m64     OperandType = iota
-	OT_r8      OperandType = iota
-	OT_r16     OperandType = iota
-	OT_r32     OperandType = iota
-	OT_r64     OperandType = iota
-	OT_imm8    OperandType = iota
-	OT_imm16   OperandType = iota
-	OT_imm32   OperandType = iota
-	OT_imm64   OperandType = iota
-	OT_xmm1    OperandType = iota
-	OT_xmm1m64 OperandType = iota
-	OT_xmm2    OperandType = iota
-	OT_xmm2m64 OperandType = iota
+	OT_rel8     OperandType = iota
+	OT_rel16    OperandType = iota
+	OT_rel32    OperandType = iota
+	OT_rm8      OperandType = iota
+	OT_rm16     OperandType = iota
+	OT_rm32     OperandType = iota
+	OT_rm64     OperandType = iota
+	OT_m        OperandType = iota
+	OT_m16      OperandType = iota
+	OT_m32      OperandType = iota
+	OT_m64      OperandType = iota
+	OT_r8       OperandType = iota
+	OT_r16      OperandType = iota
+	OT_r32      OperandType = iota
+	OT_r64      OperandType = iota
+	OT_imm8     OperandType = iota
+	OT_imm16    OperandType = iota
+	OT_imm32    OperandType = iota
+	OT_imm64    OperandType = iota
+	OT_xmm1     OperandType = iota
+	OT_xmm1m64  OperandType = iota
+	OT_xmm2     OperandType = iota
+	OT_xmm2m64  OperandType = iota
+	OT_xmm2m128 OperandType = iota
 )
 
 //go:generate stringer -type=OperandEncoding

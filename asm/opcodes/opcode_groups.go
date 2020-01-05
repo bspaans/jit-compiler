@@ -37,3 +37,4 @@ var SETC = []*Opcode{SETC_rm8}
 var SETE = []*Opcode{SETE_rm8}
 var SETNE = []*Opcode{SETNE_rm8}
 var SUB = []*Opcode{SUB_rm64_r64, SUB_r64_rm64, SUB_rm64_imm32, SUBSD_xmm1_xmm2m64}
+var XOR = []*Opcode{XOR_rm64_imm32, XOR_r64_rm64}

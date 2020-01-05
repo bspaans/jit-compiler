@@ -69,7 +69,7 @@ func (t *TArray) Type() TypeNr {
 	return T_Array
 }
 func (b *TArray) String() string {
-	return "[" + b.ItemType.String() + "]"
+	return "[]" + b.ItemType.String()
 }
 func (b *TArray) Width() lib.Size {
 	return lib.QUADWORD

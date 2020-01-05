@@ -625,38 +625,6 @@ func ParseArrayIndex() Parser {
 	})
 }
 
-func init() {
-	fmt.Println(ParseUint64()("123123"))
-	fmt.Println(ParseVariable()("a123"))
-	fmt.Println(ParseAssigment()("a123 = 1234"))
-	fmt.Println(ParseAssigment()("a123 = 1234 + 123"))
-	fmt.Println(ParseStatement()("a123 = 1234 + z + b"))
-	fmt.Println(ParseStatement()("a123 = 1234 + z + b; z = a + 2"))
-	fmt.Println(ParseStatement()("a123 = 1234 + z + b; z = a + 2"))
-	fmt.Println(ParseStatement()("a123 = 1234 + z + b; z = a + 2; b = 3; return b"))
-	fmt.Println(ParseStatement()("if a + 3 { b = 3 } else { z = 300 }"))
-	fmt.Println(ParseStatement()("while a != 3 { a = a * 1 }"))
-	fmt.Println(ParseStatement()("while a != 3 { a = a * 1; b = 3.1415 }"))
-	fmt.Println(ParseAssigment()("a123 = 1234 + b[3]"))
-	fmt.Println(ParseAssigment()("a123 = 1234 + b[3 + z]"))
-	fmt.Println(ParseAssigment()("a123 = []uint64{1,2,3,4,5}"))
-	fmt.Println(ParseAssigment()("a123 = []uint64{1,2,3,4,5}[i]"))
-	fmt.Println(ParseAssigment()("a123 = []float64{1.0,2.0,3.0,4.0,5.0}[i]"))
-	fmt.Println(ParseAssigment()("a123 = func(a uint64) uint64 { b = a * 2 }"))
-	fmt.Println(ParseAssigment()("a123 = func(a uint64, c float64) uint64 { b = a * 2 }"))
-	fmt.Println(ParseAssigment()("a123 = b() + c()"))
-	fmt.Println(ParseAssigment()("a123 = b(1, 2) + c(1, 2, 3)"))
-	fmt.Println(ParseAssigment()("a123 = uint64(3.0) + float64(3)"))
-	fmt.Println(ParseAssigment()("a123 = uint64(3.0) + float64(3, 123)"))
-	fmt.Println(ParseStruct()(`struct { 
-        Field uint64 
-        Field2 uint64
-	}{
-		12, 
-		14 
-	}`))
-}
-
 func ParseIR(str string) (shared.IR, error) {
 	result := ParseStatement()(str)
 	if result.Error != nil {

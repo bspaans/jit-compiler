@@ -23,6 +23,14 @@ var (
 			OpcodeOperand{OT_imm32, ImmediateValue},
 		},
 	}
+	// Add packed double-precision floating point values from xmm2/mem to xmm1 and store result in xmm1
+	ADDPD_xmm1_xmm2m128 = &Opcode{"addpd", []uint8{}, []uint8{0x66, 0x0f, 0x58}, []OpcodeExtensions{SlashR},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_xmm1, ModRM_reg_rw},
+			OpcodeOperand{OT_xmm2m128, ModRM_rm_r},
+		},
+	}
+	// Add the low double-precision floating-point value from xmm2/mem to xmm1 and store the result in xmm1
 	ADDSD_xmm1_xmm2m64 = &Opcode{"addsd", []uint8{}, []uint8{0xf2, 0x0f, 0x58}, []OpcodeExtensions{SlashR},
 		[]OpcodeOperand{
 			OpcodeOperand{OT_xmm1, ModRM_reg_rw},
@@ -305,5 +313,23 @@ var (
 	}
 	SYSCALL = &Opcode{"syscall", []uint8{}, []uint8{0x0f, 0x05}, []OpcodeExtensions{},
 		[]OpcodeOperand{},
+	}
+	XOR_rm64_imm32 = &Opcode{"xor", []uint8{}, []uint8{0x81}, []OpcodeExtensions{RexW, Slash6, ImmediateDouble},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_rm64, ModRM_rm_rw},
+			OpcodeOperand{OT_imm32, ImmediateValue},
+		},
+	}
+	XOR_rm64_r64 = &Opcode{"xor", []uint8{}, []uint8{0x31}, []OpcodeExtensions{RexW, SlashR},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_rm64, ModRM_rm_rw},
+			OpcodeOperand{OT_r64, ModRM_reg_r},
+		},
+	}
+	XOR_r64_rm64 = &Opcode{"xor", []uint8{}, []uint8{0x33}, []OpcodeExtensions{RexW, SlashR},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_r64, ModRM_reg_rw},
+			OpcodeOperand{OT_rm64, ModRM_rm_r},
+		},
 	}
 )
