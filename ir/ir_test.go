@@ -80,7 +80,7 @@ func Test_Execute_Result(t *testing.T) {
 				NewIR_Assignment("f", NewIR_Uint64(54)),
 			)},
 		[]IR{NewIR_Assignment("f", NewIR_Uint64(53)),
-			NewIR_Assignment("g", NewIR_Syscall(uint(IR_Syscall_Linux_Write), []IRExpression{NewIR_Uint64(1), NewIR_ByteArray([]uint8("hello world\n")), NewIR_Uint64(uint64(12))})),
+			NewIR_Assignment("g", NewIR_Syscall(NewIR_Uint64(uint64(IR_Syscall_Linux_Write)), []IRExpression{NewIR_Uint64(1), NewIR_ByteArray([]uint8("hello world\n")), NewIR_Uint64(uint64(12))})),
 		},
 		[]IR{NewIR_Assignment("f", NewIR_Uint64(0)),
 			NewIR_While(NewIR_Not(NewIR_Equals(NewIR_Variable("f"), NewIR_Uint64(53))),

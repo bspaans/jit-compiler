@@ -14,7 +14,9 @@ type IRExpression interface {
 	String() string
 }
 
+//go:generate stringer -type=IRExpressionType
 const (
+	Uint8       IRExpressionType = iota
 	Uint64      IRExpressionType = iota
 	Float64     IRExpressionType = iota
 	ByteArray   IRExpressionType = iota

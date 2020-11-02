@@ -57,7 +57,7 @@ func (b *IR_StaticArray) AddToDataSection(ctx *IR_Context) error {
 		} else if ir, ok := v.(*IR_Float64); ok {
 			bytes = encoding.Float64(ir.Value).Encode()
 		} else {
-			return fmt.Errorf("Unsupported array type %s", v.Type())
+			return fmt.Errorf("Unsupported array type %s", v.Type().String())
 		}
 		addr := ctx.AddToDataSection(bytes)
 		if b.address == -1 {
