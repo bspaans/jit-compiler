@@ -52,7 +52,9 @@ func (b *IR_StaticArray) AddToDataSection(ctx *IR_Context) error {
 	b.address = -1
 	for _, v := range b.Value {
 		bytes := []uint8{}
-		if ir, ok := v.(*IR_Uint64); ok {
+		if ir, ok := v.(*IR_Uint8); ok {
+			bytes = []uint8{uint8(ir.Value)}
+		} else if ir, ok := v.(*IR_Uint64); ok {
 			bytes = encoding.Uint64(ir.Value).Encode()
 		} else if ir, ok := v.(*IR_Float64); ok {
 			bytes = encoding.Float64(ir.Value).Encode()
