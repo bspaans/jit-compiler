@@ -1,7 +1,7 @@
 package opcodes
 
 import (
-	. "github.com/bspaans/jit/asm/encoding"
+	. "github.com/bspaans/jit-compiler/asm/encoding"
 )
 
 var (

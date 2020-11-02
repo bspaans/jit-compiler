@@ -1,6 +1,6 @@
 package encoding
 
-import "github.com/bspaans/jit/lib"
+import "github.com/bspaans/jit-compiler/lib"
 
 //go:generate stringer -type=Type
 type Type uint8

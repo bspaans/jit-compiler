@@ -3,7 +3,7 @@ package shared
 import (
 	"strings"
 
-	"github.com/bspaans/jit/lib"
+	"github.com/bspaans/jit-compiler/lib"
 )
 
 //go:generate stringer -type=TypeNr

@@ -1,8 +1,8 @@
 package expr
 
 import (
-	"github.com/bspaans/jit/asm"
-	. "github.com/bspaans/jit/ir/shared"
+	"github.com/bspaans/jit-compiler/asm"
+	. "github.com/bspaans/jit-compiler/ir/shared"
 )
 
 func NewIR_Add(op1, op2 IRExpression) IRExpression {

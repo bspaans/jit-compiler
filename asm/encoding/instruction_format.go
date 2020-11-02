@@ -1,7 +1,7 @@
 package encoding
 
 import (
-	"github.com/bspaans/jit/lib"
+	"github.com/bspaans/jit-compiler/lib"
 )
 
 type InstructionFormat struct {

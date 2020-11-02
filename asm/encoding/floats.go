@@ -5,7 +5,7 @@ import (
 	"encoding/binary"
 	"fmt"
 
-	"github.com/bspaans/jit/lib"
+	"github.com/bspaans/jit-compiler/lib"
 )
 
 type Float32 float32

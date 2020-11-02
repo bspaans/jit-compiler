@@ -1,7 +1,7 @@
 package opcodes
 
 import (
-	. "github.com/bspaans/jit/asm/encoding"
+	. "github.com/bspaans/jit-compiler/asm/encoding"
 )
 
 var ADD = []*Opcode{ADD_rm64_r64, ADD_r64_rm64, ADD_rm64_imm32, ADDSD_xmm1_xmm2m64}

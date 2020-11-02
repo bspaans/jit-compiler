@@ -3,10 +3,10 @@ package expr
 import (
 	"fmt"
 
-	"github.com/bspaans/jit/asm/encoding"
-	"github.com/bspaans/jit/lib"
+	"github.com/bspaans/jit-compiler/asm/encoding"
+	"github.com/bspaans/jit-compiler/lib"
 
-	. "github.com/bspaans/jit/ir/shared"
+	. "github.com/bspaans/jit-compiler/ir/shared"
 )
 
 type operator func(op1, op2 encoding.Operand) lib.Instruction

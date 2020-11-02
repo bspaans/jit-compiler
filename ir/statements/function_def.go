@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/bspaans/jit/ir/expr"
-	. "github.com/bspaans/jit/ir/shared"
-	"github.com/bspaans/jit/lib"
+	"github.com/bspaans/jit-compiler/ir/expr"
+	. "github.com/bspaans/jit-compiler/ir/shared"
+	"github.com/bspaans/jit-compiler/lib"
 )
 
 type IR_FunctionDef struct {

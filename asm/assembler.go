@@ -16,9 +16,9 @@ package asm
 import (
 	"fmt"
 
-	"github.com/bspaans/jit/asm/encoding"
-	"github.com/bspaans/jit/asm/opcodes"
-	"github.com/bspaans/jit/lib"
+	"github.com/bspaans/jit-compiler/asm/encoding"
+	"github.com/bspaans/jit-compiler/asm/opcodes"
+	"github.com/bspaans/jit-compiler/lib"
 )
 
 func ADD(src, dest encoding.Operand) lib.Instruction {

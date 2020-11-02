@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/bspaans/jit/ir"
-	"github.com/bspaans/jit/ir/shared"
+	"github.com/bspaans/jit-compiler/ir"
+	"github.com/bspaans/jit-compiler/ir/shared"
 )
 
 func main() {

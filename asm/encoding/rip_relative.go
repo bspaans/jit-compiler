@@ -3,7 +3,7 @@ package encoding
 import (
 	"fmt"
 
-	"github.com/bspaans/jit/lib"
+	"github.com/bspaans/jit-compiler/lib"
 )
 
 // Get address relative to instruction pointer

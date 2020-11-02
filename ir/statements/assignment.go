@@ -3,8 +3,8 @@ package statements
 import (
 	"fmt"
 
-	. "github.com/bspaans/jit/ir/shared"
-	"github.com/bspaans/jit/lib"
+	. "github.com/bspaans/jit-compiler/ir/shared"
+	"github.com/bspaans/jit-compiler/lib"
 )
 
 type IR_Assignment struct {

@@ -3,10 +3,10 @@ package expr
 import (
 	"fmt"
 
-	"github.com/bspaans/jit/asm"
-	"github.com/bspaans/jit/asm/encoding"
-	. "github.com/bspaans/jit/ir/shared"
-	"github.com/bspaans/jit/lib"
+	"github.com/bspaans/jit-compiler/asm"
+	"github.com/bspaans/jit-compiler/asm/encoding"
+	. "github.com/bspaans/jit-compiler/ir/shared"
+	"github.com/bspaans/jit-compiler/lib"
 )
 
 type IR_StructField struct {

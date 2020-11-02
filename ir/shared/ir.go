@@ -1,6 +1,6 @@
 package shared
 
-import "github.com/bspaans/jit/lib"
+import "github.com/bspaans/jit-compiler/lib"
 
 type IRType int
 

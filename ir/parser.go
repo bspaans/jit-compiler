@@ -6,9 +6,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/bspaans/jit/ir/expr"
-	"github.com/bspaans/jit/ir/shared"
-	"github.com/bspaans/jit/ir/statements"
+	"github.com/bspaans/jit-compiler/ir/expr"
+	"github.com/bspaans/jit-compiler/ir/shared"
+	"github.com/bspaans/jit-compiler/ir/statements"
 )
 
 type ParseResult struct {
