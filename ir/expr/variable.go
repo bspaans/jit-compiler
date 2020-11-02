@@ -1,6 +1,8 @@
 package expr
 
 import (
+	"fmt"
+
 	"github.com/bspaans/jit-compiler/asm"
 	"github.com/bspaans/jit-compiler/asm/encoding"
 	. "github.com/bspaans/jit-compiler/ir/shared"
@@ -28,7 +30,10 @@ func (i *IR_Variable) String() string {
 }
 
 func (i *IR_Variable) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.Instruction, error) {
-	reg := ctx.VariableMap[i.Value]
+	reg, ok := ctx.VariableMap[i.Value]
+	if !ok {
+		return nil, fmt.Errorf("Unknown variable '%s'", i.Value)
+	}
 	result := []lib.Instruction{asm.MOV(reg, target)}
 	ctx.AddInstructions(result)
 	return result, nil
