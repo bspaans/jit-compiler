@@ -48,7 +48,7 @@ func (i *IR_ArrayAssignment) Encode(ctx *IR_Context) ([]lib.Instruction, error) 
 	itemWidth := returnType.Width()
 	if itemWidth == 8 {
 		// TODO write directly to location?
-		tmpReg2 := ctx.AllocateRegister(TUint64)
+		tmpReg2 := ctx.AllocateRegister(returnType)
 		defer ctx.DeallocateRegister(tmpReg2)
 		expr, err := i.Expr.Encode(ctx, tmpReg2)
 		if err != nil {

@@ -141,10 +141,12 @@ func OpcodesToOpcodeMap(opcodes []*Opcode, operand int) OpcodeMap {
 		} else if opcode.Operands[operand].Type == OT_xmm1m64 {
 			opcodeMap.add(T_Register, lib.QUADDOUBLE, opcode)
 			opcodeMap.add(T_Register, lib.QUADWORD, opcode)
+			opcodeMap.add(T_IndirectRegister, lib.QUADWORD, opcode)
 			opcodeMap.add(T_RIPRelative, lib.QUADWORD, opcode)
 		} else if opcode.Operands[operand].Type == OT_xmm2m64 {
 			opcodeMap.add(T_Register, lib.QUADDOUBLE, opcode)
 			opcodeMap.add(T_Register, lib.QUADWORD, opcode)
+			opcodeMap.add(T_IndirectRegister, lib.QUADWORD, opcode)
 			opcodeMap.add(T_RIPRelative, lib.QUADWORD, opcode)
 		} else if opcode.Operands[operand].Type == OT_xmm2m128 {
 			opcodeMap.add(T_Register, lib.QUADDOUBLE, opcode)

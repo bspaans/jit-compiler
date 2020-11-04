@@ -43,6 +43,8 @@ func Test_ParseExecute_Happy(t *testing.T) {
 		`f = ([]uint64{42,52,53})[2]`,
 		`g = []uint64{42,52,53}; g[0] = g[0] + 11; f = g[0]`,
 		`g = []float64{53.0}; h = uint64(g[0]) ; f = h`,
+		`g = []float64{53.0}; h =g[0] ; f = uint64(h)`,
+		`g = []float64{51.0}; g[0] = g[0] + 2.0 ; f = uint64(g[0])`,
 		`f = 0; while f != 53 { f = f + 1 }`,
 		`if 15 == 15 { f = 53 } else { f = 100 }`,
 		`b = struct{Field uint64}{53}; f = b.Field`,

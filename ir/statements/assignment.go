@@ -27,7 +27,6 @@ func (i *IR_Assignment) Encode(ctx *IR_Context) ([]lib.Instruction, error) {
 	reg, found := ctx.VariableMap[i.Variable]
 	if !found {
 		reg = ctx.AllocateRegister(returnType)
-		fmt.Printf("Allocating for %s for assignment to %s\n", reg, i.Variable)
 		ctx.VariableMap[i.Variable] = reg
 		ctx.VariableTypes[i.Variable] = returnType
 	}

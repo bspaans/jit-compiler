@@ -50,7 +50,6 @@ func (i *IR_ArrayIndex) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.
 
 	// TODO: if i.Index == number => specialise
 	tmpIndexReg := ctx.AllocateRegister(TUint64)
-	fmt.Println("Tmp reg for index dest", tmpIndexReg)
 	defer ctx.DeallocateRegister(tmpIndexReg)
 	ix, err := i.Index.Encode(ctx, tmpIndexReg)
 	if err != nil {
