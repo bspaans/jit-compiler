@@ -36,6 +36,9 @@ func (o *opcodeMapsInstruction) Encode() (lib.MachineCode, error) {
 	if opcode == nil {
 		args := []string{}
 		for _, arg := range o.Operands {
+			if arg == nil {
+				return nil, fmt.Errorf("nil arg in instruction: %s %s", o.Name, strings.Join(args, ", "))
+			}
 			args = append(args, arg.String())
 		}
 		return nil, fmt.Errorf("unsupported %s instruction: %s %s", o.Name, o.Name, strings.Join(args, ", "))
@@ -48,12 +51,12 @@ func (o *opcodeMapsInstruction) String() string {
 		return o.Name
 	}
 	opcode := o.opcodeMaps.ResolveOpcode(o.Operands)
-	if opcode == nil {
-		return "<unmatched " + o.Name + " instruction>"
-	}
 	args := []string{}
 	for i := len(o.Operands) - 1; i >= 0; i-- {
 		args = append(args, o.Operands[i].String())
+	}
+	if opcode == nil {
+		return fmt.Sprintf("<unmatched %s instruction: %s %s>", o.Name, o.Name, strings.Join(args, ", "))
 	}
 	return opcode.Name + " " + strings.Join(args, ", ")
 }

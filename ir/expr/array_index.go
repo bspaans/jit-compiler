@@ -41,13 +41,18 @@ func (i *IR_ArrayIndex) String() string {
 func (i *IR_ArrayIndex) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.Instruction, error) {
 	// tmpReg will contain the address of the array
 	tmpReg := ctx.AllocateRegister(TUint64)
+	fmt.Println("Tmp reg for array dest", tmpReg)
 	defer ctx.DeallocateRegister(tmpReg)
 	result, err := i.Array.Encode(ctx, tmpReg)
 	if err != nil {
 		return nil, err
 	}
+
 	// TODO: if i.Index == number => specialise
-	ix, err := i.Index.Encode(ctx, target)
+	tmpIndexReg := ctx.AllocateRegister(TUint64)
+	fmt.Println("Tmp reg for index dest", tmpIndexReg)
+	defer ctx.DeallocateRegister(tmpIndexReg)
+	ix, err := i.Index.Encode(ctx, tmpIndexReg)
 	if err != nil {
 		return nil, err
 	}
@@ -62,14 +67,14 @@ func (i *IR_ArrayIndex) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.
 		tmpReg3 := ctx.AllocateRegister(TUint64)
 		defer ctx.DeallocateRegister(tmpReg3)
 		mov := asm.MOV(encoding.Uint32(itemWidth), tmpReg3)
-		mul := asm.MUL(tmpReg3, target)
+		mul := asm.MUL(tmpReg3, tmpIndexReg)
 		ctx.AddInstruction(mov)
 		ctx.AddInstruction(mul)
 		result = append(result, mov)
 		result = append(result, mul)
 	}
 	instr := lib.Instructions{
-		asm.ADD(target, tmpReg),
+		asm.ADD(tmpIndexReg, tmpReg),
 	}
 	if itemWidth == 1 {
 		var tmpReg2 *encoding.Register
