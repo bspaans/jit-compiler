@@ -420,7 +420,8 @@ func ParseExpression() Parser {
 func ParseSingleStatement() Parser {
 	return ParseSpace().And(OneOf([]Parser{
 		ParseIf(),
-		ParseAssigment(),
+		ParseAssignment(),
+		ParseArrayAssignment(),
 		ParseReturn(),
 		ParseWhile(),
 		ParseFunctionDef(),
@@ -434,11 +435,23 @@ func ParseStatement() Parser {
 	}), ParseWhiteSpace())
 }
 
-func ParseAssigment() Parser {
+func ParseAssignment() Parser {
 	return ParseVariable().AndThen(func(variable *ParseResult) Parser {
 		return ParseSpace().And(ParseByte('=')).And(ParseSpace()).And(ParseExpression()).Fmap(func(value *ParseResult) *ParseResult {
 			v := variable.Result.(*expr.IR_Variable).Value
 			return ParseSuccess(statements.NewIR_Assignment(v, value.Result.(shared.IRExpression)), value.Rest)
+		})
+	})
+}
+
+func ParseArrayAssignment() Parser {
+	return ParseVariable().AndThen(func(variable *ParseResult) Parser {
+		return ParseSpace().And(ParseByte('[')).And(ParseSpace()).And(ParseExpression()).AndThen(func(index *ParseResult) Parser {
+			return ParseSpace().And(ParseByte(']')).And(ParseSpace()).And(ParseByte('=')).And(ParseSpace()).And(ParseExpression()).Fmap(func(value *ParseResult) *ParseResult {
+				array := variable.Result.(*expr.IR_Variable).Value
+
+				return ParseSuccess(statements.NewIR_ArrayAssignment(array, index.Result.(shared.IRExpression), value.Result.(shared.IRExpression)), value.Rest)
+			})
 		})
 	})
 }

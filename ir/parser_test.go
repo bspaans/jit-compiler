@@ -23,6 +23,10 @@ func Test_Parser_Happy(t *testing.T) {
 		"a123 = []float64{ 1.0, 2.0, 3.0, 4.0, 5.0 }[i]",
 		"a123 = func(a uint64) uint64 { b = a * 2 }",
 		"a123 = func(a uint64, c float64) uint64 { b = a * 2 }",
+
+		`f = 2.5`,
+		`f = freq * 0.00027210884353741496; currentIndex = 0`,
+		`f[0] = 12`,
 		"a123 = b() + c()",
 		"a123 = b() + c(1)",
 		"a123 = b() + c(1, 2)",
