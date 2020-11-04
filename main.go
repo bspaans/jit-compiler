@@ -26,6 +26,8 @@ func main() {
 			continue
 
 		}
-		fmt.Println(instr)
+		for _, i := range instr {
+			fmt.Println(" ", i)
+		}
 	}
 }
