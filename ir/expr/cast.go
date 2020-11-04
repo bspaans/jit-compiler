@@ -38,7 +38,7 @@ func (i *IR_Cast) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.Instru
 		return nil, fmt.Errorf("nil return type in %s", i.Value.String())
 	}
 	if i.CastToType == TUint64 {
-		if valueType == TUint64 {
+		if valueType == TUint64 || valueType == TUint8 {
 			return i.Value.Encode(ctx, target)
 		} else if valueType == TFloat64 {
 			tmpReg := ctx.AllocateRegister(TFloat64)

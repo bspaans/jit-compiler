@@ -41,7 +41,6 @@ func (i *IR_ArrayIndex) String() string {
 func (i *IR_ArrayIndex) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.Instruction, error) {
 	// tmpReg will contain the address of the array
 	tmpReg := ctx.AllocateRegister(TUint64)
-	fmt.Println("Tmp reg for array dest", tmpReg)
 	defer ctx.DeallocateRegister(tmpReg)
 	result, err := i.Array.Encode(ctx, tmpReg)
 	if err != nil {
@@ -61,7 +60,6 @@ func (i *IR_ArrayIndex) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.
 		return nil, fmt.Errorf("Return type nil. wut")
 	}
 	itemWidth := i.ReturnType(ctx).Width()
-	fmt.Println(i.ReturnType(ctx), i.ReturnType(ctx).Width())
 	if itemWidth != 1 {
 		tmpReg3 := ctx.AllocateRegister(TUint64)
 		defer ctx.DeallocateRegister(tmpReg3)

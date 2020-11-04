@@ -44,18 +44,26 @@ func (i *IR_ArrayAssignment) Encode(ctx *IR_Context) ([]lib.Instruction, error) 
 	ctx.AddInstruction(add)
 	result = append(result, add)
 
+	// Encode the expression
+
 	returnType := i.Expr.ReturnType(ctx)
+	// TODO write directly to location?
+	tmpReg2 := ctx.AllocateRegister(returnType)
+	defer ctx.DeallocateRegister(tmpReg2)
+	expr, err := i.Expr.Encode(ctx, tmpReg2)
+	if err != nil {
+		return nil, err
+	}
+	ctx.AddInstructions(expr)
+	result = lib.Instructions(result).Add(expr)
+
+	// Move the expr result into the array
 	itemWidth := returnType.Width()
-	if itemWidth == 8 {
-		// TODO write directly to location?
-		tmpReg2 := ctx.AllocateRegister(returnType)
-		defer ctx.DeallocateRegister(tmpReg2)
-		expr, err := i.Expr.Encode(ctx, tmpReg2)
-		if err != nil {
-			return nil, err
-		}
-		ctx.AddInstructions(expr)
-		result = lib.Instructions(result).Add(expr)
+	if itemWidth == 1 {
+		mov := asm.MOV(tmpReg2.Lower8BitRegister(), &encoding.IndirectRegister{tmpReg})
+		ctx.AddInstruction(mov)
+		result = append(result, mov)
+	} else if itemWidth == 8 {
 		mov := asm.MOV(tmpReg2, &encoding.IndirectRegister{tmpReg})
 		ctx.AddInstruction(mov)
 		result = append(result, mov)

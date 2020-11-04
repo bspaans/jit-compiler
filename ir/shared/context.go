@@ -1,8 +1,6 @@
 package shared
 
 import (
-	"fmt"
-
 	"github.com/bspaans/jit-compiler/asm/encoding"
 	"github.com/bspaans/jit-compiler/lib"
 )
@@ -51,17 +49,14 @@ func NewIRContext() *IR_Context {
 
 func (i *IR_Context) PushReturnOperand(op encoding.Operand) {
 	i.ReturnOperandStack = append(i.ReturnOperandStack, op)
-	fmt.Println(i.ReturnOperandStack)
 }
 func (i *IR_Context) PeekReturn() encoding.Operand {
 	return i.ReturnOperandStack[len(i.ReturnOperandStack)-1]
 }
 
 func (i *IR_Context) PopReturn() encoding.Operand {
-	fmt.Println(i.ReturnOperandStack)
 	op := i.ReturnOperandStack[len(i.ReturnOperandStack)-1]
 	i.ReturnOperandStack = i.ReturnOperandStack[:len(i.ReturnOperandStack)-1]
-	fmt.Println(i.ReturnOperandStack)
 	return op
 }
 

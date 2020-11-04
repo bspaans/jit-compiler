@@ -1,7 +1,6 @@
 package asm
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/bspaans/jit-compiler/asm/encoding"
@@ -241,14 +240,14 @@ func Test_Execute(t *testing.T) {
 		},
 	}
 	for _, unit := range units {
-		b, err := lib.CompileInstruction(unit)
+		debug := false
+		b, err := lib.CompileInstruction(unit, debug)
 		if err != nil {
 			t.Fatal(err, "in", unit)
 		}
-		fmt.Println(b)
-		value := b.Execute()
+		value := b.Execute(debug)
 		if value != uint(5) {
-			t.Fatal("Expecting 5 got", value, "in", unit)
+			t.Fatal("Expecting 5 got", value, "in", unit, "\n", b)
 		}
 	}
 

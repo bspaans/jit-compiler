@@ -58,10 +58,6 @@ func (i *IR_Call) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.Instru
 	if movedTarget, found := mapping[function]; found {
 		function = movedTarget
 	}
-	fmt.Println("Calling", i.Function, "at", function)
-	for op1, op2 := range mapping {
-		fmt.Println(op1, "=>", op2)
-	}
 
 	call := asm.CALL(function)
 	mov := asm.MOV(encoding.Rax, target)

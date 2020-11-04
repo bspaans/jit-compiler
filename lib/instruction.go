@@ -30,7 +30,7 @@ func (i Instructions) Add(i2 []Instruction) Instructions {
 	return i
 }
 
-func CompileInstruction(instr []Instruction) (MachineCode, error) {
+func CompileInstruction(instr []Instruction, debug bool) (MachineCode, error) {
 	result := []uint8{}
 	address := 0
 	for _, i := range instr {
@@ -38,9 +38,13 @@ func CompileInstruction(instr []Instruction) (MachineCode, error) {
 		if err != nil {
 			return nil, err
 		}
-		fmt.Printf("0x%x: %s\n", address, i.String())
+		if debug {
+			fmt.Printf("0x%x: %s\n", address, i.String())
+		}
 		address += len(b)
-		fmt.Println(MachineCode(b))
+		if debug {
+			fmt.Println(MachineCode(b))
+		}
 		for _, code := range b {
 			result = append(result, code)
 		}

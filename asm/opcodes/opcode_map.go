@@ -22,7 +22,6 @@ func (o OpcodeMaps) ResolveOpcode(operands []Operand) *Opcode {
 	picks := map[*Opcode]bool{}
 
 	for i, opcodeMap := range o {
-		//fmt.Println(i, opcodeMap)
 		oper := operands[i]
 		if oper == nil {
 			return nil
@@ -44,7 +43,6 @@ func (o OpcodeMaps) ResolveOpcode(operands []Operand) *Opcode {
 		picks = newPick
 	}
 	for pick, _ := range picks {
-		//fmt.Println("Resolved", pick.String())
 		return pick
 	}
 	return nil

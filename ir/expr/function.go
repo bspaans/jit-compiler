@@ -75,10 +75,6 @@ func (b *IR_Function) encodeFunction(ctx *IR_Context) ([]uint8, error) {
 	if err != nil {
 		return nil, err
 	}
-	//result := []uint8{}
-	for _, instr := range instr {
-		fmt.Println(instr)
-	}
 	return lib.Instructions(instr).Encode()
 }
 

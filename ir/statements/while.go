@@ -55,7 +55,6 @@ func (i *IR_While) Encode(ctx *IR_Context) ([]lib.Instruction, error) {
 		jmp := asm.JMP(encoding.Uint8(uint8(0xff - (int(ctx.InstructionPointer+1) - int(beginning)))))
 		result = append(result, jmp)
 		ctx.AddInstruction(jmp)
-		fmt.Println("InstructionPointer", ctx.InstructionPointer, beginning, ctx.InstructionPointer-beginning)
 		return result, nil
 	}
 	return nil, errors.New("Unsupported if IR expression")

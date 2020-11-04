@@ -1,7 +1,6 @@
 package ir
 
 import (
-	"fmt"
 	"testing"
 
 	. "github.com/bspaans/jit-compiler/ir/expr"
@@ -23,12 +22,12 @@ var ShouldRun = [][]IR{
 
 func Test_ShouldRun(t *testing.T) {
 	for _, ir := range ShouldRun {
-		b, err := Compile(ir)
+		debug := false
+		b, err := Compile(ir, debug)
 		if err != nil {
 			t.Fatal(err)
 		}
-		fmt.Println(b)
-		b.Execute()
+		b.Execute(debug)
 	}
 }
 
@@ -45,6 +44,8 @@ func Test_ParseExecute_Happy(t *testing.T) {
 		`g = []float64{53.0}; h = uint64(g[0]) ; f = h`,
 		`g = []float64{53.0}; h =g[0] ; f = uint64(h)`,
 		`g = []float64{51.0}; g[0] = g[0] + 2.0 ; f = uint64(g[0])`,
+		`g = []uint8{53} ; f = uint64(g[0])`,
+		`g = []uint8{51} ; g[0] = g[0] + uint8(2); f = uint64(g[0])`,
 		`f = 0; while f != 53 { f = f + 1 }`,
 		`if 15 == 15 { f = 53 } else { f = 100 }`,
 		`b = struct{Field uint64}{53}; f = b.Field`,
@@ -58,14 +59,14 @@ func Test_ParseExecute_Happy(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		b, err := Compile([]IR{i})
+		debug := false
+		b, err := Compile([]IR{i}, debug)
 		if err != nil {
 			t.Fatal(err)
 		}
-		fmt.Println(b)
-		value := b.Execute()
+		value := b.Execute(debug)
 		if value != uint(53) {
-			t.Fatal("Expecting 53 got", value, "in", ir)
+			t.Fatal("Expecting 53 got", value, "in", ir, "\n", b)
 		}
 	}
 
@@ -143,14 +144,14 @@ func Test_Execute_Result(t *testing.T) {
 	}
 	for _, ir := range units {
 		i := append(ir, NewIR_Return(NewIR_Variable("f")))
-		b, err := Compile(i)
+		debug := false
+		b, err := Compile(i, debug)
 		if err != nil {
 			t.Fatal(err)
 		}
-		fmt.Println(b)
-		value := b.Execute()
+		value := b.Execute(debug)
 		if value != uint(53) {
-			t.Fatal("Expecting 53 got", value, "in", ir)
+			t.Fatal("Expecting 53 got", value, "in", ir, "\n", b)
 		}
 	}
 }

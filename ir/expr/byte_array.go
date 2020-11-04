@@ -34,7 +34,6 @@ func (i *IR_ByteArray) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.I
 	// Calculate the displacement between RIP (the instruction pointer,
 	// pointing to the *next* instruction) and the address of our byte array,
 	// and load the resulting address into target using a LEA instruction.
-	fmt.Println("Loading from ", i.address, ctx.InstructionPointer)
 	ownLength := uint(7)
 	diff := uint(ctx.InstructionPointer+ownLength) - uint(i.address)
 	result := []lib.Instruction{asm.LEA(&encoding.RIPRelative{encoding.Int32(int32(-diff))}, target)}

@@ -24,7 +24,7 @@ func (m MachineCode) String() string {
 	return string(result)
 }
 
-func (m MachineCode) Execute() uint {
+func (m MachineCode) Execute(debug bool) uint {
 	mmapFunc, err := syscall.Mmap(
 		-1,
 		0,
@@ -41,9 +41,11 @@ func (m MachineCode) Execute() uint {
 	unsafeFunc := (uintptr)(unsafe.Pointer(&mmapFunc))
 	f := *(*execFunc)(unsafe.Pointer(&unsafeFunc))
 	value := f()
-	fmt.Println("\nResult :", value)
-	fmt.Printf("Hex    : %x\n", value)
-	fmt.Printf("Size   : %d bytes\n\n", len(m))
+	if debug {
+		fmt.Println("\nResult :", value)
+		fmt.Printf("Hex    : %x\n", value)
+		fmt.Printf("Size   : %d bytes\n\n", len(m))
+	}
 	return value
 }
 func (m MachineCode) Add(m2 MachineCode) MachineCode {
