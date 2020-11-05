@@ -17,8 +17,9 @@ type IR_Syscall struct {
 
 func NewIR_Syscall(syscall IRExpression, args []IRExpression) *IR_Syscall {
 	return &IR_Syscall{
-		Syscall: syscall,
-		Args:    args,
+		BaseIRExpression: NewBaseIRExpression(Syscall),
+		Syscall:          syscall,
+		Args:             args,
 	}
 }
 func (i *IR_Syscall) ReturnType(ctx *IR_Context) Type {
