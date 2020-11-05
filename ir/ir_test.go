@@ -57,12 +57,12 @@ func Test_ParseExecute_Happy(t *testing.T) {
 	for _, ir := range units {
 		i, err := ParseIR(ir + "; return f")
 		if err != nil {
-			t.Fatal(err)
+			t.Fatal(err, "in", ir)
 		}
 		debug := false
 		b, err := Compile([]IR{i}, debug)
 		if err != nil {
-			t.Fatal(err)
+			t.Fatal(err, "in", ir)
 		}
 		value := b.Execute(debug)
 		if value != uint(53) {

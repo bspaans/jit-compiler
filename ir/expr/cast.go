@@ -32,6 +32,7 @@ func (i *IR_Cast) String() string {
 }
 
 func (i *IR_Cast) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.Instruction, error) {
+	ctx.AddInstruction("cast " + encoding.Comment(i.String()))
 	result := []lib.Instruction{}
 	valueType := i.Value.ReturnType(ctx)
 	if valueType == nil {
@@ -54,8 +55,20 @@ func (i *IR_Cast) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.Instru
 			cvt := asm.CVTTSD2SI(tmpReg, target)
 			ctx.AddInstruction(cvt)
 			result = append(result, cvt)
-		} else {
-			return nil, fmt.Errorf("Unsupport cast operation %s,(%s) in: %s", valueType.String(), i.CastToType.String(), i.String())
+			return result, nil
+		}
+	} else if i.CastToType == TUint8 {
+		if valueType == TUint64 || valueType == TUint8 {
+			tmpReg := ctx.AllocateRegister(TUint64)
+			defer ctx.DeallocateRegister(tmpReg)
+			result, err := i.Value.Encode(ctx, tmpReg)
+			if err != nil {
+				return nil, err
+			}
+			mov := asm.MOV(tmpReg, target)
+			ctx.AddInstruction(mov)
+			result = append(result, mov)
+			return result, nil
 		}
 	} else if i.CastToType == TFloat64 {
 		if valueType == TFloat64 {
@@ -74,14 +87,8 @@ func (i *IR_Cast) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.Instru
 			cvt := asm.CVTSI2SD(tmpReg, target)
 			ctx.AddInstruction(cvt)
 			result = append(result, cvt)
-		} else {
-			return nil, fmt.Errorf("Unsupport cast operation %s,(%s) in: %s",
-				valueType.String(),
-				i.CastToType.String(),
-				i.String())
+			return result, nil
 		}
-	} else {
-		return nil, fmt.Errorf("Unsupport cast operation %s,(%s) in: %s", valueType.String(), i.CastToType.String(), i.String())
 	}
-	return result, nil
+	return nil, fmt.Errorf("Unsupported cast operation %s -> (%s) in: %s", valueType.String(), i.CastToType.String(), i.String())
 }

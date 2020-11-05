@@ -39,6 +39,7 @@ func (i *IR_ArrayIndex) String() string {
 }
 
 func (i *IR_ArrayIndex) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.Instruction, error) {
+	ctx.AddInstruction("array_index " + encoding.Comment(i.String()))
 	// tmpReg will contain the address of the array
 	tmpReg := ctx.AllocateRegister(TUint64)
 	defer ctx.DeallocateRegister(tmpReg)
@@ -48,6 +49,7 @@ func (i *IR_ArrayIndex) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.
 	}
 
 	// TODO: if i.Index == number => specialise
+	// SIB encoding?
 	tmpIndexReg := ctx.AllocateRegister(TUint64)
 	defer ctx.DeallocateRegister(tmpIndexReg)
 	ix, err := i.Index.Encode(ctx, tmpIndexReg)

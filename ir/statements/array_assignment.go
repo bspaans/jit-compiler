@@ -60,7 +60,7 @@ func (i *IR_ArrayAssignment) Encode(ctx *IR_Context) ([]lib.Instruction, error) 
 	// Move the expr result into the array
 	itemWidth := returnType.Width()
 	if itemWidth == 1 {
-		mov := asm.MOV(tmpReg2.Lower8BitRegister(), &encoding.IndirectRegister{tmpReg})
+		mov := asm.MOV(tmpReg2.Lower8BitRegister(), &encoding.IndirectRegister{tmpReg.Lower8BitRegister()})
 		ctx.AddInstruction(mov)
 		result = append(result, mov)
 	} else if itemWidth == 8 {

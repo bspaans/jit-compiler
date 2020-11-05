@@ -3,6 +3,7 @@ package statements
 import (
 	"fmt"
 
+	"github.com/bspaans/jit-compiler/asm/encoding"
 	. "github.com/bspaans/jit-compiler/ir/shared"
 	"github.com/bspaans/jit-compiler/lib"
 )
@@ -23,6 +24,7 @@ func NewIR_Assignment(variable string, expr IRExpression) *IR_Assignment {
 
 // Allocates a new register and assigns it the value of the expression.
 func (i *IR_Assignment) Encode(ctx *IR_Context) ([]lib.Instruction, error) {
+	ctx.AddInstruction("assignment " + encoding.Comment(i.String()))
 	returnType := i.Expr.ReturnType(ctx)
 	reg, found := ctx.VariableMap[i.Variable]
 	if !found {

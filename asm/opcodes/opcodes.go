@@ -5,6 +5,18 @@ import (
 )
 
 var (
+	ADD_rm8_r8 = &Opcode{"add", []uint8{}, []uint8{0x00}, []OpcodeExtensions{Rex, SlashR},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_rm8, ModRM_rm_rw},
+			OpcodeOperand{OT_r8, ModRM_reg_r},
+		},
+	}
+	ADD_r8_rm8 = &Opcode{"add", []uint8{}, []uint8{0x02}, []OpcodeExtensions{Rex, SlashR},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_r8, ModRM_reg_rw},
+			OpcodeOperand{OT_rm8, ModRM_rm_r},
+		},
+	}
 	ADD_rm64_r64 = &Opcode{"add", []uint8{}, []uint8{0x01}, []OpcodeExtensions{RexW, SlashR},
 		[]OpcodeOperand{
 			OpcodeOperand{OT_rm64, ModRM_rm_rw},

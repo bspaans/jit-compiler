@@ -4,7 +4,14 @@ import (
 	. "github.com/bspaans/jit-compiler/asm/encoding"
 )
 
-var ADD = []*Opcode{ADD_rm64_r64, ADD_r64_rm64, ADD_rm64_imm32, ADDSD_xmm1_xmm2m64}
+var ADD = []*Opcode{
+	ADD_rm8_r8,
+	ADD_r8_rm8,
+	ADD_rm64_r64,
+	ADD_r64_rm64,
+	ADD_rm64_imm32,
+	ADDSD_xmm1_xmm2m64,
+}
 var CALL = []*Opcode{CALL_rm64}
 var CMP = []*Opcode{CMP_rm64_imm32, CMP_rm64_r64}
 var CVTSI2SD = []*Opcode{CVTSI2SD_xmm1_rm64}
