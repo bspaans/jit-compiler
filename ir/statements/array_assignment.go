@@ -26,15 +26,28 @@ func NewIR_ArrayAssignment(variable string, index IRExpression, expr IRExpressio
 }
 
 func (i *IR_ArrayAssignment) Encode(ctx *IR_Context) ([]lib.Instruction, error) {
+	ctx.AddInstruction("array_assignment " + encoding.Comment(i.String()))
 	tmpReg := ctx.AllocateRegister(TUint64)
 	defer ctx.DeallocateRegister(tmpReg)
 
+	returnType := i.Expr.ReturnType(ctx)
+	itemWidth := returnType.Width()
+
 	// Calculate the index offset and add the address of
-	// the array to it (TODO: only works for quadwords)
-	// TODO: check returntype of i.Index
+	// the array to it
 	result, err := i.Index.Encode(ctx, tmpReg)
 	if err != nil {
 		return nil, err
+	}
+	if itemWidth != 1 {
+		tmpReg3 := ctx.AllocateRegister(TUint64)
+		defer ctx.DeallocateRegister(tmpReg3)
+		mov := asm.MOV(encoding.Uint32(itemWidth), tmpReg3)
+		mul := asm.MUL(tmpReg3, tmpReg)
+		ctx.AddInstruction(mov)
+		ctx.AddInstruction(mul)
+		result = append(result, mov)
+		result = append(result, mul)
 	}
 	reg, found := ctx.VariableMap[i.Variable]
 	if !found {
@@ -46,7 +59,6 @@ func (i *IR_ArrayAssignment) Encode(ctx *IR_Context) ([]lib.Instruction, error) 
 
 	// Encode the expression
 
-	returnType := i.Expr.ReturnType(ctx)
 	// TODO write directly to location?
 	tmpReg2 := ctx.AllocateRegister(returnType)
 	defer ctx.DeallocateRegister(tmpReg2)
@@ -54,11 +66,9 @@ func (i *IR_ArrayAssignment) Encode(ctx *IR_Context) ([]lib.Instruction, error) 
 	if err != nil {
 		return nil, err
 	}
-	ctx.AddInstructions(expr)
 	result = lib.Instructions(result).Add(expr)
 
 	// Move the expr result into the array
-	itemWidth := returnType.Width()
 	if itemWidth == 1 {
 		mov := asm.MOV(tmpReg2.Lower8BitRegister(), &encoding.IndirectRegister{tmpReg.Lower8BitRegister()})
 		ctx.AddInstruction(mov)

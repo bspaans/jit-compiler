@@ -85,7 +85,7 @@ func Compile(stmts []IR, debug bool) (lib.MachineCode, error) {
 	return result, nil
 }
 
-func CompileIR(stmts []IR) ([]lib.Instruction, error) {
+func CompileIR(stmts []IR) (lib.Instructions, error) {
 	ctx := NewIRContext()
 	for _, stmt := range stmts {
 		_, err := stmt.Encode(ctx)

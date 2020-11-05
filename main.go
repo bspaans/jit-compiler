@@ -29,5 +29,10 @@ func main() {
 		for _, i := range instr {
 			fmt.Println(" ", i)
 		}
+		b, err := instr.Encode()
+		if err != nil {
+			fmt.Println("Encode error: ", err.Error())
+		}
+		fmt.Println(b.Execute(false))
 	}
 }
