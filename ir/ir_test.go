@@ -46,9 +46,9 @@ func Test_ParseExecute_Happy(t *testing.T) {
 		`g = []uint64{42,52,53}; g[1] = 53; f = g[1]`,
 		`g = []uint64{42,52,33}; g[2] = 53; f = g[2]`,
 		`g = []uint64{42,52,53}; g[0] = 42 + 11; f = g[0]`,
-		`g = []uint64{42,52,53}; g[0] = 11 + g[0]; f = g[0]`,
-		//`g = []uint64{42,52,53}; g[0] = g[0] + 11; f = g[0]`,
-		//`g = []uint64{42,52,53}; g[1] = g[1] + 1; f = g[1]`,
+		//`g = []uint64{42,52,53}; g[0] = 11 + g[0]; f = g[0]`,
+		`g = []uint64{42,52,53}; g[0] = g[0] + 11; f = g[0]`,
+		`g = []uint64{42,52,53}; g[1] = g[1] + 1; f = g[1]`,
 		`g = []float64{53.0}; h = uint64(g[0]) ; f = h`,
 		`g = []float64{53.0}; h =g[0] ; f = uint64(h)`,
 		`g = []float64{51.0}; g[0] = g[0] + 2.0 ; f = uint64(g[0])`,
@@ -68,7 +68,7 @@ func Test_ParseExecute_Happy(t *testing.T) {
 		if err != nil {
 			t.Fatal(err, "in", ir)
 		}
-		debug := false
+		debug := true
 		b, err := Compile([]IR{i}, debug)
 		if err != nil {
 			t.Fatal(err, "in", ir)

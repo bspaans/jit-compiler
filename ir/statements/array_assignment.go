@@ -25,62 +25,88 @@ func NewIR_ArrayAssignment(variable string, index IRExpression, expr IRExpressio
 	}
 }
 
-func (i *IR_ArrayAssignment) Encode(ctx *IR_Context) ([]lib.Instruction, error) {
-	ctx.AddInstruction("array_assignment " + encoding.Comment(i.String()))
-	tmpReg := ctx.AllocateRegister(TUint64)
-	defer ctx.DeallocateRegister(tmpReg)
-
-	returnType := i.Expr.ReturnType(ctx)
-	itemWidth := returnType.Width()
-
+func (i *IR_ArrayAssignment) encodeIndex(ctx *IR_Context, indexReg encoding.Operand) ([]lib.Instruction, error) {
 	// Calculate the index offset and add the address of
 	// the array to it
-	result, err := i.Index.Encode(ctx, tmpReg)
+	result, err := i.Index.Encode(ctx, indexReg)
 	if err != nil {
 		return nil, err
 	}
+
+	// If the item width is not 1 byte wide we need to scale up the
+	// index (TODO: can we use SIB encoding for this?)
+	returnType := i.Expr.ReturnType(ctx)
+	itemWidth := returnType.Width()
 	if itemWidth != 1 {
-		tmpReg3 := ctx.AllocateRegister(TUint64)
-		defer ctx.DeallocateRegister(tmpReg3)
-		mov := asm.MOV(encoding.Uint32(itemWidth), tmpReg3)
-		mul := asm.MUL(tmpReg3, tmpReg)
+		mulReg := ctx.AllocateRegister(TUint64)
+		defer ctx.DeallocateRegister(mulReg)
+		mov := asm.MOV(encoding.Uint32(itemWidth), mulReg)
+		mul := asm.MUL(mulReg, indexReg)
 		ctx.AddInstruction(mov)
 		ctx.AddInstruction(mul)
 		result = append(result, mov)
 		result = append(result, mul)
 	}
+
+	// Add the address of the Array to the index
 	reg, found := ctx.VariableMap[i.Variable]
 	if !found {
 		return nil, fmt.Errorf("Unknown array '%s'", i.Variable)
 	}
-	add := asm.ADD(reg, tmpReg)
+	add := asm.ADD(reg, indexReg)
 	ctx.AddInstruction(add)
 	result = append(result, add)
+	return result, err
+}
 
-	// Encode the expression
+func (i *IR_ArrayAssignment) encodeExpr(ctx *IR_Context, indexReg *encoding.Register) ([]lib.Instruction, error) {
+
+	returnType := i.Expr.ReturnType(ctx)
+	itemWidth := returnType.Width()
+
+	exprReg := ctx.AllocateRegister(returnType)
+	defer ctx.DeallocateRegister(exprReg)
 
 	// TODO write directly to location?
-	tmpReg2 := ctx.AllocateRegister(returnType)
-	defer ctx.DeallocateRegister(tmpReg2)
-	expr, err := i.Expr.Encode(ctx, tmpReg2)
+	result, err := i.Expr.Encode(ctx, exprReg)
 	if err != nil {
 		return nil, err
 	}
-	result = lib.Instructions(result).Add(expr)
 
 	// Move the expr result into the array
 	if itemWidth == 1 {
-		mov := asm.MOV(tmpReg2.Lower8BitRegister(), &encoding.IndirectRegister{tmpReg.Lower8BitRegister()})
+		mov := asm.MOV(exprReg.Lower8BitRegister(), &encoding.IndirectRegister{indexReg.Lower8BitRegister()})
 		ctx.AddInstruction(mov)
 		result = append(result, mov)
 	} else if itemWidth == 8 {
-		mov := asm.MOV(tmpReg2, &encoding.IndirectRegister{tmpReg})
+		mov := asm.MOV(exprReg, &encoding.IndirectRegister{indexReg})
 		ctx.AddInstruction(mov)
 		result = append(result, mov)
 
 	} else {
-		return nil, fmt.Errorf("Assigning to non 64 bit arrays not supported at this time [TODO]")
+		return nil, fmt.Errorf("Assigning to arrays of type %s is not supported at this time [TODO]", returnType)
 	}
+	return result, nil
+}
+
+func (i *IR_ArrayAssignment) Encode(ctx *IR_Context) ([]lib.Instruction, error) {
+	ctx.AddInstruction("array_assignment " + encoding.Comment(i.String()))
+
+	indexReg := ctx.AllocateRegister(TUint64)
+	defer ctx.DeallocateRegister(indexReg)
+
+	result, err := i.encodeIndex(ctx, indexReg)
+	if err != nil {
+		return nil, fmt.Errorf("Failed to encode array index in %s: %s", i.String(), err.Error())
+	}
+	exprInstr, err := i.encodeExpr(ctx, indexReg)
+	if err != nil {
+		return nil, fmt.Errorf("Failed to encode expr in %s: %s", i.String(), err.Error())
+	}
+	for _, r := range exprInstr {
+		result = append(result, r)
+	}
+
 	return result, nil
 }
 
