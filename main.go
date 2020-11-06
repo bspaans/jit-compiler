@@ -32,6 +32,7 @@ func main() {
 		b, err := instr.Encode()
 		if err != nil {
 			fmt.Println("Encode error: ", err.Error())
+			continue
 		}
 		fmt.Println(b.Execute(false))
 	}

@@ -25,8 +25,12 @@ func NewIR_Return(expr IRExpression) *IR_Return {
 func (i *IR_Return) Encode(ctx *IR_Context) ([]lib.Instruction, error) {
 	result := []lib.Instruction{}
 	var reg encoding.Operand
+	var ok bool
 	if i.Expr.Type() == Variable {
-		reg = ctx.VariableMap[i.Expr.(*expr.IR_Variable).Value]
+		reg, ok = ctx.VariableMap[i.Expr.(*expr.IR_Variable).Value]
+		if !ok {
+			return nil, fmt.Errorf("Unknown variable '%s' in return expression: %s", i.Expr.(*expr.IR_Variable).Value, i.String())
+		}
 	} else {
 		reg = ctx.AllocateRegister(i.Expr.ReturnType(ctx))
 		defer ctx.DeallocateRegister(reg.(*encoding.Register))

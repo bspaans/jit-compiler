@@ -31,7 +31,7 @@ func (i *IR_Variable) String() string {
 
 func (i *IR_Variable) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.Instruction, error) {
 	reg, ok := ctx.VariableMap[i.Value]
-	if !ok {
+	if !ok || reg == nil {
 		return nil, fmt.Errorf("Unknown variable '%s'", i.Value)
 	}
 	result := []lib.Instruction{asm.MOV(reg, target)}

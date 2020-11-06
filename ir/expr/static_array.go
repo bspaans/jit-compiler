@@ -52,11 +52,20 @@ func (b *IR_StaticArray) AddToDataSection(ctx *IR_Context) error {
 	b.address = -1
 	for _, v := range b.Value {
 		bytes := []uint8{}
-		if ir, ok := v.(*IR_Uint8); ok {
-			bytes = []uint8{uint8(ir.Value)}
-		} else if ir, ok := v.(*IR_Uint64); ok {
+		if b.ElemType == TUint8 {
+			switch v.(type) {
+			case *IR_Uint8:
+				bytes = []uint8{uint8(v.(*IR_Uint8).Value)}
+			case *IR_Uint64:
+				bytes = []uint8{uint8(v.(*IR_Uint64).Value)}
+			default:
+				return fmt.Errorf("Unsupport uint8 array type %s in %s", b.ElemType, b.String())
+			}
+		} else if b.ElemType == TUint64 {
+			ir := v.(*IR_Uint64)
 			bytes = encoding.Uint64(ir.Value).Encode()
-		} else if ir, ok := v.(*IR_Float64); ok {
+		} else if b.ElemType == TFloat64 {
+			ir := v.(*IR_Float64)
 			bytes = encoding.Float64(ir.Value).Encode()
 		} else {
 			return fmt.Errorf("Unsupported array type %s", v.Type().String())

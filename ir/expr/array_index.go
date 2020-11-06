@@ -86,6 +86,7 @@ func (i *IR_ArrayIndex) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.
 
 		instr = append(instr, asm.MOV(encoding.Uint64(0), tmpReg2))
 		// TODO: replace Lower8BitRegister with GetRegisterForWidth(itemWidth)
+		//instr = append(instr, asm.MOV(&encoding.IndirectRegister{tmpReg.Lower8BitRegister()}, tmpReg2.Lower8BitRegister()))
 		instr = append(instr, asm.MOV(&encoding.IndirectRegister{tmpReg.Lower8BitRegister()}, tmpReg2.Lower8BitRegister()))
 		instr = append(instr, asm.MOV(tmpReg2, target))
 	} else {
