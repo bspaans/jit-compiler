@@ -47,7 +47,7 @@ func (i *IR_Operator) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.In
 			variable := i.Op2.(*IR_Variable).Value
 			reg = ctx.VariableMap[variable]
 		} else {
-			reg = ctx.AllocateRegister(returnType1)
+			reg = ctx.AllocateRegister(returnType2)
 			defer ctx.DeallocateRegister(reg.(*encoding.Register))
 
 			expr, err := i.Op2.Encode(ctx, reg)

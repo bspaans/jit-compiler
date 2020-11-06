@@ -38,43 +38,46 @@ func (i *IR_ArrayIndex) String() string {
 	return fmt.Sprintf("%s[%s]", i.Array.String(), i.Index.String())
 }
 
-func (i *IR_ArrayIndex) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.Instruction, error) {
-	ctx.AddInstruction("array_index " + encoding.Comment(i.String()))
-	// tmpReg will contain the address of the array
-	tmpReg := ctx.AllocateRegister(TUint64)
-	defer ctx.DeallocateRegister(tmpReg)
-	result, err := i.Array.Encode(ctx, tmpReg)
+func (i *IR_ArrayIndex) encodeIndex(ctx *IR_Context, arrayReg encoding.Operand) ([]lib.Instruction, error) {
+
+	// Optimisation: if we're getting a[0] we don't have to do anything.
+	// The address in arrayReg will already be correct
+	if ix, ok := i.Index.(*IR_Uint64); ok && ix.Value == 0 {
+		return []lib.Instruction{}, nil
+	}
+
+	indexReg := ctx.AllocateRegister(TUint64)
+	defer ctx.DeallocateRegister(indexReg)
+
+	// Calculate the index offset
+	result, err := i.Index.Encode(ctx, indexReg)
 	if err != nil {
 		return nil, err
 	}
 
-	// TODO: if i.Index == number => specialise
-	// SIB encoding?
-	tmpIndexReg := ctx.AllocateRegister(TUint64)
-	defer ctx.DeallocateRegister(tmpIndexReg)
-	ix, err := i.Index.Encode(ctx, tmpIndexReg)
-	if err != nil {
-		return nil, err
-	}
-	result = lib.Instructions(result).Add(ix)
-	returnType := i.ReturnType(ctx)
-	if returnType == nil {
-		return nil, fmt.Errorf("Return type nil. wut")
-	}
+	// If the item width is not 1 byte wide we need to scale up the
+	// index (TODO: can we use SIB or displacement encoding for this?)
 	itemWidth := i.ReturnType(ctx).Width()
 	if itemWidth != 1 {
-		tmpReg3 := ctx.AllocateRegister(TUint64)
-		defer ctx.DeallocateRegister(tmpReg3)
-		mov := asm.MOV(encoding.Uint32(itemWidth), tmpReg3)
-		mul := asm.MUL(tmpReg3, tmpIndexReg)
+		mulReg := ctx.AllocateRegister(TUint64)
+		defer ctx.DeallocateRegister(mulReg)
+		mov := asm.MOV(encoding.Uint32(itemWidth), mulReg)
+		mul := asm.MUL(mulReg, indexReg)
 		ctx.AddInstruction(mov)
 		ctx.AddInstruction(mul)
 		result = append(result, mov)
 		result = append(result, mul)
 	}
-	instr := lib.Instructions{
-		asm.ADD(tmpIndexReg, tmpReg),
-	}
+	add := asm.ADD(indexReg, arrayReg)
+	ctx.AddInstruction(add)
+	result = append(result, add)
+	return result, err
+}
+
+func (i *IR_ArrayIndex) encodeMove(ctx *IR_Context, arrayReg, target encoding.Operand) ([]lib.Instruction, error) {
+
+	itemWidth := i.ReturnType(ctx).Width()
+
 	if itemWidth == 1 {
 		var tmpReg2 *encoding.Register
 		if target.Type() == encoding.T_Register {
@@ -84,16 +87,45 @@ func (i *IR_ArrayIndex) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.
 			defer ctx.DeallocateRegister(tmpReg2)
 		}
 
-		instr = append(instr, asm.MOV(encoding.Uint64(0), tmpReg2))
-		// TODO: replace Lower8BitRegister with GetRegisterForWidth(itemWidth)
-		//instr = append(instr, asm.MOV(&encoding.IndirectRegister{tmpReg.Lower8BitRegister()}, tmpReg2.Lower8BitRegister()))
-		instr = append(instr, asm.MOV(&encoding.IndirectRegister{tmpReg.Lower8BitRegister()}, tmpReg2.Lower8BitRegister()))
-		instr = append(instr, asm.MOV(tmpReg2, target))
+		mov0 := asm.MOV(encoding.Uint64(0), tmpReg2)
+		mov := asm.MOV(&encoding.IndirectRegister{arrayReg.(*encoding.Register).Lower8BitRegister()}, tmpReg2.Lower8BitRegister())
+		movTarget := asm.MOV(tmpReg2, target)
+		ctx.AddInstruction(mov0)
+		ctx.AddInstruction(mov)
+		if tmpReg2 == target {
+			return []lib.Instruction{mov0, mov}, nil
+		}
+		ctx.AddInstruction(movTarget)
+		return []lib.Instruction{mov0, mov, movTarget}, nil
 	} else {
-		instr = append(instr, asm.MOV(&encoding.IndirectRegister{tmpReg}, target))
+		mov := asm.MOV(&encoding.IndirectRegister{arrayReg.(*encoding.Register)}, target)
+		ctx.AddInstruction(mov)
+		return []lib.Instruction{mov}, nil
 	}
-	ctx.AddInstructions(instr)
-	return lib.Instructions(result).Add(instr), nil
+	return nil, nil
+}
+
+func (i *IR_ArrayIndex) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.Instruction, error) {
+	ctx.AddInstruction("array_index " + encoding.Comment(i.String()))
+	// tmpReg will contain the address of the array
+	arrayReg := ctx.AllocateRegister(TUint64)
+	defer ctx.DeallocateRegister(arrayReg)
+	result, err := i.Array.Encode(ctx, arrayReg)
+	if err != nil {
+		return nil, err
+	}
+
+	index, err := i.encodeIndex(ctx, arrayReg)
+	if err != nil {
+		return nil, err
+	}
+	result = lib.Instructions(result).Add(index)
+	mov, err := i.encodeMove(ctx, arrayReg, target)
+	if err != nil {
+		return nil, err
+	}
+	result = lib.Instructions(result).Add(mov)
+	return result, nil
 }
 
 func (b *IR_ArrayIndex) AddToDataSection(ctx *IR_Context) error {

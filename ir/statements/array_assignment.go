@@ -26,8 +26,7 @@ func NewIR_ArrayAssignment(variable string, index IRExpression, expr IRExpressio
 }
 
 func (i *IR_ArrayAssignment) encodeIndex(ctx *IR_Context, indexReg encoding.Operand) ([]lib.Instruction, error) {
-	// Calculate the index offset and add the address of
-	// the array to it
+	// Calculate the index offset
 	result, err := i.Index.Encode(ctx, indexReg)
 	if err != nil {
 		return nil, err
