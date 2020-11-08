@@ -20,20 +20,13 @@ func main() {
 			continue
 
 		}
-		instr, err := ir.CompileIR([]shared.IR{statements})
+		debug := true
+		instr, err := ir.Compile([]shared.IR{statements}, debug)
 		if err != nil {
 			fmt.Println("Compile error: ", err.Error())
 			continue
 
 		}
-		for _, i := range instr {
-			fmt.Println(" ", i)
-		}
-		b, err := instr.Encode()
-		if err != nil {
-			fmt.Println("Encode error: ", err.Error())
-			continue
-		}
-		fmt.Println(b.Execute(false))
+		fmt.Println(instr.Execute(debug))
 	}
 }

@@ -25,8 +25,15 @@ func NewIR_Not(op1 IRExpression) *IR_Not {
 func (i *IR_Not) ReturnType(ctx *IR_Context) Type {
 	return TBool
 }
+func (i *IR_Not) EncodeWithoutSETE(ctx *IR_Context, target encoding.Operand) ([]lib.Instruction, error) {
+	return i.encode(ctx, target, false)
+}
 
 func (i *IR_Not) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.Instruction, error) {
+	return i.encode(ctx, target, true)
+}
+
+func (i *IR_Not) encode(ctx *IR_Context, target encoding.Operand, includeSETE bool) ([]lib.Instruction, error) {
 
 	var reg1 encoding.Operand
 
@@ -56,9 +63,11 @@ func (i *IR_Not) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.Instruc
 	defer ctx.DeallocateRegister(tmpReg)
 	instr := []lib.Instruction{}
 	instr = append(instr, asm.CMP(encoding.Uint32(0), reg1))
-	instr = append(instr, asm.MOV(encoding.Uint64(0), tmpReg))
-	instr = append(instr, asm.SETE(tmpReg.Lower8BitRegister()))
-	instr = append(instr, asm.MOV(tmpReg, target))
+	if includeSETE {
+		instr = append(instr, asm.MOV(encoding.Uint64(0), tmpReg))
+		instr = append(instr, asm.SETE(tmpReg.Lower8BitRegister()))
+		instr = append(instr, asm.MOV(tmpReg, target))
+	}
 	for _, inst := range instr {
 		result = append(result, inst)
 		ctx.AddInstruction(inst)

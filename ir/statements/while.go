@@ -25,6 +25,7 @@ func NewIR_While(condition IRExpression, stmt IR) *IR_While {
 }
 
 func (i *IR_While) Encode(ctx *IR_Context) ([]lib.Instruction, error) {
+	jmpSize := uint(2)
 	if i.Condition.ReturnType(ctx) == TBool {
 		reg := ctx.AllocateRegister(TBool)
 		defer ctx.DeallocateRegister(reg)
@@ -39,7 +40,7 @@ func (i *IR_While) Encode(ctx *IR_Context) ([]lib.Instruction, error) {
 		}
 		instr := []lib.Instruction{
 			asm.CMP(encoding.Uint32(1), reg),
-			asm.JNE(encoding.Uint8(stmtLen + 2)),
+			asm.JNE(encoding.Uint8(stmtLen + int(jmpSize))),
 		}
 		for _, inst := range instr {
 			ctx.AddInstruction(inst)
@@ -49,10 +50,12 @@ func (i *IR_While) Encode(ctx *IR_Context) ([]lib.Instruction, error) {
 		if err != nil {
 			return nil, err
 		}
-		for _, instr := range s1 {
-			result = append(result, instr)
-		}
-		jmp := asm.JMP(encoding.Uint8(uint8(0xff - (int(ctx.InstructionPointer+1) - int(beginning)))))
+		result = lib.Instructions(result).Add(s1)
+		jump := uint8((ctx.InstructionPointer + jmpSize) - beginning)
+		fmt.Println("The jump is", jump)
+		// two's complement
+		jump = (^jump) + 1
+		jmp := asm.JMP(encoding.Uint8(jump))
 		result = append(result, jmp)
 		ctx.AddInstruction(jmp)
 		return result, nil

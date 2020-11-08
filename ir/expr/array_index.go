@@ -107,9 +107,10 @@ func (i *IR_ArrayIndex) encodeMove(ctx *IR_Context, arrayReg, target encoding.Op
 
 func (i *IR_ArrayIndex) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.Instruction, error) {
 	ctx.AddInstruction("array_index " + encoding.Comment(i.String()))
-	// tmpReg will contain the address of the array
+
 	arrayReg := ctx.AllocateRegister(TUint64)
 	defer ctx.DeallocateRegister(arrayReg)
+
 	result, err := i.Array.Encode(ctx, arrayReg)
 	if err != nil {
 		return nil, err

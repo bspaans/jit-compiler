@@ -28,7 +28,15 @@ func (i *IR_Equals) ReturnType(ctx *IR_Context) Type {
 	return TBool
 }
 
+func (i *IR_Equals) EncodeWithoutSETE(ctx *IR_Context, target encoding.Operand) ([]lib.Instruction, error) {
+	return i.encode(ctx, target, false)
+}
+
 func (i *IR_Equals) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.Instruction, error) {
+	return i.encode(ctx, target, true)
+}
+
+func (i *IR_Equals) encode(ctx *IR_Context, target encoding.Operand, includeSETE bool) ([]lib.Instruction, error) {
 	result := []lib.Instruction{}
 
 	var reg1, reg2 encoding.Operand
@@ -59,9 +67,11 @@ func (i *IR_Equals) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.Inst
 	tmpReg := ctx.AllocateRegister(TUint64)
 	defer ctx.DeallocateRegister(tmpReg)
 	result = append(result, asm.CMP(reg1, reg2))
-	result = append(result, asm.MOV(encoding.Uint64(0), tmpReg))
-	result = append(result, asm.SETE(tmpReg.Lower8BitRegister()))
-	result = append(result, asm.MOV(tmpReg, target))
+	if includeSETE {
+		result = append(result, asm.MOV(encoding.Uint64(0), tmpReg))
+		result = append(result, asm.SETE(tmpReg.Lower8BitRegister()))
+		result = append(result, asm.MOV(tmpReg, target))
+	}
 	ctx.AddInstructions(result)
 	return result, nil
 }

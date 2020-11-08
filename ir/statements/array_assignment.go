@@ -5,6 +5,7 @@ import (
 
 	"github.com/bspaans/jit-compiler/asm"
 	"github.com/bspaans/jit-compiler/asm/encoding"
+	"github.com/bspaans/jit-compiler/ir/expr"
 	. "github.com/bspaans/jit-compiler/ir/shared"
 	"github.com/bspaans/jit-compiler/lib"
 )
@@ -25,7 +26,17 @@ func NewIR_ArrayAssignment(variable string, index IRExpression, expr IRExpressio
 	}
 }
 
-func (i *IR_ArrayAssignment) encodeIndex(ctx *IR_Context, indexReg encoding.Operand) ([]lib.Instruction, error) {
+func (i *IR_ArrayAssignment) encodeIndex(ctx *IR_Context, arrayReg encoding.Operand) ([]lib.Instruction, error) {
+
+	// Optimisation: if we're getting a[0] we don't have to do anything.
+	// The address in arrayReg will already be correct
+	if ix, ok := i.Index.(*expr.IR_Uint64); ok && ix.Value == 0 {
+		return []lib.Instruction{}, nil
+	}
+
+	indexReg := ctx.AllocateRegister(TUint64)
+	defer ctx.DeallocateRegister(indexReg)
+
 	// Calculate the index offset
 	result, err := i.Index.Encode(ctx, indexReg)
 	if err != nil {
@@ -46,19 +57,13 @@ func (i *IR_ArrayAssignment) encodeIndex(ctx *IR_Context, indexReg encoding.Oper
 		result = append(result, mov)
 		result = append(result, mul)
 	}
-
-	// Add the address of the Array to the index
-	reg, found := ctx.VariableMap[i.Variable]
-	if !found {
-		return nil, fmt.Errorf("Unknown array '%s'", i.Variable)
-	}
-	add := asm.ADD(reg, indexReg)
+	add := asm.ADD(indexReg, arrayReg)
 	ctx.AddInstruction(add)
 	result = append(result, add)
 	return result, err
 }
 
-func (i *IR_ArrayAssignment) encodeExpr(ctx *IR_Context, indexReg *encoding.Register) ([]lib.Instruction, error) {
+func (i *IR_ArrayAssignment) encodeExpr(ctx *IR_Context, arrayReg *encoding.Register) ([]lib.Instruction, error) {
 
 	returnType := i.Expr.ReturnType(ctx)
 	itemWidth := returnType.Width()
@@ -74,11 +79,11 @@ func (i *IR_ArrayAssignment) encodeExpr(ctx *IR_Context, indexReg *encoding.Regi
 
 	// Move the expr result into the array
 	if itemWidth == 1 {
-		mov := asm.MOV(exprReg.Lower8BitRegister(), &encoding.IndirectRegister{indexReg.Lower8BitRegister()})
+		mov := asm.MOV(exprReg.Lower8BitRegister(), &encoding.IndirectRegister{arrayReg.Lower8BitRegister()})
 		ctx.AddInstruction(mov)
 		result = append(result, mov)
 	} else if itemWidth == 8 {
-		mov := asm.MOV(exprReg, &encoding.IndirectRegister{indexReg})
+		mov := asm.MOV(exprReg, &encoding.IndirectRegister{arrayReg})
 		ctx.AddInstruction(mov)
 		result = append(result, mov)
 
@@ -91,21 +96,29 @@ func (i *IR_ArrayAssignment) encodeExpr(ctx *IR_Context, indexReg *encoding.Regi
 func (i *IR_ArrayAssignment) Encode(ctx *IR_Context) ([]lib.Instruction, error) {
 	ctx.AddInstruction("array_assignment " + encoding.Comment(i.String()))
 
-	indexReg := ctx.AllocateRegister(TUint64)
-	defer ctx.DeallocateRegister(indexReg)
+	arrayReg := ctx.AllocateRegister(TUint64)
+	defer ctx.DeallocateRegister(arrayReg)
 
-	result, err := i.encodeIndex(ctx, indexReg)
+	// Move the address of the Array to the register
+	reg, found := ctx.VariableMap[i.Variable]
+	if !found {
+		return nil, fmt.Errorf("Unknown array '%s'", i.Variable)
+	}
+	mov := asm.MOV(reg, arrayReg)
+	ctx.AddInstruction(mov)
+	result := []lib.Instruction{mov}
+
+	instr, err := i.encodeIndex(ctx, arrayReg)
 	if err != nil {
 		return nil, fmt.Errorf("Failed to encode array index in %s: %s", i.String(), err.Error())
 	}
-	exprInstr, err := i.encodeExpr(ctx, indexReg)
+	result = lib.Instructions(result).Add(instr)
+
+	exprInstr, err := i.encodeExpr(ctx, arrayReg)
 	if err != nil {
 		return nil, fmt.Errorf("Failed to encode expr in %s: %s", i.String(), err.Error())
 	}
-	for _, r := range exprInstr {
-		result = append(result, r)
-	}
-
+	result = lib.Instructions(result).Add(exprInstr)
 	return result, nil
 }
 
