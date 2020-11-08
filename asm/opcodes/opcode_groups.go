@@ -23,6 +23,7 @@ var IDIV = []*Opcode{DIV_rm64}
 var IMUL = []*Opcode{MUL_rm64}
 var INC = []*Opcode{INC_rm64}
 var JMP = []*Opcode{JMP_rel8, JMP_rel32, JMP_rm64}
+var JE = []*Opcode{JE_rel8}
 var JNE = []*Opcode{JNE_rel8}
 var LEA = []*Opcode{LEA_r64_m}
 var MOV = []*Opcode{

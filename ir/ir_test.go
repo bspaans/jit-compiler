@@ -48,10 +48,10 @@ func Test_ParseExecute_Happy(t *testing.T) {
 		`g = []uint64{42,52,53}; h = []uint64{42,52,53}; f = g[2]`,
 		`g = []uint64{42,52,53}; h = []uint64{42,52,53}; f = h[2]`,
 		`i = 0; while i != 53 { i = i + 1} ; f = i`,
-		//`k = 2;j = 1; i = 0; while i != 53 { i = i + 1} ; f = i`,
-		//`k = 2;j = 1; i = 0; while i != 53 { i = i + 1} ; f = 53`,
-		//`g = []uint64{13,13}; i = 0; while i != 53 { i = i + 1} ; f = i`,
-		//`g = []uint64{13,13}; i = 0; while i != 53 { h = 2; i = i + 1} ; f = 53`,
+		`k = 2;j = 1; i = 0; while i != 53 { i = i + 1} ; f = i`,
+		`k = 2;j = 1; i = 0; while i != 53 { i = i + 1} ; f = 53`,
+		`g = []uint64{13,13}; i = 0; while i != 53 { i = i + 1} ; f = i`,
+		`g = []uint64{13,13}; i = 0; while i != 53 { h = 2; i = i + 1} ; f = 53`,
 		`g = []uint64{42,52,53}; f = g[2]`,
 		`g = []uint64{42,52,53}; g[2] = g[2]; f = g[2]`,
 		`g = []uint64{42,52,53}; f = g[0] + 11`,
@@ -72,11 +72,13 @@ func Test_ParseExecute_Happy(t *testing.T) {
 		`if 15 == 15 { f = 53 } else { f = 100 }`,
 		`k = 21; j = 1; if 15 == 15 { f = 53 } else { f = 100 }`,
 		`if 13 != 15 { f = 53 } else { f = 100 }`,
+		`if 13 == 15 { f = 100 } else { f = 53 }`,
 		`b = struct{Field uint64}{53}; f = b.Field`,
 		`b = struct{Field uint64
 		            Field2 uint64}{51, 53}; f = b.Field2`,
 		`b = func(i uint64) uint64 { return i - 2 }; f = b(55)`,
 		`func b(i uint64) uint64 { return i - 2}; f = b(55)`,
+		`j = 1; i = 5; while i == 5 { j = j + 1; if j == 5 { i = 53 } else { i = 5 }}; f = i`,
 	}
 	for _, ir := range units {
 		i, err := ParseIR(ir + "; return f")

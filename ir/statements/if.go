@@ -44,13 +44,15 @@ func (i *IR_If) Encode(ctx *IR_Context) ([]lib.Instruction, error) {
 		return nil, err
 	}
 
+	jmpSize := 2
+
 	// Add the condition and jump
 	var result []lib.Instruction
 	switch i.Condition.(type) {
 	case *expr.IR_Equals:
 		result, err = i.Condition.(*expr.IR_Equals).EncodeWithoutSETE(ctx, reg)
 		instr := []lib.Instruction{
-			asm.JNE(encoding.Uint8(stmt1Len)),
+			asm.JNE(encoding.Uint8(stmt1Len + jmpSize)),
 		}
 		for _, inst := range instr {
 			ctx.AddInstruction(inst)
@@ -59,7 +61,7 @@ func (i *IR_If) Encode(ctx *IR_Context) ([]lib.Instruction, error) {
 	case *expr.IR_Not:
 		result, err = i.Condition.(*expr.IR_Not).EncodeWithoutSETE(ctx, reg)
 		instr := []lib.Instruction{
-			asm.JNE(encoding.Uint8(stmt1Len)),
+			asm.JE(encoding.Uint8(stmt1Len)),
 		}
 		for _, inst := range instr {
 			ctx.AddInstruction(inst)

@@ -47,6 +47,9 @@ func DIV(src, dest encoding.Operand) lib.Instruction {
 func INC(dest encoding.Operand) lib.Instruction {
 	return opcodes.OpcodesToInstruction("inc", opcodes.INC, 1, dest)
 }
+func JE(dest encoding.Operand) lib.Instruction {
+	return opcodes.OpcodesToInstruction("je", opcodes.JE, 1, dest)
+}
 func JNE(dest encoding.Operand) lib.Instruction {
 	return opcodes.OpcodesToInstruction("jne", opcodes.JNE, 1, dest)
 }

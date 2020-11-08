@@ -68,7 +68,6 @@ func (i *IR_Equals) encode(ctx *IR_Context, target encoding.Operand, includeSETE
 	defer ctx.DeallocateRegister(tmpReg)
 	result = append(result, asm.CMP(reg1, reg2))
 	if includeSETE {
-		result = append(result, asm.MOV(encoding.Uint64(0), tmpReg))
 		result = append(result, asm.SETE(tmpReg.Lower8BitRegister()))
 		result = append(result, asm.MOV(tmpReg, target))
 	}

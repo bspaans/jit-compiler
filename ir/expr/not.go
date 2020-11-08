@@ -38,32 +38,39 @@ func (i *IR_Not) encode(ctx *IR_Context, target encoding.Operand, includeSETE bo
 	var reg1 encoding.Operand
 
 	result := []lib.Instruction{}
-	if i.Op1.Type() == Variable {
+	switch i.Op1.(type) {
+	case *IR_Variable:
 		variable := i.Op1.(*IR_Variable).Value
 		reg1 = ctx.VariableMap[variable]
-	} else if i.Op1.Type() == Uint64 {
+	case *IR_Uint64:
 		value := i.Op1.(*IR_Uint64).Value
 		reg1 = ctx.AllocateRegister(TUint64)
 		defer ctx.DeallocateRegister(reg1.(*encoding.Register))
 		result = append(result, asm.MOV(encoding.Uint64(value), reg1))
-	} else if i.Op1.Type() == Equals {
-		result_, err := i.Op1.Encode(ctx, target)
+	case *IR_Equals:
+		var err error
+		var eq []lib.Instruction
+		if includeSETE {
+			eq, err = i.Op1.Encode(ctx, target)
+		} else {
+			eq, err = i.Op1.(*IR_Equals).EncodeWithoutSETE(ctx, target)
+		}
 		if err != nil {
 			return nil, err
 		}
-		for _, r := range result_ {
+		for _, r := range eq {
 			result = append(result, r)
 		}
 		reg1 = target
-	} else {
-		return nil, errors.New("Unsupported not IR operation: " + i.String())
+	default:
+		return nil, errors.New("Unsupported not operation: " + i.String())
 	}
 
 	tmpReg := ctx.AllocateRegister(TUint64)
 	defer ctx.DeallocateRegister(tmpReg)
 	instr := []lib.Instruction{}
-	instr = append(instr, asm.CMP(encoding.Uint32(0), reg1))
 	if includeSETE {
+		instr = append(instr, asm.CMP(encoding.Uint32(0), reg1))
 		instr = append(instr, asm.MOV(encoding.Uint64(0), tmpReg))
 		instr = append(instr, asm.SETE(tmpReg.Lower8BitRegister()))
 		instr = append(instr, asm.MOV(tmpReg, target))

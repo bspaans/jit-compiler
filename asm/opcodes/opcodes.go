@@ -135,6 +135,12 @@ var (
 			OpcodeOperand{OT_rm64, ModRM_rm_r},
 		},
 	}
+	// Jump short if equal (ZF=1)
+	JE_rel8 = &Opcode{"je", []uint8{}, []uint8{0x74}, []OpcodeExtensions{ImmediateByte},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_rel8, ImmediateValue},
+		},
+	}
 	// Jump short if not equal (ZF=0)
 	JNE_rel8 = &Opcode{"jne", []uint8{}, []uint8{0x75}, []OpcodeExtensions{ImmediateByte},
 		[]OpcodeOperand{
