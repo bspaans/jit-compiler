@@ -42,7 +42,8 @@ func NewIRContext() *IR_Context {
 	}
 	// Always allocate rsp
 	// Should track usage?
-	ctx.Registers[4] = true
+	ctx.Registers[4] = true // stack pointer
+	ctx.Registers[5] = true // frame pointer
 	ctx.RegistersAllocated = 1
 	return ctx
 }

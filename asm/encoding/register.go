@@ -85,8 +85,8 @@ var (
 	Rcx *Register = NewRegister("rcx", 1, QUADWORD)
 	Rdx *Register = NewRegister("rdx", 2, QUADWORD)
 	Rbx *Register = NewRegister("rbx", 3, QUADWORD)
-	Rsp *Register = NewRegister("rsp", 4, QUADWORD)
-	Rbp *Register = NewRegister("rbp", 5, QUADWORD)
+	Rsp *Register = NewRegister("rsp", 4, QUADWORD) // stack pointer
+	Rbp *Register = NewRegister("rbp", 5, QUADWORD) // frame pointer
 	Rsi *Register = NewRegister("rsi", 6, QUADWORD)
 	Rdi *Register = NewRegister("rdi", 7, QUADWORD)
 	R8  *Register = NewRegister("r8", 8, QUADWORD)

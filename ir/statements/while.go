@@ -81,7 +81,6 @@ func (i *IR_While) Encode(ctx *IR_Context) ([]lib.Instruction, error) {
 	}
 	result = lib.Instructions(result).Add(s1)
 	jump := uint8((ctx.InstructionPointer + jmpSize) - beginning)
-	fmt.Println("The jump is", jump)
 	// two's complement
 	jump = (^jump) + 1
 	jmp := asm.JMP(encoding.Uint8(jump))

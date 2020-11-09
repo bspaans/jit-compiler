@@ -38,6 +38,7 @@ func Test_ParseExecute_Happy(t *testing.T) {
 		`f = 55 - 2`,
 		`f = 3 + 25 * 2`,
 		`f = (2 * 25) + 3`,
+		`f = 3 + (2 * 25)`,
 		`h = 2; f = (h * 25) + 3`,
 		`h = 25; f = (2 * h) + 3`,
 		`h = 3; f = (2 * 25) + h`,
@@ -60,14 +61,18 @@ func Test_ParseExecute_Happy(t *testing.T) {
 		`g = []uint64{42,52,33}; g[2] = 53; f = g[2]`,
 		`g = []uint64{42,52,53}; g[0] = 42 + 11; f = g[0]`,
 		`g = []uint64{42,52,53}; g[0] = 11 + g[0]; f = g[0]`,
+		`g = []uint64{42,52,53}; g[0] = 1 + g[1]; f = g[0]`,
 		`g = []uint64{42,52,53}; g[0] = g[0] + 11; f = g[0]`,
 		`g = []uint64{42,52,53}; g[1] = g[1] + 1; f = g[1]`,
+		`g = []uint8{42,52,53}; g[0] = uint8(42) + uint8(11); f = g[0]`,
+		`g = []uint8{42,52,53}; g[0] = g[0] + uint8(11); f = g[0]`,
 		`g = []float64{53.0}; h = uint64(g[0]) ; f = h`,
 		`g = []float64{53.0}; h =g[0] ; f = uint64(h)`,
 		`g = []float64{51.0}; g[0] = g[0] + 2.0 ; f = uint64(g[0])`,
 		`g = []uint8{53} ; f = uint64(g[0])`,
 		`g = []uint8{52,53} ; f = uint64(g[1])`,
 		`g = []uint8{51} ; g[0] = g[0] + uint8(2); f = uint64(g[0])`,
+		`g = []uint8{51} ; f = 2 + uint64(g[0])`,
 		`f = 0; while f != 53 { f = f + 1 }`,
 		`if 15 == 15 { f = 53 } else { f = 100 }`,
 		`k = 21; j = 1; if 15 == 15 { f = 53 } else { f = 100 }`,
@@ -190,8 +195,8 @@ func Test_IR_Length(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if l != 10 {
-		t.Fatal("Expecting length 10 but got", l)
+	if l != 7 {
+		t.Fatal("Expecting length 7 but got", l)
 	}
 }
 

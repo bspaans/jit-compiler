@@ -50,7 +50,7 @@ func (i *IR_ArrayAssignment) encodeIndex(ctx *IR_Context, arrayReg encoding.Oper
 	if itemWidth != 1 {
 		mulReg := ctx.AllocateRegister(TUint64)
 		defer ctx.DeallocateRegister(mulReg)
-		mov := asm.MOV(encoding.Uint32(itemWidth), mulReg)
+		mov := asm.MOV_immediate(uint64(itemWidth), mulReg)
 		mul := asm.MUL(mulReg, indexReg)
 		ctx.AddInstruction(mov)
 		ctx.AddInstruction(mul)
