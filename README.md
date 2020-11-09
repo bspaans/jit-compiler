@@ -96,7 +96,7 @@ calls and syscalls is supported however.
 
 ### Creating machine code 
 
-```[go]
+```golang
 import (
     "github.com/bspaans/jit-compiler/asm"
     "github.com/bspaans/jit-compiler/asm/encoding"
@@ -118,7 +118,7 @@ machineCode.Execute()
 
 ### Using the Intermediate Representation
 
-```[go]
+```golang
 import (
     "github.com/bspaans/jit-compiler/ir"
 )
