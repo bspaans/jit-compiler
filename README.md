@@ -144,4 +144,6 @@ fmt.Println(machineCode.Execute())
 * SIMD support 
 * Improve array support (SIMD, auto-vectorisation)
 * Possibly a higher level language that compiles down into the IR
+* Possible a WASM or ARM backend
+* Test output against other assemblers
 * Try and use it from bleep ([prototype](https://github.com/bspaans/bleep-jit))

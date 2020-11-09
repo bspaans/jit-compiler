@@ -5,6 +5,7 @@ import (
 
 	"github.com/bspaans/jit-compiler/asm"
 	"github.com/bspaans/jit-compiler/asm/encoding"
+	"github.com/bspaans/jit-compiler/ir/shared"
 	. "github.com/bspaans/jit-compiler/ir/shared"
 	"github.com/bspaans/jit-compiler/lib"
 )
@@ -41,16 +42,56 @@ func (i *IR_ArrayIndex) String() string {
 func (i *IR_ArrayIndex) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.Instruction, error) {
 	ctx.AddInstruction("array_index " + encoding.Comment(i.String()))
 
-	arrayReg := ctx.AllocateRegister(TUint64)
-	defer ctx.DeallocateRegister(arrayReg)
-	indexReg := ctx.AllocateRegister(TUint64)
-	defer ctx.DeallocateRegister(indexReg)
-
 	itemWidth := i.ReturnType(ctx).Width()
+
+	var arrayReg *encoding.Register
+	var indexReg *encoding.Register
+	if i.Array.Type() == shared.Variable {
+		variable := i.Array.(*IR_Variable).Value
+		reg, ok := ctx.VariableMap[variable]
+		if !ok {
+			return nil, fmt.Errorf("Unknown variable %s", variable)
+		}
+		arrayReg = reg.(*encoding.Register)
+	} else {
+		arrayReg = ctx.AllocateRegister(TUint64)
+		defer ctx.DeallocateRegister(arrayReg)
+	}
 
 	result, err := i.Array.Encode(ctx, arrayReg)
 	if err != nil {
 		return nil, fmt.Errorf("Array encoding issue: %s", err.Error())
+	}
+
+	// Specialise for integers
+	if i.Index.Type() == shared.Uint64 {
+		op := i.Index.(*IR_Uint64)
+		if op.Value == 0 {
+			mov := asm.MOV(&encoding.IndirectRegister{arrayReg.ForOperandWidth(itemWidth)}, target.(*encoding.Register).ForOperandWidth(itemWidth))
+			// Move 0 into target register if going from a wider to narrower register
+			mov0 := asm.MOV(encoding.Uint64(0), target)
+			if itemWidth < lib.QUADWORD {
+				ctx.AddInstruction(mov0)
+				result = append(result, mov0)
+			}
+			ctx.AddInstruction(mov)
+			result = append(result, mov)
+			return result, nil
+		} else {
+			// TODO add index*itemwidth to arrayReg
+		}
+	}
+
+	if i.Index.Type() == shared.Variable {
+		variable := i.Index.(*IR_Variable).Value
+		reg, ok := ctx.VariableMap[variable]
+		if !ok {
+			return nil, fmt.Errorf("Unknown variable %s", variable)
+		}
+		indexReg = reg.(*encoding.Register)
+	} else {
+		indexReg = ctx.AllocateRegister(TUint64)
+		defer ctx.DeallocateRegister(indexReg)
 	}
 
 	index, err := i.Index.Encode(ctx, indexReg)
@@ -58,13 +99,16 @@ func (i *IR_ArrayIndex) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.
 		return nil, fmt.Errorf("Array index encoding issue: %s", err.Error())
 	}
 	result = lib.Instructions(result).Add(index)
-	mov0 := asm.MOV(encoding.Uint64(0), target)
 	mov := asm.MOV(&encoding.SIBRegister{arrayReg, indexReg, encoding.ScaleForItemWidth(itemWidth)},
 		target.(*encoding.Register).ForOperandWidth(itemWidth))
+
+	// Move 0 into target register if going from a wider to narrower register
+	mov0 := asm.MOV(encoding.Uint64(0), target)
 	if itemWidth < lib.QUADWORD {
 		ctx.AddInstruction(mov0)
 		result = append(result, mov0)
 	}
+
 	ctx.AddInstruction(mov)
 	result = append(result, mov)
 	return result, nil
