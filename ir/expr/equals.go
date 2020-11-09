@@ -48,7 +48,7 @@ func (i *IR_Equals) encode(ctx *IR_Context, target encoding.Operand, includeSETE
 		value := i.Op1.(*IR_Uint64).Value
 		reg1 = ctx.AllocateRegister(TUint64)
 		defer ctx.DeallocateRegister(reg1.(*encoding.Register))
-		result = append(result, asm.MOV(encoding.Uint64(value), reg1))
+		result = append(result, asm.MOV_immediate(value, reg1))
 	} else {
 		return nil, errors.New("Unsupported cmp IR operation")
 	}
@@ -60,7 +60,7 @@ func (i *IR_Equals) encode(ctx *IR_Context, target encoding.Operand, includeSETE
 		value := i.Op2.(*IR_Uint64).Value
 		reg2 = ctx.AllocateRegister(TUint64)
 		defer ctx.DeallocateRegister(reg2.(*encoding.Register))
-		result = append(result, asm.MOV(encoding.Uint64(value), reg2))
+		result = append(result, asm.MOV_immediate(value, reg2))
 	} else {
 		return nil, errors.New("Unsupported add IR operation")
 	}

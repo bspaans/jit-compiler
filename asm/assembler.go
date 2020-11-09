@@ -62,6 +62,12 @@ func LEA(src, dest encoding.Operand) lib.Instruction {
 func MOV(src, dest encoding.Operand) lib.Instruction {
 	return opcodes.OpcodesToInstruction("mov", opcodes.MOV, 2, dest, src)
 }
+func MOV_immediate(v uint64, dest encoding.Operand) lib.Instruction {
+	if v < (1 << 32) {
+		return MOV(encoding.Uint32(v), dest)
+	}
+	return MOV(encoding.Uint64(v), dest)
+}
 func MUL(src, dest encoding.Operand) lib.Instruction {
 	return opcodes.OpcodesToInstruction("mul", opcodes.MUL, 2, dest, src)
 }

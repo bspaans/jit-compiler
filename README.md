@@ -7,13 +7,15 @@ higher level intermediate representation that compiles down into x86-64 (see
 ## Why Though?
 
 The original intent behind this project was to be able to compile complicated
-Sequencer and Synthesizer definitions down to machine code (see my `bleep`
+Sequencer and Synthesizer definitions down to machine code (see my [bleep](https://github.com/bspaans/bleep))
 project), but it's become a little bit more general purpose since, whilst still 
-not achieving its original goal 👍 
+not achieving its original goal 👍 There's a very, very early prototype [here](https://github.com/bspaans/bleep-jit), 
+but it's not doing much yet.
+
 
 In `bleep`, as in many other synthesizers, we build complex sounds by combining
 smaller building blocks (e.g. a sine wave, a delay filter, etc.) into bigger
-blocks:
+instruments:
 
 ```
           +---- sine wave
@@ -50,17 +52,17 @@ hence projects like these.
 The following x86-64 instructions are supported in the assembler. For a detailed 
 overview see `asm/opcodes/opcodes.go` and `asm/opcodes/opcode_groups.go`:
 
-* MOV, MOVQ, MOVSD
-* LEA
-* PUSH and POP
-* PUSHFQ
-* ADD, SUB, DIV
+* MOV, MOVQ, MOVSD (moving things in and out of registers and memory)
+* LEA (loading the address of memory locations into a register)
+* PUSH and POP (stack em up)
+* PUSHFQ 
+* ADD, SUB, DIV 
 * ADDSD, SUBSD, MULSD and DIVSD
 * INC and DEC
 * CMP
 * CVTSI2SD, CVTTSD2SI (convert int to and from float)
 * SETA, SETAE, SETB, SETBE, SETE, SETNE
-* JMP and JMPE
+* JMP, JNE, JMPE
 * CALL and SYSCALL
 * RET 
 
@@ -69,12 +71,13 @@ relative addressing are supported.
 
 In the higher level language the following constructs work:
 
-* Unsigned 64bit integers
+* Unsigned 8bit and 64bit integers
 * 64bit floating point numbers
 * Booleans
 * Static size arrays
 * Array indexing
 * Assigning to variables
+* Assigning to arrays
 * If statements
 * While loops
 * Defining and calling functions
@@ -95,4 +98,4 @@ calls and syscalls is supported however.
 * SIMD support 
 * Improve array support (SIMD, auto-vectorisation)
 * Possibly a higher level language that compiles down into the IR
-* Try and use it from bleep
+* Try and use it from bleep ([prototype](https://github.com/bspaans/bleep-jit))

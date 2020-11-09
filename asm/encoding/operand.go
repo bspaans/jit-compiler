@@ -24,3 +24,13 @@ type Operand interface {
 	String() string
 	Width() lib.Size
 }
+
+func IsRegister(op Operand) bool {
+	t := op.Type()
+	return t == T_Register || t == T_IndirectRegister || t == T_DisplacedRegister || t == T_RIPRelative
+}
+
+func IsInt(op Operand) bool {
+	t := op.Type()
+	return t == T_Uint8 || t == T_Uint16 || t == T_Uint32 || t == T_Uint64
+}
