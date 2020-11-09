@@ -11,5 +11,5 @@ func (t *IndirectRegister) Type() Type {
 }
 
 func (t *IndirectRegister) String() string {
-	return fmt.Sprintf("[%s]", t.Register.String())
+	return fmt.Sprintf("(%s)", t.Register.String())
 }

@@ -155,6 +155,8 @@ func Test_SIB_Addressing(t *testing.T) {
 		[]interface{}{encoding.Rax, &encoding.SIBRegister{encoding.Rcx, encoding.R9, encoding.Scale8}, "  4a 89 04 c9"},
 		[]interface{}{encoding.Rax, &encoding.SIBRegister{encoding.R9, encoding.R9, encoding.Scale8}, "  4b 89 04 c9"},
 		[]interface{}{encoding.Rax, &encoding.SIBRegister{encoding.R13, encoding.R9, encoding.Scale8}, "  4b 89 44 cd 00"},
+
+		[]interface{}{encoding.Al, &encoding.SIBRegister{encoding.Rax, encoding.Rcx, encoding.Scale8}, "  40 88 04 c8"},
 	}
 	for _, testCase := range table {
 		unit, err := MOV(testCase[0].(encoding.Operand), testCase[1].(encoding.Operand)).Encode()

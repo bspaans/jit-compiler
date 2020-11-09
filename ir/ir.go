@@ -57,7 +57,7 @@ func Compile(stmts []IR, debug bool) (lib.MachineCode, error) {
 	for _, stmt := range stmts {
 		code, err := stmt.Encode(ctx)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("Error encoding %s: %s", stmt, err.Error())
 		}
 		if debug {
 			fmt.Println("\n:: " + stmt.String() + "\n")
@@ -65,7 +65,7 @@ func Compile(stmts []IR, debug bool) (lib.MachineCode, error) {
 		for _, i := range code {
 			b, err := i.Encode()
 			if err != nil {
-				return nil, err
+				return nil, fmt.Errorf("Failed to encode %s: %s\n%s", stmt, err.Error(), lib.Instructions(code).String())
 			}
 			if debug {
 				fmt.Printf("0x%x-0x%x 0x%x: %s\n", address, address+uint(len(b)), ctx.InstructionPointer, i.String())

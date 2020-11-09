@@ -1,15 +1,32 @@
 package encoding
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/bspaans/jit-compiler/lib"
+)
 
 type Scale uint8
 
 const (
-	Scale0 Scale = 0
+	Scale1 Scale = 0
 	Scale2 Scale = 1
 	Scale4 Scale = 2
 	Scale8 Scale = 3
 )
+
+func ScaleForItemWidth(itemWidth lib.Size) Scale {
+	if itemWidth == lib.BYTE {
+		return Scale1
+	} else if itemWidth == lib.WORD {
+		return Scale2
+	} else if itemWidth == lib.DOUBLE {
+		return Scale4
+	} else if itemWidth == lib.QUADWORD {
+		return Scale8
+	}
+	return Scale1
+}
 
 func (s Scale) String() string {
 	return fmt.Sprintf("%d", 1<<s)

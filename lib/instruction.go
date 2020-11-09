@@ -1,6 +1,9 @@
 package lib
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 type Instruction interface {
 	Encode() (MachineCode, error)
@@ -28,6 +31,14 @@ func (i Instructions) Add(i2 []Instruction) Instructions {
 		i = append(i, instr)
 	}
 	return i
+}
+
+func (i Instructions) String() string {
+	result := make([]string, len(i))
+	for j, instr := range i {
+		result[j] = instr.String()
+	}
+	return strings.Join(result, "\n")
 }
 
 func CompileInstruction(instr []Instruction, debug bool) (MachineCode, error) {

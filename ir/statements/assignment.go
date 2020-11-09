@@ -32,7 +32,11 @@ func (i *IR_Assignment) Encode(ctx *IR_Context) ([]lib.Instruction, error) {
 		ctx.VariableMap[i.Variable] = reg
 		ctx.VariableTypes[i.Variable] = returnType
 	}
-	return i.Expr.Encode(ctx, reg)
+	expr, err := i.Expr.Encode(ctx, reg)
+	if err != nil {
+		return nil, fmt.Errorf("Error in assignment: %s", err.Error())
+	}
+	return expr, nil
 }
 
 func (i *IR_Assignment) String() string {

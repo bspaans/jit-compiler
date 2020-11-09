@@ -59,15 +59,10 @@ func (i *IR_Cast) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.Instru
 		}
 	} else if i.CastToType == TUint8 {
 		if valueType == TUint64 || valueType == TUint8 {
-			tmpReg := ctx.AllocateRegister(TUint64)
-			defer ctx.DeallocateRegister(tmpReg)
-			result, err := i.Value.Encode(ctx, tmpReg)
+			result, err := i.Value.Encode(ctx, target)
 			if err != nil {
 				return nil, err
 			}
-			mov := asm.MOV(tmpReg, target)
-			ctx.AddInstruction(mov)
-			result = append(result, mov)
 			return result, nil
 		}
 	} else if i.CastToType == TFloat64 {

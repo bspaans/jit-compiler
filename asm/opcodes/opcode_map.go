@@ -88,16 +88,19 @@ func OpcodesToOpcodeMap(opcodes []*Opcode, operand int) OpcodeMap {
 			opcodeMap.add(T_IndirectRegister, lib.BYTE, opcode)
 			opcodeMap.add(T_DisplacedRegister, lib.BYTE, opcode)
 			opcodeMap.add(T_RIPRelative, lib.BYTE, opcode)
+			opcodeMap.add(T_SIBRegister, lib.QUADWORD, opcode)
 		} else if opcode.Operands[operand].Type == OT_rm16 {
 			opcodeMap.add(T_Register, lib.WORD, opcode)
 			opcodeMap.add(T_IndirectRegister, lib.WORD, opcode)
 			opcodeMap.add(T_DisplacedRegister, lib.WORD, opcode)
 			opcodeMap.add(T_RIPRelative, lib.WORD, opcode)
+			opcodeMap.add(T_SIBRegister, lib.QUADWORD, opcode)
 		} else if opcode.Operands[operand].Type == OT_rm32 {
 			opcodeMap.add(T_Register, lib.DOUBLE, opcode)
 			opcodeMap.add(T_IndirectRegister, lib.DOUBLE, opcode)
 			opcodeMap.add(T_DisplacedRegister, lib.DOUBLE, opcode)
 			opcodeMap.add(T_RIPRelative, lib.DOUBLE, opcode)
+			opcodeMap.add(T_SIBRegister, lib.QUADWORD, opcode)
 		} else if opcode.Operands[operand].Type == OT_rm64 {
 			opcodeMap.add(T_Register, lib.QUADWORD, opcode)
 			opcodeMap.add(T_IndirectRegister, lib.QUADWORD, opcode)

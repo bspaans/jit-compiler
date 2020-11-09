@@ -1,6 +1,7 @@
 package encoding
 
 import (
+	"github.com/bspaans/jit-compiler/lib"
 	. "github.com/bspaans/jit-compiler/lib"
 )
 
@@ -29,6 +30,13 @@ func (r *Register) Type() Type {
 }
 func (r *Register) Width() Size {
 	return r.Size
+}
+
+func (r *Register) ForOperandWidth(w lib.Size) *Register {
+	if w == lib.BYTE {
+		return r.Lower8BitRegister()
+	}
+	return r
 }
 
 func (r *Register) Lower8BitRegister() *Register {
