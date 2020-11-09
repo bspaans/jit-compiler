@@ -9,6 +9,7 @@ type InstructionFormat struct {
 	REXPrefix    *REXPrefix
 	Opcode       []uint8
 	ModRM        *ModRM
+	SIB          *SIB
 	Displacement []uint8
 	Immediate    []uint8
 }
@@ -53,6 +54,9 @@ func (i *InstructionFormat) Encode() lib.MachineCode {
 	}
 	if i.ModRM != nil {
 		result = append(result, i.ModRM.Encode())
+	}
+	if i.SIB != nil {
+		result = append(result, i.SIB.Encode())
 	}
 	for _, b := range i.Displacement {
 		result = append(result, b)

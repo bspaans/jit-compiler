@@ -65,9 +65,8 @@ overview see `asm/opcodes/opcodes.go` and `asm/opcodes/opcode_groups.go`:
 * JMP, JNE, JMPE
 * CALL and SYSCALL
 * RET 
-
-Immediate values, direct and indirect registers, displaced registers and RIP
-relative addressing are supported.
+* Immediate values
+* Addressing modes: direct and indirect registers, displaced registers, RIP relative, SIB
 
 In the higher level language the following constructs work:
 

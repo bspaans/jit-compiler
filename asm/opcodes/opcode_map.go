@@ -52,6 +52,7 @@ func NewOpcodeMap() OpcodeMap {
 	return map[Type]map[lib.Size][]*Opcode{
 		T_Register:          map[lib.Size][]*Opcode{},
 		T_IndirectRegister:  map[lib.Size][]*Opcode{},
+		T_SIBRegister:       map[lib.Size][]*Opcode{},
 		T_DisplacedRegister: map[lib.Size][]*Opcode{},
 		T_RIPRelative:       map[lib.Size][]*Opcode{},
 		T_Uint8:             map[lib.Size][]*Opcode{},
@@ -102,6 +103,7 @@ func OpcodesToOpcodeMap(opcodes []*Opcode, operand int) OpcodeMap {
 			opcodeMap.add(T_IndirectRegister, lib.QUADWORD, opcode)
 			opcodeMap.add(T_DisplacedRegister, lib.QUADWORD, opcode)
 			opcodeMap.add(T_RIPRelative, lib.QUADWORD, opcode)
+			opcodeMap.add(T_SIBRegister, lib.QUADWORD, opcode)
 		} else if opcode.Operands[operand].Type == OT_m {
 			opcodeMap.add(T_DisplacedRegister, lib.QUADWORD, opcode)
 			opcodeMap.add(T_RIPRelative, lib.QUADWORD, opcode)

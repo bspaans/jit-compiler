@@ -7,6 +7,10 @@ const (
 	IndirectRegisterByteDisplacedMode   Mode = 1
 	IndirectRegisterDoubleDisplacedMode Mode = 2
 	DirectRegisterMode                  Mode = 3
+
+	// If RM is set to SIBFollowsRM a SIB byte is expected to follow
+	// the ModRM byte (see instruction format)
+	SIBFollowsRM uint8 = 4
 )
 
 type ModRM struct {

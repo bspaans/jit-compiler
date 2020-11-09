@@ -256,7 +256,27 @@ func (o *Opcode) Encode(ops []Operand) ([]uint8, error) {
 					instr.ModRM.Reg = 5
 					instr.SetDisplacement(op, oper.Displacement.Encode())
 				}
-
+			} else if op.Type() == T_SIBRegister {
+				oper := op.(*SIBRegister)
+				if opcodeOperand.Encoding == ModRM_rm_r || opcodeOperand.Encoding == ModRM_rm_rw {
+					if instr.ModRM == nil {
+						instr.ModRM = &ModRM{}
+					}
+					instr.ModRM.Mode = IndirectRegisterMode
+					instr.ModRM.RM = SIBFollowsRM
+					instr.SIB = NewSIB(oper.Scale, oper.Index.Encode(), oper.Register.Encode())
+					if exts[RexW] || exts[Rex] {
+						instr.REXPrefix.X = oper.Index.Register > 7
+						instr.REXPrefix.B = oper.Register.Register > 7
+					}
+					// There is a special case for register 13, because the
+					// encoding interferes with RIP relative encoding.  Need to
+					// use a 0 displacement
+					if oper.Register.Register == 13 {
+						instr.ModRM.Mode = IndirectRegisterByteDisplacedMode
+						instr.SetDisplacement(oper.Register, []uint8{0})
+					}
+				}
 			} else if op.Type() == T_Uint64 {
 				for _, b := range op.(Uint64).Encode() {
 					instr.Immediate = append(instr.Immediate, b)

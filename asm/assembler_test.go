@@ -140,6 +140,33 @@ func Test_JMP(t *testing.T) {
 	}
 }
 
+func Test_SIB_Addressing(t *testing.T) {
+	//unit, err := MOV(encoding.Rax, &encoding.SIBRegister{encoding.Rcx, encoding.Rax, encoding.Scale8}).Encode()
+	table := [][]interface{}{
+		[]interface{}{&encoding.SIBRegister{encoding.Rcx, encoding.Rax, encoding.Scale8}, encoding.Rax, "  48 8b 04 c1"},
+		[]interface{}{&encoding.SIBRegister{encoding.Rcx, encoding.R9, encoding.Scale8}, encoding.Rax, "  4a 8b 04 c9"},
+		[]interface{}{&encoding.SIBRegister{encoding.R9, encoding.Rax, encoding.Scale8}, encoding.Rax, "  49 8b 04 c1"},
+		[]interface{}{&encoding.SIBRegister{encoding.R9, encoding.R10, encoding.Scale8}, encoding.Rax, "  4b 8b 04 d1"},
+		// There is a special case for register 13, because the encoding
+		// interferes with RIP relative encoding.  Need to use a 0 displacement
+		[]interface{}{&encoding.SIBRegister{encoding.R13, encoding.R9, encoding.Scale8}, encoding.Rax, "  4b 8b 44 cd 00"},
+
+		[]interface{}{encoding.Rax, &encoding.SIBRegister{encoding.Rcx, encoding.Rax, encoding.Scale8}, "  48 89 04 c1"},
+		[]interface{}{encoding.Rax, &encoding.SIBRegister{encoding.Rcx, encoding.R9, encoding.Scale8}, "  4a 89 04 c9"},
+		[]interface{}{encoding.Rax, &encoding.SIBRegister{encoding.R9, encoding.R9, encoding.Scale8}, "  4b 89 04 c9"},
+		[]interface{}{encoding.Rax, &encoding.SIBRegister{encoding.R13, encoding.R9, encoding.Scale8}, "  4b 89 44 cd 00"},
+	}
+	for _, testCase := range table {
+		unit, err := MOV(testCase[0].(encoding.Operand), testCase[1].(encoding.Operand)).Encode()
+		if err != nil {
+			t.Fatal(err)
+		}
+		if unit.String() != testCase[2].(string) {
+			t.Error("Expecting", testCase[2].(string), "got", unit, "in mov", testCase[0], testCase[1])
+		}
+	}
+}
+
 func Test_Execute(t *testing.T) {
 	units := [][]lib.Instruction{
 		[]lib.Instruction{

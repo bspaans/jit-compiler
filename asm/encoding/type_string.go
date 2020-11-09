@@ -10,20 +10,22 @@ func _() {
 	var x [1]struct{}
 	_ = x[T_Register-0]
 	_ = x[T_IndirectRegister-1]
-	_ = x[T_DisplacedRegister-2]
-	_ = x[T_RIPRelative-3]
-	_ = x[T_Uint8-4]
-	_ = x[T_Uint16-5]
-	_ = x[T_Uint32-6]
-	_ = x[T_Uint64-7]
-	_ = x[T_Int32-8]
-	_ = x[T_Float32-9]
-	_ = x[T_Float64-10]
+	_ = x[T_RIPRelative-2]
+	_ = x[T_SIBRegister-3]
+	_ = x[T_DisplacedRegister-4]
+	_ = x[T_DisplacedSIBRegister-5]
+	_ = x[T_Uint8-6]
+	_ = x[T_Uint16-7]
+	_ = x[T_Uint32-8]
+	_ = x[T_Uint64-9]
+	_ = x[T_Int32-10]
+	_ = x[T_Float32-11]
+	_ = x[T_Float64-12]
 }
 
-const _Type_name = "T_RegisterT_IndirectRegisterT_DisplacedRegisterT_RIPRelativeT_Uint8T_Uint16T_Uint32T_Uint64T_Int32T_Float32T_Float64"
+const _Type_name = "T_RegisterT_IndirectRegisterT_RIPRelativeT_SIBRegisterT_DisplacedRegisterT_DisplacedSIBRegisterT_Uint8T_Uint16T_Uint32T_Uint64T_Int32T_Float32T_Float64"
 
-var _Type_index = [...]uint8{0, 10, 28, 47, 60, 67, 75, 83, 91, 98, 107, 116}
+var _Type_index = [...]uint8{0, 10, 28, 41, 54, 73, 95, 102, 110, 118, 126, 133, 142, 151}
 
 func (i Type) String() string {
 	if i >= Type(len(_Type_index)-1) {
