@@ -93,6 +93,53 @@ Register allocation is really noddy and works until you run out of registers;
 there is no allocating on the stack or heap yet; preserving registers across
 calls and syscalls is supported however.
 
+## Examples
+
+### Creating machine code 
+
+```[go]
+import (
+    "github.com/bspaans/jit-compiler/asm"
+    "github.com/bspaans/jit-compiler/asm/encoding"
+    "github.com/bspaans/jit-compiler/lib"
+)
+
+
+...
+
+result := lib.Instructions
+result = result.Add(asm.MOV(encoding.Rax, encoding.Rcx))
+machineCode, err := result.Encode()
+if err != nil {
+    panic(err)
+}
+machineCode.Execute()
+
+```
+
+### Using the Intermediate Representation
+
+```[go]
+import (
+    "github.com/bspaans/jit-compiler/ir"
+)
+
+var code = `prev = 1; current = 1;
+while current != 13 {
+  tmp = current
+  current = current + prev
+  prev = tmp
+}
+return current
+`
+
+machineCode, err := ir.Compile(ir.MustParseIR(code))
+if err != nil {
+    panic(err)
+}
+fmt.Println(machineCode.Execute())
+```
+
 ## Next steps
 
 * SIMD support 
