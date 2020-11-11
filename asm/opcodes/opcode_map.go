@@ -1,6 +1,9 @@
 package opcodes
 
 import (
+	"fmt"
+	"sort"
+
 	. "github.com/bspaans/jit-compiler/asm/encoding"
 	"github.com/bspaans/jit-compiler/lib"
 )
@@ -42,8 +45,17 @@ func (o OpcodeMaps) ResolveOpcode(operands []Operand) *Opcode {
 		}
 		picks = newPick
 	}
+	opcodes := []*Opcode{}
 	for pick, _ := range picks {
-		return pick
+		opcodes = append(opcodes, pick)
+	}
+
+	sort.Slice(opcodes, func(i, j int) bool {
+		return opcodes[i].Operands[0].Type < opcodes[j].Operands[0].Type
+
+	})
+	for _, _ = range picks {
+		return opcodes[0]
 	}
 	return nil
 }
@@ -77,6 +89,9 @@ func OpcodesToOpcodeMaps(opcodes []*Opcode, argCount int) OpcodeMaps {
 func OpcodesToOpcodeMap(opcodes []*Opcode, operand int) OpcodeMap {
 	opcodeMap := NewOpcodeMap()
 	for _, opcode := range opcodes {
+		if operand >= len(opcode.Operands) {
+			panic(fmt.Sprintf("Opcode %s expects only %d operands", opcode.String(), len(opcode.Operands)))
+		}
 		if opcode.Operands[operand].Type == OT_rel8 {
 			opcodeMap.add(T_Uint8, lib.BYTE, opcode)
 		} else if opcode.Operands[operand].Type == OT_rel16 {
@@ -127,16 +142,12 @@ func OpcodesToOpcodeMap(opcodes []*Opcode, operand int) OpcodeMap {
 			opcodeMap.add(T_Float64, lib.QUADWORD, opcode)
 		} else if opcode.Operands[operand].Type == OT_r8 {
 			opcodeMap.add(T_Register, lib.BYTE, opcode)
-			opcodeMap.add(T_RIPRelative, lib.BYTE, opcode)
 		} else if opcode.Operands[operand].Type == OT_r16 {
 			opcodeMap.add(T_Register, lib.WORD, opcode)
-			opcodeMap.add(T_RIPRelative, lib.WORD, opcode)
 		} else if opcode.Operands[operand].Type == OT_r32 {
 			opcodeMap.add(T_Register, lib.DOUBLE, opcode)
-			opcodeMap.add(T_RIPRelative, lib.DOUBLE, opcode)
 		} else if opcode.Operands[operand].Type == OT_r64 {
 			opcodeMap.add(T_Register, lib.QUADWORD, opcode)
-			opcodeMap.add(T_RIPRelative, lib.QUADWORD, opcode)
 		} else if opcode.Operands[operand].Type == OT_xmm1 {
 			opcodeMap.add(T_Register, lib.QUADDOUBLE, opcode)
 		} else if opcode.Operands[operand].Type == OT_xmm2 {

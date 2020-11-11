@@ -40,9 +40,20 @@ func (i *IR_Return) Encode(ctx *IR_Context) ([]lib.Instruction, error) {
 		}
 		result = result_
 	}
+	if reg.Width() != lib.QUADWORD {
+		cast := ctx.AllocateRegister(TUint64)
+		defer ctx.DeallocateRegister(cast)
+		mov0 := asm.MOV(encoding.Uint64(0), cast) // TODO: use XOR reg, reg
+		mov := asm.MOV(reg, cast.ForOperandWidth(reg.Width()))
+		result = append(result, mov0)
+		result = append(result, mov)
+		ctx.AddInstruction(mov)
+		ctx.AddInstruction(mov0)
+		reg = cast
+	}
 	target := ctx.PeekReturn()
 	instr := []lib.Instruction{
-		asm.MOV(reg, target),
+		asm.MOV(reg.(*encoding.Register).Get64BitRegister(), target),
 		asm.RETURN(),
 	}
 	for _, inst := range instr {

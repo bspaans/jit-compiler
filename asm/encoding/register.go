@@ -39,6 +39,10 @@ func (r *Register) ForOperandWidth(w lib.Size) *Register {
 	return r
 }
 
+func (r *Register) Get64BitRegister() *Register {
+	return Get64BitRegisterByIndex(r.Register)
+}
+
 func (r *Register) Lower8BitRegister() *Register {
 	for _, reg := range Registers8 {
 		if reg.Register == r.Register {

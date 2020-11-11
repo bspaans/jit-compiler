@@ -165,6 +165,12 @@ var (
 			OpcodeOperand{OT_rm8, ModRM_rm_r},
 		},
 	}
+	MOV_r8_imm8 = &Opcode{"mov", []uint8{}, []uint8{0xb0}, []OpcodeExtensions{Rex, ImmediateByte},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_r8, Opcode_plus_rd_r},
+			OpcodeOperand{OT_imm8, ImmediateValue},
+		},
+	}
 	MOV_rm16_r16 = &Opcode{"mov", []uint8{}, []uint8{0x89}, []OpcodeExtensions{SlashR},
 		[]OpcodeOperand{
 			OpcodeOperand{OT_rm16, ModRM_rm_rw},
@@ -223,6 +229,21 @@ var (
 		[]OpcodeOperand{
 			OpcodeOperand{OT_xmm1m64, ModRM_rm_rw},
 			OpcodeOperand{OT_xmm2, ModRM_reg_r},
+		},
+	}
+	MUL_rm8 = &Opcode{"mul", []uint8{}, []uint8{0xf6}, []OpcodeExtensions{Rex, Slash4},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_rm8, ModRM_rm_r},
+		},
+	}
+	MUL_rm16 = &Opcode{"mul", []uint8{}, []uint8{0xf7}, []OpcodeExtensions{Rex, Slash4},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_rm16, ModRM_rm_r},
+		},
+	}
+	MUL_rm32 = &Opcode{"mul", []uint8{}, []uint8{0xf7}, []OpcodeExtensions{Rex, Slash4},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_rm32, ModRM_rm_r},
 		},
 	}
 	// Performs an unsigned multiplication of the first operand (destination
@@ -303,6 +324,30 @@ var (
 	SETNE_rm8 = &Opcode{"setne", []uint8{}, []uint8{0x0f, 0x95}, []OpcodeExtensions{},
 		[]OpcodeOperand{
 			OpcodeOperand{OT_rm8, ModRM_rm_r},
+		},
+	}
+	SUB_rm8_imm8 = &Opcode{"sub", []uint8{}, []uint8{0x80}, []OpcodeExtensions{Rex, Slash5, ImmediateByte},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_rm8, ModRM_rm_rw},
+			OpcodeOperand{OT_imm8, ImmediateValue},
+		},
+	}
+	SUB_rm64_imm8 = &Opcode{"sub", []uint8{}, []uint8{0x83}, []OpcodeExtensions{Rex, Slash5, ImmediateByte},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_rm64, ModRM_rm_rw},
+			OpcodeOperand{OT_imm8, ImmediateValue},
+		},
+	}
+	SUB_r8_rm8 = &Opcode{"sub", []uint8{}, []uint8{0x2a}, []OpcodeExtensions{Rex, SlashR},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_r8, ModRM_reg_rw},
+			OpcodeOperand{OT_rm8, ModRM_rm_r},
+		},
+	}
+	SUB_rm8_r8 = &Opcode{"sub", []uint8{}, []uint8{0x28}, []OpcodeExtensions{Rex, SlashR},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_rm8, ModRM_rm_rw},
+			OpcodeOperand{OT_r8, ModRM_reg_r},
 		},
 	}
 	SUB_rm64_r64 = &Opcode{"sub", []uint8{}, []uint8{0x29}, []OpcodeExtensions{RexW, SlashR},

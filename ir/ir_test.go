@@ -36,6 +36,10 @@ func Test_ParseExecute_Happy(t *testing.T) {
 		`f = 53`,
 		`f = 51 + 2`,
 		`f = 55 - 2`,
+		`f = uint8(51) + uint8(2)`,
+		`f = uint8(55) - uint8(2)`,
+		`f = (uint8(2) * uint8(25)) + uint8(3)`,
+		`f = uint8(3) + (uint8(2) * uint8(25))`,
 		`f = 3 + 25 * 2`,
 		`f = (2 * 25) + 3`,
 		`f = 3 + (2 * 25)`,
@@ -90,7 +94,7 @@ func Test_ParseExecute_Happy(t *testing.T) {
 		if err != nil {
 			t.Fatal(err, "in", ir)
 		}
-		debug := false
+		debug := true
 		b, err := Compile([]IR{i}, debug)
 		if err != nil {
 			t.Fatal(err, "in", ir)

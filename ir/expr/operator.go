@@ -21,7 +21,7 @@ type IR_Operator struct {
 
 func NewIR_Operator(opcode operator, repr string, op1, op2 IRExpression) *IR_Operator {
 	return &IR_Operator{
-		BaseIRExpression: NewBaseIRExpression(Add),
+		BaseIRExpression: NewBaseIRExpression(Add), // TODO this is wrong
 		Opcode:           opcode,
 		Repr:             repr,
 		Op1:              op1,

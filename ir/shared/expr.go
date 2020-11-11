@@ -27,6 +27,9 @@ const (
 	StructField IRExpressionType = iota
 	Not         IRExpressionType = iota
 	Add         IRExpressionType = iota
+	Sub         IRExpressionType = iota
+	Mul         IRExpressionType = iota
+	Div         IRExpressionType = iota
 	Variable    IRExpressionType = iota
 	Equals      IRExpressionType = iota
 	Syscall     IRExpressionType = iota

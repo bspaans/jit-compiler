@@ -126,6 +126,8 @@ func (i *IR_Context) GetInstructions() []lib.Instruction {
 func (i *IR_Context) AllocateRegister(typ Type) *encoding.Register {
 	if typ == TFloat64 {
 		return encoding.GetFloatingPointRegisterByIndex(i.allocateFloatRegister())
+	} else if typ == TUint8 {
+		return encoding.Get64BitRegisterByIndex(i.allocateRegister()).Lower8BitRegister()
 	}
 	return encoding.Get64BitRegisterByIndex(i.allocateRegister())
 }

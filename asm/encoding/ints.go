@@ -25,7 +25,7 @@ func (i Uint8) Type() Type {
 	return T_Uint8
 }
 func (i Uint8) String() string {
-	return fmt.Sprintf("$%d", i)
+	return fmt.Sprintf("u8$%d", i)
 }
 func (i Uint8) Encode() []uint8 {
 	result := make([]byte, 1)
@@ -40,7 +40,7 @@ func (i Uint16) Type() Type {
 	return T_Uint16
 }
 func (i Uint16) String() string {
-	return fmt.Sprintf("$%d", i)
+	return fmt.Sprintf("u16$%d", i)
 }
 func (i Uint16) Encode() []uint8 {
 	result := make([]byte, 2)
@@ -55,7 +55,7 @@ func (i Uint32) Type() Type {
 	return T_Uint32
 }
 func (i Uint32) String() string {
-	return fmt.Sprintf("$%d", i)
+	return fmt.Sprintf("u32$%d", i)
 }
 func (i Uint32) Encode() []uint8 {
 	result := make([]byte, 4)
@@ -70,7 +70,7 @@ func (i Uint64) Type() Type {
 	return T_Uint64
 }
 func (i Uint64) String() string {
-	return fmt.Sprintf("$%d", i)
+	return fmt.Sprintf("u64$%d", i)
 }
 func (i Uint64) Encode() []uint8 {
 	result := make([]byte, 8)
@@ -85,7 +85,7 @@ func (i Int32) Type() Type {
 	return T_Int32
 }
 func (i Int32) String() string {
-	return fmt.Sprintf("$%d", i)
+	return fmt.Sprintf("i32$%d", i)
 }
 func (i Int32) Encode() []uint8 {
 	buf := new(bytes.Buffer)

@@ -69,7 +69,7 @@ func (i *IR_ArrayIndex) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.
 		if op.Value == 0 {
 			mov := asm.MOV(&encoding.IndirectRegister{arrayReg.ForOperandWidth(itemWidth)}, target.(*encoding.Register).ForOperandWidth(itemWidth))
 			// Move 0 into target register if going from a wider to narrower register
-			mov0 := asm.MOV(encoding.Uint64(0), target)
+			mov0 := asm.MOV(encoding.Uint64(0), target.(*encoding.Register).Get64BitRegister()) // TODO use xor reg, reg
 			if itemWidth < lib.QUADWORD {
 				ctx.AddInstruction(mov0)
 				result = append(result, mov0)
@@ -103,7 +103,7 @@ func (i *IR_ArrayIndex) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.
 		target.(*encoding.Register).ForOperandWidth(itemWidth))
 
 	// Move 0 into target register if going from a wider to narrower register
-	mov0 := asm.MOV(encoding.Uint64(0), target)
+	mov0 := asm.MOV(encoding.Uint64(0), target.(*encoding.Register).Get64BitRegister())
 	if itemWidth < lib.QUADWORD {
 		ctx.AddInstruction(mov0)
 		result = append(result, mov0)

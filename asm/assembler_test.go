@@ -240,7 +240,7 @@ func Test_Execute(t *testing.T) {
 			MOV(encoding.Float64(2.5), encoding.Rdi),
 			MOV(encoding.Rcx, encoding.Xmm4),
 			MOV(encoding.Rdi, encoding.Xmm5),
-			MUL(encoding.Xmm5, encoding.Xmm4),
+			IMUL(encoding.Xmm5, encoding.Xmm4),
 			CVTTSD2SI(encoding.Xmm4, encoding.Rax),
 			MOV(encoding.Rax, &encoding.DisplacedRegister{encoding.Rsp, 8}),
 			RETURN(),

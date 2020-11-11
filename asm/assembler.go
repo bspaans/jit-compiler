@@ -63,13 +63,19 @@ func MOV(src, dest encoding.Operand) lib.Instruction {
 	return opcodes.OpcodesToInstruction("mov", opcodes.MOV, 2, dest, src)
 }
 func MOV_immediate(v uint64, dest encoding.Operand) lib.Instruction {
+	if reg, ok := dest.(*encoding.Register); ok && reg.Width() == lib.BYTE {
+		return MOV(encoding.Uint8(v), dest)
+	}
 	if v < (1 << 32) {
 		return MOV(encoding.Uint32(v), dest)
 	}
 	return MOV(encoding.Uint64(v), dest)
 }
-func MUL(src, dest encoding.Operand) lib.Instruction {
-	return opcodes.OpcodesToInstruction("mul", opcodes.MUL, 2, dest, src)
+func IMUL(src, dest encoding.Operand) lib.Instruction {
+	return opcodes.OpcodesToInstruction("imul", opcodes.IMUL, 2, dest, src)
+}
+func MUL(src encoding.Operand) lib.Instruction {
+	return opcodes.OpcodesToInstruction("mul", opcodes.MUL, 1, src)
 }
 func POP(dest encoding.Operand) lib.Instruction {
 	return opcodes.OpcodesToInstruction("pop", opcodes.POP, 1, dest)
