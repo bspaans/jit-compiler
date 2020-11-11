@@ -85,6 +85,7 @@ var Registers16 []*Register = []*Register{
 var Registers8 []*Register = []*Register{
 	Al, Cl, Dl, Bl, Spl, Bpl, Sil, Dil,
 	R8b, R9b, R10b, R11b, R12b, R13b, R14b, R15b,
+	// TODO: AH, BH, CH, DH
 }
 
 var RegistersSSE []*Register = []*Register{
@@ -177,4 +178,9 @@ var (
 	R13b *Register = NewRegister("r13b", 13, BYTE)
 	R14b *Register = NewRegister("r14b", 14, BYTE)
 	R15b *Register = NewRegister("r15b", 15, BYTE)
+
+	Ah *Register = NewRegister("ah", 4, BYTE)
+	Ch *Register = NewRegister("ch", 5, BYTE)
+	Dh *Register = NewRegister("dh", 6, BYTE)
+	Bh *Register = NewRegister("bh", 7, BYTE)
 )

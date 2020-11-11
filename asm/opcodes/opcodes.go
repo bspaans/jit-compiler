@@ -92,6 +92,21 @@ var (
 			OpcodeOperand{OT_rm64, ModRM_rm_rw},
 		},
 	}
+	DIV_rm8 = &Opcode{"div", []uint8{}, []uint8{0xf6}, []OpcodeExtensions{Rex, Slash6},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_rm8, ModRM_rm_r},
+		},
+	}
+	DIV_rm16 = &Opcode{"div", []uint8{}, []uint8{0xf7}, []OpcodeExtensions{Slash6},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_rm16, ModRM_rm_r},
+		},
+	}
+	DIV_rm32 = &Opcode{"div", []uint8{}, []uint8{0xf7}, []OpcodeExtensions{Slash6},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_rm32, ModRM_rm_r},
+		},
+	}
 	// Divides unsigned the value in the AX, DX:AX, EDX:EAX, or RDX:RAX
 	// registers (dividend) by the source operand (divisor) and stores the
 	// result in the AX (AH:AL), DX:AX, EDX:EAX, or RDX:RAX registers.
@@ -163,6 +178,12 @@ var (
 		[]OpcodeOperand{
 			OpcodeOperand{OT_r8, ModRM_reg_rw},
 			OpcodeOperand{OT_rm8, ModRM_rm_r},
+		},
+	}
+	MOV_r8_imm8_no_rex = &Opcode{"mov", []uint8{}, []uint8{0xb0}, []OpcodeExtensions{ImmediateByte},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_r8, Opcode_plus_rd_r},
+			OpcodeOperand{OT_imm8, ImmediateValue},
 		},
 	}
 	MOV_r8_imm8 = &Opcode{"mov", []uint8{}, []uint8{0xb0}, []OpcodeExtensions{Rex, ImmediateByte},

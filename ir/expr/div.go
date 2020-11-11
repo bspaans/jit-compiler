@@ -9,32 +9,32 @@ import (
 	"github.com/bspaans/jit-compiler/lib"
 )
 
-type IR_Mul struct {
+type IR_Div struct {
 	*BaseIRExpression
 	Op1 IRExpression
 	Op2 IRExpression
 }
 
-func NewIR_Mul(op1, op2 IRExpression) *IR_Mul {
-	return &IR_Mul{
-		BaseIRExpression: NewBaseIRExpression(Mul),
+func NewIR_Div(op1, op2 IRExpression) *IR_Div {
+	return &IR_Div{
+		BaseIRExpression: NewBaseIRExpression(Div),
 		Op1:              op1,
 		Op2:              op2,
 	}
 }
 
-func (i *IR_Mul) ReturnType(ctx *IR_Context) Type {
+func (i *IR_Div) ReturnType(ctx *IR_Context) Type {
 	return i.Op1.ReturnType(ctx)
 }
 
-func (i *IR_Mul) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.Instruction, error) {
+func (i *IR_Div) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.Instruction, error) {
 	ctx.AddInstruction("operator " + encoding.Comment(i.String()))
 	returnType1, returnType2 := i.Op1.ReturnType(ctx), i.Op2.ReturnType(ctx)
 	if returnType1 != returnType2 {
-		return nil, fmt.Errorf("Unsupported types (%s, %s) in * IR operation: %s", returnType1, returnType2, i.String())
+		return nil, fmt.Errorf("Unsupported types (%s, %s) in / IR operation: %s", returnType1, returnType2, i.String())
 	}
 	if returnType1 == TFloat64 {
-		return NewIR_Operator(asm.IMUL, "*", i.Op1, i.Op2).Encode(ctx, target)
+		return NewIR_Operator(asm.IDIV, "*", i.Op1, i.Op2).Encode(ctx, target)
 	}
 	if returnType1 == TUint64 || returnType1 == TUint8 {
 
@@ -62,7 +62,18 @@ func (i *IR_Mul) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.Instruc
 					ctxCopy.VariableMap[v] = tmpRax
 				}
 			}
+		}
+		// Set %ah to 0 in 8bit mode
+		if returnType1 == TUint8 {
+			mov0 := asm.MOV_immediate(0, encoding.Ah) // TODO use xor
+			result = append(result, mov0)
+			ctx.AddInstructions(result)
 
+			// Set %rdi to 0 in 64bit mode
+		} else if returnType1 == TUint64 {
+			mov0 := asm.MOV_immediate(0, encoding.Rdx) // TODO use xor
+			result = append(result, mov0)
+			ctx.AddInstructions(result)
 		}
 
 		// Preserve the %rax register
@@ -108,7 +119,7 @@ func (i *IR_Mul) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.Instruc
 			}
 			result = lib.Instructions(result).Add(expr)
 		}
-		instr := asm.MUL(reg)
+		instr := asm.DIV(reg)
 		ctx.AddInstruction(instr)
 		result = append(result, instr)
 
@@ -130,14 +141,14 @@ func (i *IR_Mul) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.Instruc
 		}
 		return result, nil
 	}
-	return nil, fmt.Errorf("Unsupported types (%s, %s) in * IR operation: %s", returnType1, returnType2, i.String())
+	return nil, fmt.Errorf("Unsupported types (%s, %s) in / IR operation: %s", returnType1, returnType2, i.String())
 }
 
-func (i *IR_Mul) String() string {
-	return fmt.Sprintf("%s * %s", i.Op1.String(), i.Op2.String())
+func (i *IR_Div) String() string {
+	return fmt.Sprintf("%s / %s", i.Op1.String(), i.Op2.String())
 }
 
-func (b *IR_Mul) AddToDataSection(ctx *IR_Context) error {
+func (b *IR_Div) AddToDataSection(ctx *IR_Context) error {
 	if err := b.Op1.AddToDataSection(ctx); err != nil {
 		return err
 	}

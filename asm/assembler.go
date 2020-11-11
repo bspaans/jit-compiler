@@ -41,8 +41,11 @@ func CVTTSD2SI(src, dest encoding.Operand) lib.Instruction {
 func DEC(dest encoding.Operand) lib.Instruction {
 	return opcodes.OpcodesToInstruction("dec", opcodes.DEC, 1, dest)
 }
-func DIV(src, dest encoding.Operand) lib.Instruction {
-	return opcodes.OpcodesToInstruction("div", opcodes.DIV, 2, dest, src)
+func DIV(src encoding.Operand) lib.Instruction {
+	return opcodes.OpcodesToInstruction("div", opcodes.DIV, 1, src)
+}
+func IDIV(src, dest encoding.Operand) lib.Instruction {
+	return opcodes.OpcodesToInstruction("div", opcodes.IDIV, 2, dest, src)
 }
 func INC(dest encoding.Operand) lib.Instruction {
 	return opcodes.OpcodesToInstruction("inc", opcodes.INC, 1, dest)

@@ -36,16 +36,20 @@ func Test_ParseExecute_Happy(t *testing.T) {
 		`f = 53`,
 		`f = 51 + 2`,
 		`f = 55 - 2`,
+		`f = 3 + 25 * 2`,
+		`f = (2 * 25) + 3`,
+		`f = 3 + (2 * 25)`,
+		`f = (100 / 2) + 3`,
+		`f = 3 + (100 / 2)`,
+		`h = 2; f = (h * 25) + 3`,
+		`h = 25; f = (2 * h) + 3`,
+		`h = 3; f = (2 * 25) + h`,
 		`f = uint8(51) + uint8(2)`,
 		`f = uint8(55) - uint8(2)`,
 		`f = (uint8(2) * uint8(25)) + uint8(3)`,
 		`f = uint8(3) + (uint8(2) * uint8(25))`,
-		`f = 3 + 25 * 2`,
-		`f = (2 * 25) + 3`,
-		`f = 3 + (2 * 25)`,
-		`h = 2; f = (h * 25) + 3`,
-		`h = 25; f = (2 * h) + 3`,
-		`h = 3; f = (2 * 25) + h`,
+		`f = uint8(3) + (uint8(100) / uint8(2))`,
+		`f = (uint8(100) / uint8(2)) + uint8(3)`,
 		`f = []uint64{53}[0]`,
 		`f = []uint64{42,52,53}[2]`,
 		`f = ([]uint64{42,52,53})[2]`,
@@ -94,13 +98,20 @@ func Test_ParseExecute_Happy(t *testing.T) {
 		if err != nil {
 			t.Fatal(err, "in", ir)
 		}
-		debug := true
+		debug := false
 		b, err := Compile([]IR{i}, debug)
 		if err != nil {
+			if !debug {
+				Compile([]IR{i}, true)
+			}
 			t.Fatal(err, "in", ir)
 		}
 		value := b.Execute(debug)
 		if value != uint(53) {
+			if !debug {
+				Compile([]IR{i}, true)
+				b.Execute(true)
+			}
 			t.Fatal("Expecting 53 got", value, "in", ir, "\n", b)
 		}
 	}

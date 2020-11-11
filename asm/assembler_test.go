@@ -127,6 +127,24 @@ func Test_MOV(t *testing.T) {
 	if unit.String() != expected {
 		t.Fatal("Expecting", expected, "got", unit)
 	}
+
+	unit, err = (MOV(encoding.Uint8(0x01), encoding.Sil)).Encode()
+	if err != nil {
+		t.Fatal(err)
+	}
+	expected = "  40 b6 01"
+	if unit.String() != expected {
+		t.Fatal("Expecting", expected, "got", unit)
+	}
+
+	unit, err = (MOV(encoding.Uint8(0x01), encoding.Ah)).Encode()
+	if err != nil {
+		t.Fatal(err)
+	}
+	expected = "  b4 01"
+	if unit.String() != expected {
+		t.Fatal("Expecting", expected, "got", unit)
+	}
 }
 
 func Test_JMP(t *testing.T) {
@@ -250,7 +268,7 @@ func Test_Execute(t *testing.T) {
 			MOV(encoding.Float64(10.0), encoding.Rdi),
 			MOV(encoding.Rdi, encoding.Xmm4),
 			MOV(encoding.Rcx, encoding.Xmm5),
-			DIV(encoding.Xmm5, encoding.Xmm4),
+			IDIV(encoding.Xmm5, encoding.Xmm4),
 			CVTTSD2SI(encoding.Xmm4, encoding.Rax),
 			MOV(encoding.Rax, &encoding.DisplacedRegister{encoding.Rsp, 8}),
 			RETURN(),
@@ -262,7 +280,7 @@ func Test_Execute(t *testing.T) {
 			MOV(encoding.Rcx, encoding.Xmm5),
 			MOV(encoding.Xmm4, encoding.Xmm0),
 			MOV(encoding.Xmm5, encoding.Xmm1),
-			DIV(encoding.Xmm1, encoding.Xmm0),
+			IDIV(encoding.Xmm1, encoding.Xmm0),
 			CVTTSD2SI(encoding.Xmm0, encoding.Rax),
 			MOV(encoding.Rax, &encoding.DisplacedRegister{encoding.Rsp, 8}),
 			RETURN(),

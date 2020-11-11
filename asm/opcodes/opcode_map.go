@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"sort"
 
+	"github.com/bspaans/jit-compiler/asm/encoding"
 	. "github.com/bspaans/jit-compiler/asm/encoding"
 	"github.com/bspaans/jit-compiler/lib"
 )
@@ -35,6 +36,9 @@ func (o OpcodeMaps) ResolveOpcode(operands []Operand) *Opcode {
 		}
 		newPick := map[*Opcode]bool{}
 		for _, opcode := range matches {
+			if (oper == encoding.Ah || oper == encoding.Ch || oper == encoding.Dh || oper == encoding.Bh) && (opcode.HasExtension(Rex) || opcode.HasExtension(RexW)) {
+				continue
+			}
 			if i == 0 {
 				newPick[opcode] = true
 			} else {

@@ -95,6 +95,15 @@ type Opcode struct {
 	Operands         []OpcodeOperand
 }
 
+func (o *Opcode) HasExtension(ext OpcodeExtensions) bool {
+	for _, e := range o.OpcodeExtensions {
+		if e == ext {
+			return true
+		}
+	}
+	return false
+}
+
 func (o *Opcode) Encode(ops []Operand) ([]uint8, error) {
 	instr := NewInstructionFormat(o.Opcode)
 	exts := map[OpcodeExtensions]bool{}
