@@ -63,30 +63,16 @@ func (i *IR_Div) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.Instruc
 				}
 			}
 		}
-		// Set %ah to 0 in 8bit mode
-		if returnType1 == TUint8 {
-			mov0 := asm.MOV_immediate(0, encoding.Ah) // TODO use xor
-			result = append(result, mov0)
-			ctx.AddInstructions(result)
-
-			// Set %dx to 0 in 32 bit mode
-		} else if returnType1 == TUint16 {
-			mov0 := asm.MOV_immediate(0, encoding.Dx) // TODO use xor
-			result = append(result, mov0)
-			ctx.AddInstructions(result)
-
-			// Set %edx to 0 in 32 bit mode
-		} else if returnType1 == TUint32 {
-			mov0 := asm.MOV_immediate(0, encoding.Edx) // TODO use xor
-			result = append(result, mov0)
-			ctx.AddInstructions(result)
-
-			// Set %rdi to 0 in 64bit mode
-		} else if returnType1 == TUint64 {
-			mov0 := asm.MOV_immediate(0, encoding.Rdx) // TODO use xor
-			result = append(result, mov0)
-			ctx.AddInstructions(result)
+		zeroRegisters := map[Type]*encoding.Register{
+			TUint8:  encoding.Ah,
+			TUint16: encoding.Dx,
+			TUint32: encoding.Edx,
+			TUint64: encoding.Rdx,
 		}
+		zero := zeroRegisters[returnType1]
+		xor := asm.XOR(zero, zero)
+		result = append(result, xor)
+		ctx.AddInstructions(result)
 
 		// Preserve the %rax register
 		if shouldPreserveRax {
