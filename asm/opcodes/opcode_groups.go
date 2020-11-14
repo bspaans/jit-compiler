@@ -47,6 +47,13 @@ var MOV = []*Opcode{
 	MOV_r64_imm64, MOV_rm64_imm32,
 	MOVQ_xmm_rm64, MOVSD_xmm1m64_xmm2,
 }
+var MOVZX = []*Opcode{
+	MOVZX_r16_rm8,
+	MOVZX_r32_rm8,
+	MOVZX_r64_rm8,
+	MOVZX_r32_rm16,
+	MOVZX_r64_rm16,
+}
 var POP = []*Opcode{POP_r64}
 var PUSH = []*Opcode{PUSH_imm32, PUSH_r64}
 var SETA = []*Opcode{SETA_rm8}
@@ -63,4 +70,14 @@ var SUB = []*Opcode{
 	SUB_rm32_r32, SUB_r32_rm32,
 	SUB_rm64_r64, SUB_r64_rm64, SUB_rm64_imm32,
 	SUBSD_xmm1_xmm2m64}
-var XOR = []*Opcode{XOR_rm64_imm32, XOR_r64_rm64}
+var XOR = []*Opcode{
+	XOR_r8_rm8,
+	XOR_r8_rm8_no_rex,
+	XOR_rm8_r8,
+	XOR_rm8_r8_no_rex,
+	XOR_r16_rm16,
+	XOR_rm16_r16,
+	XOR_r32_rm32,
+	XOR_rm32_r32,
+	XOR_rm64_imm32,
+	XOR_r64_rm64, XOR_rm64_r64}
