@@ -36,11 +36,11 @@ func (i *IR_Mul) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.Instruc
 	if returnType1 == TFloat64 {
 		return NewIR_Operator(asm.IMUL, "*", i.Op1, i.Op2).Encode(ctx, target)
 	}
-	if returnType1 == TUint64 || returnType1 == TUint8 {
+	if returnType1 == TUint64 || returnType1 == TUint32 || returnType1 == TUint8 {
 
 		raxInUse := ctx.Registers[0]
 
-		shouldPreserveRdx := returnType1 == TUint64 && ctx.Registers[2]
+		shouldPreserveRdx := (returnType1 == TUint64 || returnType1 == TUint32) && ctx.Registers[2]
 		shouldPreserveRax := target.(*encoding.Register).Register != 0 && raxInUse
 		var tmpRdx *encoding.Register
 		var tmpRax *encoding.Register
@@ -69,7 +69,7 @@ func (i *IR_Mul) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.Instruc
 		if shouldPreserveRax {
 			ctxCopy = ctxCopy.Copy()
 			// Make sure we don't allocate %rdx
-			if !ctxCopy.Registers[2] && returnType1 == TUint64 {
+			if !ctxCopy.Registers[2] && (returnType1 == TUint64 || returnType1 == TUint32) {
 				ctxCopy.Registers[2] = true
 			}
 			tmpRax = ctxCopy.AllocateRegister(TUint64)

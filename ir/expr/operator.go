@@ -36,7 +36,7 @@ func (i *IR_Operator) ReturnType(ctx *IR_Context) Type {
 func (i *IR_Operator) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.Instruction, error) {
 	ctx.AddInstruction("operator " + encoding.Comment(i.String()))
 	returnType1, returnType2 := i.Op1.ReturnType(ctx), i.Op2.ReturnType(ctx)
-	if returnType1 == returnType2 && (returnType1 == TFloat64 || returnType1 == TUint64 || returnType1 == TUint8) {
+	if returnType1 == returnType2 && (returnType1 == TFloat64 || returnType1 == TUint64 || returnType1 == TUint8 || returnType1 == TUint32) {
 		result, err := i.Op1.Encode(ctx, target)
 		if err != nil {
 			return nil, err

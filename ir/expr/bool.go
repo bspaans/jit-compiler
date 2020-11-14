@@ -34,7 +34,7 @@ func (i *IR_Bool) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.Instru
 	if i.Value {
 		value = 1
 	}
-	result := []lib.Instruction{asm.MOV(encoding.Uint64(value), target)}
+	result := []lib.Instruction{asm.MOV_immediate(uint64(value), target)}
 	ctx.AddInstructions(result)
 	return result, nil
 }

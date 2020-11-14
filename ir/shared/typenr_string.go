@@ -9,17 +9,18 @@ func _() {
 	// Re-run the stringer command to generate them again.
 	var x [1]struct{}
 	_ = x[T_Uint8-0]
-	_ = x[T_Uint64-1]
-	_ = x[T_Float64-2]
-	_ = x[T_Bool-3]
-	_ = x[T_Array-4]
-	_ = x[T_Function-5]
-	_ = x[T_Struct-6]
+	_ = x[T_Uint32-1]
+	_ = x[T_Uint64-2]
+	_ = x[T_Float64-3]
+	_ = x[T_Bool-4]
+	_ = x[T_Array-5]
+	_ = x[T_Function-6]
+	_ = x[T_Struct-7]
 }
 
-const _TypeNr_name = "T_Uint8T_Uint64T_Float64T_BoolT_ArrayT_FunctionT_Struct"
+const _TypeNr_name = "T_Uint8T_Uint32T_Uint64T_Float64T_BoolT_ArrayT_FunctionT_Struct"
 
-var _TypeNr_index = [...]uint8{0, 7, 15, 24, 30, 37, 47, 55}
+var _TypeNr_index = [...]uint8{0, 7, 15, 23, 32, 38, 45, 55, 63}
 
 func (i TypeNr) String() string {
 	if i < 0 || i >= TypeNr(len(_TypeNr_index)-1) {

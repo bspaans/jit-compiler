@@ -36,11 +36,11 @@ func (i *IR_Div) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.Instruc
 	if returnType1 == TFloat64 {
 		return NewIR_Operator(asm.IDIV, "*", i.Op1, i.Op2).Encode(ctx, target)
 	}
-	if returnType1 == TUint64 || returnType1 == TUint8 {
+	if returnType1 == TUint64 || returnType1 == TUint32 || returnType1 == TUint8 {
 
 		raxInUse := ctx.Registers[0]
 
-		shouldPreserveRdx := returnType1 == TUint64 && ctx.Registers[2]
+		shouldPreserveRdx := (returnType1 == TUint64 || returnType1 == TUint32) && ctx.Registers[2]
 		shouldPreserveRax := target.(*encoding.Register).Register != 0 && raxInUse
 		var tmpRdx *encoding.Register
 		var tmpRax *encoding.Register
@@ -69,6 +69,12 @@ func (i *IR_Div) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.Instruc
 			result = append(result, mov0)
 			ctx.AddInstructions(result)
 
+			// Set %edx to 0 in 32 bit mode
+		} else if returnType1 == TUint32 {
+			mov0 := asm.MOV_immediate(0, encoding.Edx) // TODO use xor
+			result = append(result, mov0)
+			ctx.AddInstructions(result)
+
 			// Set %rdi to 0 in 64bit mode
 		} else if returnType1 == TUint64 {
 			mov0 := asm.MOV_immediate(0, encoding.Rdx) // TODO use xor
@@ -80,7 +86,7 @@ func (i *IR_Div) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.Instruc
 		if shouldPreserveRax {
 			ctxCopy = ctxCopy.Copy()
 			// Make sure we don't allocate %rdx
-			if !ctxCopy.Registers[2] && returnType1 == TUint64 {
+			if !ctxCopy.Registers[2] && (returnType1 == TUint64 || returnType1 == TUint32) {
 				ctxCopy.Registers[2] = true
 			}
 			tmpRax = ctxCopy.AllocateRegister(TUint64)

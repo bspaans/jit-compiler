@@ -17,6 +17,18 @@ var (
 			OpcodeOperand{OT_rm8, ModRM_rm_r},
 		},
 	}
+	ADD_rm32_r32 = &Opcode{"add", []uint8{}, []uint8{0x01}, []OpcodeExtensions{SlashR},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_rm32, ModRM_rm_rw},
+			OpcodeOperand{OT_r32, ModRM_reg_r},
+		},
+	}
+	ADD_r32_rm32 = &Opcode{"add", []uint8{}, []uint8{0x03}, []OpcodeExtensions{SlashR},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_r32, ModRM_reg_rw},
+			OpcodeOperand{OT_rm32, ModRM_rm_r},
+		},
+	}
 	ADD_rm64_r64 = &Opcode{"add", []uint8{}, []uint8{0x01}, []OpcodeExtensions{RexW, SlashR},
 		[]OpcodeOperand{
 			OpcodeOperand{OT_rm64, ModRM_rm_rw},
@@ -216,6 +228,12 @@ var (
 			OpcodeOperand{OT_rm16, ModRM_rm_r},
 		},
 	}
+	MOV_r32_imm32 = &Opcode{"mov", []uint8{}, []uint8{0xb8}, []OpcodeExtensions{ImmediateDouble},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_r32, Opcode_plus_rd_r},
+			OpcodeOperand{OT_imm32, ImmediateValue},
+		},
+	}
 	MOV_rm32_r32 = &Opcode{"mov", []uint8{}, []uint8{0x89}, []OpcodeExtensions{SlashR},
 		[]OpcodeOperand{
 			OpcodeOperand{OT_rm32, ModRM_rm_rw},
@@ -365,12 +383,6 @@ var (
 			OpcodeOperand{OT_imm8, ImmediateValue},
 		},
 	}
-	SUB_rm64_imm8 = &Opcode{"sub", []uint8{}, []uint8{0x83}, []OpcodeExtensions{Rex, Slash5, ImmediateByte},
-		[]OpcodeOperand{
-			OpcodeOperand{OT_rm64, ModRM_rm_rw},
-			OpcodeOperand{OT_imm8, ImmediateValue},
-		},
-	}
 	SUB_r8_rm8 = &Opcode{"sub", []uint8{}, []uint8{0x2a}, []OpcodeExtensions{Rex, SlashR},
 		[]OpcodeOperand{
 			OpcodeOperand{OT_r8, ModRM_reg_rw},
@@ -383,6 +395,18 @@ var (
 			OpcodeOperand{OT_r8, ModRM_reg_r},
 		},
 	}
+	SUB_rm32_r32 = &Opcode{"sub", []uint8{}, []uint8{0x29}, []OpcodeExtensions{SlashR},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_rm32, ModRM_rm_rw},
+			OpcodeOperand{OT_r32, ModRM_reg_r},
+		},
+	}
+	SUB_r32_rm32 = &Opcode{"sub", []uint8{}, []uint8{0x2b}, []OpcodeExtensions{SlashR},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_r32, ModRM_reg_rw},
+			OpcodeOperand{OT_rm32, ModRM_rm_r},
+		},
+	}
 	SUB_rm64_r64 = &Opcode{"sub", []uint8{}, []uint8{0x29}, []OpcodeExtensions{RexW, SlashR},
 		[]OpcodeOperand{
 			OpcodeOperand{OT_rm64, ModRM_rm_rw},
@@ -393,6 +417,12 @@ var (
 		[]OpcodeOperand{
 			OpcodeOperand{OT_r64, ModRM_reg_rw},
 			OpcodeOperand{OT_rm64, ModRM_rm_r},
+		},
+	}
+	SUB_rm64_imm8 = &Opcode{"sub", []uint8{}, []uint8{0x83}, []OpcodeExtensions{Rex, Slash5, ImmediateByte},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_rm64, ModRM_rm_rw},
+			OpcodeOperand{OT_imm8, ImmediateValue},
 		},
 	}
 	SUB_rm64_imm32 = &Opcode{"sub", []uint8{}, []uint8{0x81}, []OpcodeExtensions{RexW, Slash5, ImmediateDouble},

@@ -192,6 +192,9 @@ func ParseString(s string) Parser {
 func ParseTypeUint8() Parser {
 	return ParseString("uint8").Success(shared.TUint8)
 }
+func ParseTypeUint32() Parser {
+	return ParseString("uint32").Success(shared.TUint32)
+}
 func ParseTypeUint64() Parser {
 	return ParseString("uint64").Success(shared.TUint64)
 }
@@ -201,6 +204,7 @@ func ParseTypeFloat64() Parser {
 func ParseSimpleType() Parser {
 	return OneOf([]Parser{
 		ParseTypeUint8(),
+		ParseTypeUint32(),
 		ParseTypeUint64(),
 		ParseTypeFloat64(),
 	})

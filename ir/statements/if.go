@@ -71,7 +71,7 @@ func (i *IR_If) Encode(ctx *IR_Context) ([]lib.Instruction, error) {
 		// If it's just a boolean compare it to 1
 		result, err = i.Condition.Encode(ctx, reg)
 		instr := []lib.Instruction{
-			asm.CMP(encoding.Uint32(1), reg),
+			asm.CMP_immediate(1, reg),
 			asm.JNE(encoding.Uint8(stmt1Len)),
 		}
 		for _, inst := range instr {
