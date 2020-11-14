@@ -17,6 +17,18 @@ var (
 			OpcodeOperand{OT_rm8, ModRM_rm_r},
 		},
 	}
+	ADD_rm16_r16 = &Opcode{"add", []uint8{0x66}, []uint8{0x01}, []OpcodeExtensions{SlashR},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_rm16, ModRM_rm_rw},
+			OpcodeOperand{OT_r16, ModRM_reg_r},
+		},
+	}
+	ADD_r16_rm16 = &Opcode{"add", []uint8{0x66}, []uint8{0x03}, []OpcodeExtensions{SlashR},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_r16, ModRM_reg_rw},
+			OpcodeOperand{OT_rm16, ModRM_rm_r},
+		},
+	}
 	ADD_rm32_r32 = &Opcode{"add", []uint8{}, []uint8{0x01}, []OpcodeExtensions{SlashR},
 		[]OpcodeOperand{
 			OpcodeOperand{OT_rm32, ModRM_rm_rw},
@@ -121,7 +133,7 @@ var (
 			OpcodeOperand{OT_rm8, ModRM_rm_r},
 		},
 	}
-	DIV_rm16 = &Opcode{"div", []uint8{}, []uint8{0xf7}, []OpcodeExtensions{Slash6},
+	DIV_rm16 = &Opcode{"div", []uint8{0x66}, []uint8{0xf7}, []OpcodeExtensions{Slash6},
 		[]OpcodeOperand{
 			OpcodeOperand{OT_rm16, ModRM_rm_r},
 		},
@@ -216,16 +228,22 @@ var (
 			OpcodeOperand{OT_imm8, ImmediateValue},
 		},
 	}
-	MOV_rm16_r16 = &Opcode{"mov", []uint8{}, []uint8{0x89}, []OpcodeExtensions{SlashR},
+	MOV_rm16_r16 = &Opcode{"mov", []uint8{0x66}, []uint8{0x89}, []OpcodeExtensions{SlashR},
 		[]OpcodeOperand{
 			OpcodeOperand{OT_rm16, ModRM_rm_rw},
 			OpcodeOperand{OT_r16, ModRM_reg_r},
 		},
 	}
-	MOV_r16_rm16 = &Opcode{"mov", []uint8{}, []uint8{0x8b}, []OpcodeExtensions{SlashR},
+	MOV_r16_rm16 = &Opcode{"mov", []uint8{0x66}, []uint8{0x8b}, []OpcodeExtensions{SlashR},
 		[]OpcodeOperand{
 			OpcodeOperand{OT_r16, ModRM_reg_rw},
 			OpcodeOperand{OT_rm16, ModRM_rm_r},
+		},
+	}
+	MOV_r16_imm16 = &Opcode{"mov", []uint8{0x66}, []uint8{0xb8}, []OpcodeExtensions{ImmediateWord},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_r16, Opcode_plus_rd_r},
+			OpcodeOperand{OT_imm16, ImmediateValue},
 		},
 	}
 	MOV_r32_imm32 = &Opcode{"mov", []uint8{}, []uint8{0xb8}, []OpcodeExtensions{ImmediateDouble},
@@ -287,7 +305,7 @@ var (
 			OpcodeOperand{OT_rm8, ModRM_rm_r},
 		},
 	}
-	MUL_rm16 = &Opcode{"mul", []uint8{}, []uint8{0xf7}, []OpcodeExtensions{Rex, Slash4},
+	MUL_rm16 = &Opcode{"mul", []uint8{0x66}, []uint8{0xf7}, []OpcodeExtensions{Rex, Slash4},
 		[]OpcodeOperand{
 			OpcodeOperand{OT_rm16, ModRM_rm_r},
 		},
@@ -393,6 +411,18 @@ var (
 		[]OpcodeOperand{
 			OpcodeOperand{OT_rm8, ModRM_rm_rw},
 			OpcodeOperand{OT_r8, ModRM_reg_r},
+		},
+	}
+	SUB_rm16_r16 = &Opcode{"sub", []uint8{0x66}, []uint8{0x29}, []OpcodeExtensions{SlashR},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_rm16, ModRM_rm_rw},
+			OpcodeOperand{OT_r16, ModRM_reg_r},
+		},
+	}
+	SUB_r16_rm16 = &Opcode{"sub", []uint8{0x66}, []uint8{0x2b}, []OpcodeExtensions{SlashR},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_r16, ModRM_reg_rw},
+			OpcodeOperand{OT_rm16, ModRM_rm_r},
 		},
 	}
 	SUB_rm32_r32 = &Opcode{"sub", []uint8{}, []uint8{0x29}, []OpcodeExtensions{SlashR},

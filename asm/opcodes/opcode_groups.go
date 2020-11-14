@@ -7,6 +7,8 @@ import (
 var ADD = []*Opcode{
 	ADD_rm8_r8,
 	ADD_r8_rm8,
+	ADD_rm16_r16,
+	ADD_r16_rm16,
 	ADD_rm32_r32,
 	ADD_r32_rm32,
 	ADD_rm64_r64,
@@ -38,6 +40,7 @@ var MOV = []*Opcode{
 	MOV_r8_imm8_no_rex,
 	MOV_rm8_r8, MOV_r8_rm8, MOV_r8_imm8,
 	MOV_rm16_r16, MOV_r16_rm16,
+	MOV_r16_imm16,
 	MOV_r32_imm32,
 	MOV_rm32_r32, MOV_r32_rm32,
 	MOV_rm64_r64, MOV_r64_rm64,
@@ -56,6 +59,7 @@ var SETNE = []*Opcode{SETNE_rm8}
 var SUB = []*Opcode{
 	SUB_rm8_imm8, SUB_rm64_imm8,
 	SUB_r8_rm8,
+	SUB_rm16_r16, SUB_r16_rm16,
 	SUB_rm32_r32, SUB_r32_rm32,
 	SUB_rm64_r64, SUB_r64_rm64, SUB_rm64_imm32,
 	SUBSD_xmm1_xmm2m64}

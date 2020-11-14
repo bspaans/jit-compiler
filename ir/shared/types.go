@@ -11,6 +11,7 @@ type TypeNr int
 
 const (
 	T_Uint8    TypeNr = iota
+	T_Uint16   TypeNr = iota
 	T_Uint32   TypeNr = iota
 	T_Uint64   TypeNr = iota
 	T_Float64  TypeNr = iota
@@ -37,6 +38,7 @@ func (b *BaseType) Type() TypeNr {
 func (b *BaseType) String() string {
 	return map[TypeNr]string{
 		T_Uint8:    "uint8",
+		T_Uint16:   "uint16",
 		T_Uint32:   "uint32",
 		T_Uint64:   "uint64",
 		T_Float64:  "float64",
@@ -49,6 +51,7 @@ func (b *BaseType) String() string {
 func (b *BaseType) Width() lib.Size {
 	return map[TypeNr]lib.Size{
 		T_Uint8:   lib.BYTE,
+		T_Uint16:  lib.WORD,
 		T_Uint32:  lib.DOUBLE,
 		T_Uint64:  lib.QUADWORD,
 		T_Float64: lib.QUADWORD,
@@ -58,6 +61,7 @@ func (b *BaseType) Width() lib.Size {
 
 var (
 	TUint8   = &BaseType{T_Uint8}
+	TUint16  = &BaseType{T_Uint16}
 	TUint32  = &BaseType{T_Uint32}
 	TUint64  = &BaseType{T_Uint64}
 	TFloat64 = &BaseType{T_Float64}

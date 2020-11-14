@@ -9,31 +9,32 @@ func _() {
 	// Re-run the stringer command to generate them again.
 	var x [1]struct{}
 	_ = x[Uint8-0]
-	_ = x[Uint32-1]
-	_ = x[Uint64-2]
-	_ = x[Float64-3]
-	_ = x[ByteArray-4]
-	_ = x[StaticArray-5]
-	_ = x[ArrayIndex-6]
-	_ = x[Bool-7]
-	_ = x[Struct-8]
-	_ = x[StructField-9]
-	_ = x[Not-10]
-	_ = x[Add-11]
-	_ = x[Sub-12]
-	_ = x[Mul-13]
-	_ = x[Div-14]
-	_ = x[Variable-15]
-	_ = x[Equals-16]
-	_ = x[Syscall-17]
-	_ = x[Cast-18]
-	_ = x[Function-19]
-	_ = x[Call-20]
+	_ = x[Uint16-1]
+	_ = x[Uint32-2]
+	_ = x[Uint64-3]
+	_ = x[Float64-4]
+	_ = x[ByteArray-5]
+	_ = x[StaticArray-6]
+	_ = x[ArrayIndex-7]
+	_ = x[Bool-8]
+	_ = x[Struct-9]
+	_ = x[StructField-10]
+	_ = x[Not-11]
+	_ = x[Add-12]
+	_ = x[Sub-13]
+	_ = x[Mul-14]
+	_ = x[Div-15]
+	_ = x[Variable-16]
+	_ = x[Equals-17]
+	_ = x[Syscall-18]
+	_ = x[Cast-19]
+	_ = x[Function-20]
+	_ = x[Call-21]
 }
 
-const _IRExpressionType_name = "Uint8Uint32Uint64Float64ByteArrayStaticArrayArrayIndexBoolStructStructFieldNotAddSubMulDivVariableEqualsSyscallCastFunctionCall"
+const _IRExpressionType_name = "Uint8Uint16Uint32Uint64Float64ByteArrayStaticArrayArrayIndexBoolStructStructFieldNotAddSubMulDivVariableEqualsSyscallCastFunctionCall"
 
-var _IRExpressionType_index = [...]uint8{0, 5, 11, 17, 24, 33, 44, 54, 58, 64, 75, 78, 81, 84, 87, 90, 98, 104, 111, 115, 123, 127}
+var _IRExpressionType_index = [...]uint8{0, 5, 11, 17, 23, 30, 39, 50, 60, 64, 70, 81, 84, 87, 90, 93, 96, 104, 110, 117, 121, 129, 133}
 
 func (i IRExpressionType) String() string {
 	if i < 0 || i >= IRExpressionType(len(_IRExpressionType_index)-1) {

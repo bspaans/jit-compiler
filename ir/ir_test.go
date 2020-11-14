@@ -56,6 +56,12 @@ func Test_ParseExecute_Happy(t *testing.T) {
 		`f = uint32(3) + (uint32(2) * uint32(25))`,
 		`f = uint32(3) + (uint32(100) / uint32(2))`,
 		`f = (uint32(100) / uint32(2)) + uint32(3)`,
+		`f = uint16(51) + uint16(2)`,
+		`f = uint16(55) - uint16(2)`,
+		`f = (uint16(2) * uint16(25)) + uint16(3)`,
+		`f = uint16(3) + (uint16(2) * uint16(25))`,
+		`f = uint16(3) + (uint16(100) / uint16(2))`,
+		`f = (uint16(100) / uint16(2)) + uint16(3)`,
 		`f = []uint64{53}[0]`,
 		`f = []uint64{42,52,53}[2]`,
 		`f = ([]uint64{42,52,53})[2]`,
@@ -82,6 +88,8 @@ func Test_ParseExecute_Happy(t *testing.T) {
 		`g = []uint8{42,52,53}; g[0] = g[0] + uint8(11); f = g[0]`,
 		`g = []uint32{42,52,53}; g[0] = uint32(42) + uint32(11); f = g[0]`,
 		`g = []uint32{42,52,53}; g[0] = g[0] + uint32(11); f = g[0]`,
+		`g = []uint16{42,52,53}; g[0] = uint16(42) + uint16(11); f = g[0]`,
+		`g = []uint16{42,52,53}; g[0] = g[0] + uint16(11); f = g[0]`,
 		`g = []float64{53.0}; h = uint64(g[0]) ; f = h`,
 		`g = []float64{53.0}; h =g[0] ; f = uint64(h)`,
 		`g = []float64{51.0}; g[0] = g[0] + 2.0 ; f = uint64(g[0])`,
@@ -93,6 +101,10 @@ func Test_ParseExecute_Happy(t *testing.T) {
 		`g = []uint32{52,53} ; f = uint64(g[1])`,
 		`g = []uint32{51} ; g[0] = g[0] + uint32(2); f = uint64(g[0])`,
 		`g = []uint32{51} ; f = 2 + uint64(g[0])`,
+		`g = []uint16{53} ; f = uint64(g[0])`,
+		`g = []uint16{52,53} ; f = uint64(g[1])`,
+		`g = []uint16{51} ; g[0] = g[0] + uint16(2); f = uint64(g[0])`,
+		`g = []uint16{51} ; f = 2 + uint64(g[0])`,
 		`f = 0; while f != 53 { f = f + 1 }`,
 		`if 15 == 15 { f = 53 } else { f = 100 }`,
 		`k = 21; j = 1; if 15 == 15 { f = 53 } else { f = 100 }`,
@@ -110,7 +122,7 @@ func Test_ParseExecute_Happy(t *testing.T) {
 		if err != nil {
 			t.Fatal(err, "in", ir)
 		}
-		debug := true
+		debug := false
 		b, err := Compile([]IR{i}, debug)
 		if err != nil {
 			if !debug {

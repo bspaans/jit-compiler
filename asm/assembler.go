@@ -75,6 +75,9 @@ func MOV_immediate(v uint64, dest encoding.Operand) lib.Instruction {
 	if reg, ok := dest.(*encoding.Register); ok && reg.Width() == lib.BYTE {
 		return MOV(encoding.Uint8(v), dest)
 	}
+	if reg, ok := dest.(*encoding.Register); ok && reg.Width() == lib.WORD {
+		return MOV(encoding.Uint16(v), dest)
+	}
 	if v < (1 << 32) {
 		return MOV(encoding.Uint32(v), dest)
 	}
