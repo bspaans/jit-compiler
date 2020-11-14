@@ -43,12 +43,19 @@ func (i *IR_Return) Encode(ctx *IR_Context) ([]lib.Instruction, error) {
 	if reg.Width() != lib.QUADWORD {
 		cast := ctx.AllocateRegister(TUint64)
 		defer ctx.DeallocateRegister(cast)
-		mov0 := asm.MOV(encoding.Uint64(0), cast) // TODO: use XOR reg, reg; OR movzbl (move zero extend)
-		mov := asm.MOV(reg, cast.ForOperandWidth(reg.Width()))
-		result = append(result, mov0)
-		result = append(result, mov)
-		ctx.AddInstruction(mov)
-		ctx.AddInstruction(mov0)
+
+		if reg.Width() == lib.BYTE || reg.Width() == lib.WORD {
+			movzx := asm.MOVZX(reg, cast)
+			result = append(result, movzx)
+			ctx.AddInstruction(movzx)
+		} else {
+			xor := asm.XOR(cast, cast)
+			mov := asm.MOV(reg, cast.ForOperandWidth(reg.Width()))
+			result = append(result, xor)
+			result = append(result, mov)
+			ctx.AddInstruction(mov)
+			ctx.AddInstruction(xor)
+		}
 		reg = cast
 	}
 	target := ctx.PeekReturn()
