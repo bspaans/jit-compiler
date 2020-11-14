@@ -61,6 +61,15 @@ func (b *IR_StaticArray) AddToDataSection(ctx *IR_Context) error {
 			default:
 				return fmt.Errorf("Unsupport uint8 array type %s in %s", b.ElemType, b.String())
 			}
+		} else if b.ElemType == TUint32 {
+			switch v.(type) {
+			case *IR_Uint32:
+				bytes = encoding.Uint32(v.(*IR_Uint32).Value).Encode()
+			case *IR_Uint64:
+				bytes = encoding.Uint32(uint32(v.(*IR_Uint64).Value)).Encode()
+			default:
+				return fmt.Errorf("Unsupport uint8 array type %s in %s", b.ElemType, b.String())
+			}
 		} else if b.ElemType == TUint64 {
 			ir := v.(*IR_Uint64)
 			bytes = encoding.Uint64(ir.Value).Encode()
