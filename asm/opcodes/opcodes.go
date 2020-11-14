@@ -54,7 +54,19 @@ var (
 			OpcodeOperand{OT_rm64, ModRM_rm_rw},
 		},
 	}
-	CMP_rm64_imm32 = &Opcode{"cmp", []uint8{}, []uint8{0x81}, []OpcodeExtensions{RexW, Slash7},
+	CMP_rm8_imm8 = &Opcode{"cmp", []uint8{}, []uint8{0x80}, []OpcodeExtensions{Rex, Slash7, ImmediateByte},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_rm8, ModRM_rm_r},
+			OpcodeOperand{OT_imm8, ImmediateValue},
+		},
+	}
+	CMP_rm8_imm8_no_rex = &Opcode{"cmp", []uint8{}, []uint8{0x80}, []OpcodeExtensions{Slash7, ImmediateByte},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_rm8, ModRM_rm_r},
+			OpcodeOperand{OT_imm8, ImmediateValue},
+		},
+	}
+	CMP_rm64_imm32 = &Opcode{"cmp", []uint8{}, []uint8{0x81}, []OpcodeExtensions{RexW, Slash7, ImmediateDouble},
 		[]OpcodeOperand{
 			OpcodeOperand{OT_rm64, ModRM_rm_r},
 			OpcodeOperand{OT_imm32, ImmediateValue},

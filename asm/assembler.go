@@ -28,6 +28,12 @@ func CALL(dest encoding.Operand) lib.Instruction {
 func CMP(src, dest encoding.Operand) lib.Instruction {
 	return opcodes.OpcodesToInstruction("cmp", opcodes.CMP, 2, dest, src)
 }
+func CMP_immediate(v uint64, dest encoding.Operand) lib.Instruction {
+	if reg, ok := dest.(*encoding.Register); ok && reg.Width() == lib.BYTE {
+		return CMP(encoding.Uint8(v), dest)
+	}
+	return opcodes.OpcodesToInstruction("cmp", opcodes.CMP, 2, dest, encoding.Uint32(v))
+}
 
 // Convert signed integer to scalar double-precision floating point (float64)
 func CVTSI2SD(src, dest encoding.Operand) lib.Instruction {

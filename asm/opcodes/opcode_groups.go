@@ -13,7 +13,12 @@ var ADD = []*Opcode{
 	ADDSD_xmm1_xmm2m64,
 }
 var CALL = []*Opcode{CALL_rm64}
-var CMP = []*Opcode{CMP_rm64_imm32, CMP_rm64_r64}
+var CMP = []*Opcode{
+	CMP_rm8_imm8,
+	CMP_rm8_imm8_no_rex,
+	CMP_rm64_imm32,
+	CMP_rm64_r64,
+}
 var CVTSI2SD = []*Opcode{CVTSI2SD_xmm1_rm64}
 var CVTSD2SI = []*Opcode{CVTSD2SI_r64_xmm1m64}
 var CVTTSD2SI = []*Opcode{CVTTSD2SI_r64_xmm1m64}

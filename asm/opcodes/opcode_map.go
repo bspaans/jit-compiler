@@ -38,6 +38,7 @@ func (o OpcodeMaps) ResolveOpcode(operands []Operand) *Opcode {
 		for _, opcode := range matches {
 			if (oper == encoding.Ah || oper == encoding.Ch || oper == encoding.Dh || oper == encoding.Bh) && (opcode.HasExtension(Rex) || opcode.HasExtension(RexW)) {
 				continue
+				// TODO do the opposite thing for  spl, bpl, sil and bpl
 			}
 			if i == 0 {
 				newPick[opcode] = true
