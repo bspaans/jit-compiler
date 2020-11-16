@@ -128,6 +128,12 @@ func SETNE(dest encoding.Operand) lib.Instruction {
 func SUB(src, dest encoding.Operand) lib.Instruction {
 	return opcodes.OpcodesToInstruction("sub", opcodes.SUB, 2, dest, src)
 }
+func SHL(src, dest encoding.Operand) lib.Instruction {
+	return opcodes.OpcodesToInstruction("shl", opcodes.SHL, 2, dest, src)
+}
+func SHR(src, dest encoding.Operand) lib.Instruction {
+	return opcodes.OpcodesToInstruction("shr", opcodes.SHR, 2, dest, src)
+}
 func SYSCALL() lib.Instruction {
 	return opcodes.OpcodeToInstruction("syscall", opcodes.SYSCALL, 0)
 }

@@ -52,25 +52,27 @@ hence projects like these.
 The following x86-64 instructions are supported in the assembler. For a detailed 
 overview see `asm/opcodes/opcodes.go` and `asm/opcodes/opcode_groups.go`:
 
-* MOV, MOVQ, MOVSD (moving things in and out of registers and memory)
+* MOV, MOVQ, MOVSD, MOVZX (moving things in and out of registers and memory)
 * LEA (loading the address of memory locations into a register)
 * PUSH and POP (stack em up)
-* PUSHFQ 
-* ADD, SUB, DIV 
-* ADDSD, SUBSD, MULSD and DIVSD
+* ADD, SUB, MUL, DIV (arithmetic)
+* ADDSD, SUBSD, MULSD and DIVSD (float arithmetic)
 * INC and DEC
+* SHL and SHR (shift to the left and right)
+* XOR
 * CMP
 * CVTSI2SD, CVTTSD2SI (convert int to and from float)
 * SETA, SETAE, SETB, SETBE, SETE, SETNE
 * JMP, JNE, JMPE
 * CALL and SYSCALL
 * RET 
+* PUSHFQ (push RFLAGS to the stack)
 * Immediate values
 * Addressing modes: direct and indirect registers, displaced registers, RIP relative, SIB
 
 In the higher level language the following constructs work:
 
-* Unsigned 8bit and 64bit integers
+* Unsigned 8bit, 16bit, 32bit and 64bit integers
 * 64bit floating point numbers
 * Booleans
 * Static size arrays

@@ -426,6 +426,66 @@ var (
 			OpcodeOperand{OT_rm8, ModRM_rm_r},
 		},
 	}
+	SHL_rm8_imm8 = &Opcode{"shl", []uint8{}, []uint8{0xc0}, []OpcodeExtensions{RexW, Slash4, ImmediateByte},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_rm8, ModRM_rm_rw},
+			OpcodeOperand{OT_imm8, ImmediateValue},
+		},
+	}
+	SHL_rm8_imm8_no_rex = &Opcode{"shl", []uint8{}, []uint8{0xc0}, []OpcodeExtensions{Slash4, ImmediateByte},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_rm8, ModRM_rm_rw},
+			OpcodeOperand{OT_imm8, ImmediateValue},
+		},
+	}
+	SHL_rm16_imm8 = &Opcode{"shl", []uint8{0x66}, []uint8{0xc1}, []OpcodeExtensions{Slash4, ImmediateByte},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_rm16, ModRM_rm_rw},
+			OpcodeOperand{OT_imm8, ImmediateValue},
+		},
+	}
+	SHL_rm32_imm8 = &Opcode{"shl", []uint8{}, []uint8{0xc1}, []OpcodeExtensions{Slash4, ImmediateByte},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_rm32, ModRM_rm_rw},
+			OpcodeOperand{OT_imm8, ImmediateValue},
+		},
+	}
+	SHL_rm64_imm8 = &Opcode{"shl", []uint8{}, []uint8{0xc1}, []OpcodeExtensions{RexW, Slash4, ImmediateByte},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_rm64, ModRM_rm_rw},
+			OpcodeOperand{OT_imm8, ImmediateValue},
+		},
+	}
+	SHR_rm8_imm8 = &Opcode{"shr", []uint8{}, []uint8{0xc0}, []OpcodeExtensions{RexW, Slash5, ImmediateByte},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_rm8, ModRM_rm_rw},
+			OpcodeOperand{OT_imm8, ImmediateValue},
+		},
+	}
+	SHR_rm8_imm8_no_rex = &Opcode{"shr", []uint8{}, []uint8{0xc0}, []OpcodeExtensions{Slash5, ImmediateByte},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_rm8, ModRM_rm_rw},
+			OpcodeOperand{OT_imm8, ImmediateValue},
+		},
+	}
+	SHR_rm16_imm8 = &Opcode{"shr", []uint8{0x66}, []uint8{0xc1}, []OpcodeExtensions{Slash5, ImmediateByte},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_rm16, ModRM_rm_rw},
+			OpcodeOperand{OT_imm8, ImmediateValue},
+		},
+	}
+	SHR_rm32_imm8 = &Opcode{"shr", []uint8{}, []uint8{0xc1}, []OpcodeExtensions{Slash5, ImmediateByte},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_rm32, ModRM_rm_rw},
+			OpcodeOperand{OT_imm8, ImmediateValue},
+		},
+	}
+	SHR_rm64_imm8 = &Opcode{"shr", []uint8{}, []uint8{0xc1}, []OpcodeExtensions{RexW, Slash5, ImmediateByte},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_rm64, ModRM_rm_rw},
+			OpcodeOperand{OT_imm8, ImmediateValue},
+		},
+	}
 	SUB_rm8_imm8 = &Opcode{"sub", []uint8{}, []uint8{0x80}, []OpcodeExtensions{Rex, Slash5, ImmediateByte},
 		[]OpcodeOperand{
 			OpcodeOperand{OT_rm8, ModRM_rm_rw},

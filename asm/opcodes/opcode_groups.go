@@ -63,6 +63,20 @@ var SETBE = []*Opcode{SETBE_rm8}
 var SETC = []*Opcode{SETC_rm8}
 var SETE = []*Opcode{SETE_rm8}
 var SETNE = []*Opcode{SETNE_rm8}
+var SHL = []*Opcode{
+	SHL_rm8_imm8,
+	SHL_rm8_imm8_no_rex,
+	SHL_rm16_imm8,
+	SHL_rm32_imm8,
+	SHL_rm64_imm8,
+}
+var SHR = []*Opcode{
+	SHR_rm8_imm8,
+	SHR_rm8_imm8_no_rex,
+	SHR_rm16_imm8,
+	SHR_rm32_imm8,
+	SHR_rm64_imm8,
+}
 var SUB = []*Opcode{
 	SUB_rm8_imm8, SUB_rm64_imm8,
 	SUB_r8_rm8,
