@@ -38,6 +38,7 @@ func (i *IR_Cast) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.Instru
 	if valueType == nil {
 		return nil, fmt.Errorf("nil return type in %s", i.Value.String())
 	}
+	// TODO: use movsx and movzx
 	if i.CastToType == TUint64 {
 		if valueType == TUint64 || valueType == TUint32 || valueType == TUint16 || valueType == TUint8 {
 			return i.Value.Encode(ctx, target)

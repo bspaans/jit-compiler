@@ -69,7 +69,7 @@ overview see `asm/opcodes/opcodes.go` and `asm/opcodes/opcode_groups.go`:
 * CBW, CWD, CDQ, CQO (sign extend %al, %ax, %eax and %rax)
 * CVTSI2SD, CVTTSD2SI (convert int to and from float)
 * SETA, SETAE, SETB, SETBE, SETE, SETNE
-* JMP, JNE, JMPE
+* JMP, JA, JAE, JB, JBE, JE, JG, JGE, JL, JLE, JNE (jumps and conditional jumps)
 * CALL and SYSCALL
 * RET 
 * PUSHFQ (push RFLAGS to the stack)
@@ -88,6 +88,7 @@ language that makes it easier to generate code. It currently supports:
 * 64bit floating point numbers
 * Booleans
 * Static size arrays
+* Structs 
 
 #### Expressions
 
@@ -98,6 +99,7 @@ language that makes it easier to generate code. It currently supports:
 * Syscalls
 * Equality testing
 * NOT logic expression
+* Struct field indexing
 
 #### Statements
 

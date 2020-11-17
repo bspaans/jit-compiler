@@ -47,11 +47,27 @@ var IMUL1 = []*Opcode{
 	IMUL_rm32,
 	IMUL_rm64,
 }
-var IMUL2 = []*Opcode{MULSD_xmm1_xmm2m64, IMUL_r64_rm64}
-var MUL = []*Opcode{MUL_rm8, MUL_rm16, MUL_rm32, MUL_rm64}
+var IMUL2 = []*Opcode{
+	MULSD_xmm1_xmm2m64,
+	IMUL_r64_rm64,
+}
+var MUL = []*Opcode{
+	MUL_rm8,
+	MUL_rm16,
+	MUL_rm32,
+	MUL_rm64,
+}
 var INC = []*Opcode{INC_rm64}
 var JMP = []*Opcode{JMP_rel8, JMP_rel32, JMP_rm64}
+var JA = []*Opcode{JA_rel8}
+var JAE = []*Opcode{JAE_rel8}
+var JB = []*Opcode{JB_rel8}
+var JBE = []*Opcode{JBE_rel8}
 var JE = []*Opcode{JE_rel8}
+var JG = []*Opcode{JG_rel8}
+var JGE = []*Opcode{JGE_rel8}
+var JL = []*Opcode{JL_rel8}
+var JLE = []*Opcode{JLE_rel8}
 var JNE = []*Opcode{JNE_rel8}
 var LEA = []*Opcode{LEA_r64_m}
 var MOV = []*Opcode{

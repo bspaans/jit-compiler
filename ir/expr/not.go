@@ -70,6 +70,7 @@ func (i *IR_Not) encode(ctx *IR_Context, target encoding.Operand, includeSETE bo
 	defer ctx.DeallocateRegister(tmpReg)
 	instr := []lib.Instruction{}
 	if includeSETE {
+		// TODO: use test?
 		instr = append(instr, asm.CMP(encoding.Uint32(0), reg1))
 		instr = append(instr, asm.MOV(encoding.Uint64(0), tmpReg))
 		instr = append(instr, asm.SETE(tmpReg.Get8BitRegister()))

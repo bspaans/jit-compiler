@@ -79,8 +79,32 @@ func IDIV2(src, dest encoding.Operand) lib.Instruction {
 func INC(dest encoding.Operand) lib.Instruction {
 	return opcodes.OpcodesToInstruction("inc", opcodes.INC, 1, dest)
 }
+func JA(dest encoding.Operand) lib.Instruction {
+	return opcodes.OpcodesToInstruction("ja", opcodes.JA, 1, dest)
+}
+func JAE(dest encoding.Operand) lib.Instruction {
+	return opcodes.OpcodesToInstruction("jae", opcodes.JAE, 1, dest)
+}
+func JB(dest encoding.Operand) lib.Instruction {
+	return opcodes.OpcodesToInstruction("jb", opcodes.JB, 1, dest)
+}
+func JBE(dest encoding.Operand) lib.Instruction {
+	return opcodes.OpcodesToInstruction("jbe", opcodes.JBE, 1, dest)
+}
 func JE(dest encoding.Operand) lib.Instruction {
 	return opcodes.OpcodesToInstruction("je", opcodes.JE, 1, dest)
+}
+func JG(dest encoding.Operand) lib.Instruction {
+	return opcodes.OpcodesToInstruction("jg", opcodes.JG, 1, dest)
+}
+func JGE(dest encoding.Operand) lib.Instruction {
+	return opcodes.OpcodesToInstruction("jge", opcodes.JGE, 1, dest)
+}
+func JL(dest encoding.Operand) lib.Instruction {
+	return opcodes.OpcodesToInstruction("jl", opcodes.JL, 1, dest)
+}
+func JLE(dest encoding.Operand) lib.Instruction {
+	return opcodes.OpcodesToInstruction("jle", opcodes.JLE, 1, dest)
 }
 func JNE(dest encoding.Operand) lib.Instruction {
 	return opcodes.OpcodesToInstruction("jne", opcodes.JNE, 1, dest)

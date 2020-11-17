@@ -245,8 +245,56 @@ var (
 			OpcodeOperand{OT_rm64, ModRM_rm_r},
 		},
 	}
+	// Jump short if above (CF=0 or ZF=0) (for unsigned)
+	JA_rel8 = &Opcode{"ja", []uint8{}, []uint8{0x77}, []OpcodeExtensions{ImmediateByte},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_rel8, ImmediateValue},
+		},
+	}
+	// Jump short if above or equal (CF=0) (for unsigned)
+	JAE_rel8 = &Opcode{"jae", []uint8{}, []uint8{0x73}, []OpcodeExtensions{ImmediateByte},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_rel8, ImmediateValue},
+		},
+	}
+	// Jump short if below (CF=1)
+	JB_rel8 = &Opcode{"jb", []uint8{}, []uint8{0x72}, []OpcodeExtensions{ImmediateByte},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_rel8, ImmediateValue},
+		},
+	}
+	// Jump short if below (CF=1 or ZF=0)
+	JBE_rel8 = &Opcode{"jbe", []uint8{}, []uint8{0x76}, []OpcodeExtensions{ImmediateByte},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_rel8, ImmediateValue},
+		},
+	}
 	// Jump short if equal (ZF=1)
 	JE_rel8 = &Opcode{"je", []uint8{}, []uint8{0x74}, []OpcodeExtensions{ImmediateByte},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_rel8, ImmediateValue},
+		},
+	}
+	// Jump short if greater (ZF=0 and SF=OF) (for signed)
+	JG_rel8 = &Opcode{"jg", []uint8{}, []uint8{0x7f}, []OpcodeExtensions{ImmediateByte},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_rel8, ImmediateValue},
+		},
+	}
+	// Jump short if greater or equal (SF=OF) (for signed)
+	JGE_rel8 = &Opcode{"jge", []uint8{}, []uint8{0x7d}, []OpcodeExtensions{ImmediateByte},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_rel8, ImmediateValue},
+		},
+	}
+	// Jump short if less (SF!=OF) (for signed)
+	JL_rel8 = &Opcode{"jl", []uint8{}, []uint8{0x7c}, []OpcodeExtensions{ImmediateByte},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_rel8, ImmediateValue},
+		},
+	}
+	// Jump short if less or equal (SF!=OF) (for signed)
+	JLE_rel8 = &Opcode{"jle", []uint8{}, []uint8{0x7e}, []OpcodeExtensions{ImmediateByte},
 		[]OpcodeOperand{
 			OpcodeOperand{OT_rel8, ImmediateValue},
 		},
