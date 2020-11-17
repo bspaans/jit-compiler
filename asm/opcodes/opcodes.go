@@ -123,6 +123,13 @@ var (
 			OpcodeOperand{OT_xmm2m64, ModRM_rm_r},
 		},
 	}
+	// Convert Word to Doubleword; dx:ax = sign extend(ax)
+	CWD = &Opcode{"cwd", []uint8{0x66}, []uint8{0x99}, []OpcodeExtensions{}, []OpcodeOperand{}}
+	// Convert Double word to Quadword; edx:eax = sign extend(eax)
+	CDQ = &Opcode{"cdq", []uint8{}, []uint8{0x99}, []OpcodeExtensions{}, []OpcodeOperand{}}
+	// Convert Quad word to double quad word; rdx:rax = sign extend(rax)
+	CQO = &Opcode{"cqo", []uint8{}, []uint8{0x99}, []OpcodeExtensions{RexW}, []OpcodeOperand{}}
+
 	DEC_rm64 = &Opcode{"dec", []uint8{}, []uint8{0xff}, []OpcodeExtensions{RexW, Slash1},
 		[]OpcodeOperand{
 			OpcodeOperand{OT_rm64, ModRM_rm_rw},

@@ -44,6 +44,21 @@ func CVTSI2SD(src, dest encoding.Operand) lib.Instruction {
 func CVTTSD2SI(src, dest encoding.Operand) lib.Instruction {
 	return opcodes.OpcodesToInstruction("cvttsd2si", opcodes.CVTTSD2SI, 2, dest, src)
 }
+
+// Convert Word to Doubleword; dx:ax = sign extend(ax)
+func CWD() lib.Instruction {
+	return opcodes.OpcodesToInstruction("cwd", []*encoding.Opcode{opcodes.CWD}, 0)
+}
+
+// Convert Double word to Quadword; edx:eax = sign extend(eax)
+func CDQ() lib.Instruction {
+	return opcodes.OpcodesToInstruction("cdq", []*encoding.Opcode{opcodes.CDQ}, 0)
+}
+
+// Convert Quad word to double quad word; rdx:rax = sign extend(rax)
+func CQO() lib.Instruction {
+	return opcodes.OpcodesToInstruction("cqo", []*encoding.Opcode{opcodes.CQO}, 0)
+}
 func DEC(dest encoding.Operand) lib.Instruction {
 	return opcodes.OpcodesToInstruction("dec", opcodes.DEC, 1, dest)
 }
