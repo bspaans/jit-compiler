@@ -5,6 +5,7 @@ import (
 
 	"github.com/bspaans/jit-compiler/asm"
 	"github.com/bspaans/jit-compiler/asm/encoding"
+	"github.com/bspaans/jit-compiler/ir/shared"
 	. "github.com/bspaans/jit-compiler/ir/shared"
 	"github.com/bspaans/jit-compiler/lib"
 )
@@ -45,8 +46,11 @@ func (i *IR_GT) encode(ctx *IR_Context, target encoding.Operand, includeSETE boo
 		defer ctx.DeallocateRegister(tmpReg)
 		// TODO xor tmpreg
 		// TODO use right SET depending on sign
-		sete := asm.SETE(tmpReg.Get8BitRegister())
-		mov := asm.MOV(tmpReg, target)
+		sete := asm.SETA(tmpReg.Get8BitRegister())
+		if shared.IsSignedInteger(i.Op1.ReturnType(ctx)) {
+			sete = asm.SETG(tmpReg.Get8BitRegister())
+		}
+		mov := asm.MOV(tmpReg.ForOperandWidth(target.Width()), target)
 		resugt = append(resugt, sete)
 		resugt = append(resugt, mov)
 		ctx.AddInstruction(sete)

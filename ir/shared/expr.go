@@ -31,6 +31,8 @@ const (
 	Bool        IRExpressionType = iota
 	Struct      IRExpressionType = iota
 	StructField IRExpressionType = iota
+	And         IRExpressionType = iota
+	Or          IRExpressionType = iota
 	Not         IRExpressionType = iota
 	Add         IRExpressionType = iota
 	Sub         IRExpressionType = iota

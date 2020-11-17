@@ -45,7 +45,7 @@ func (i *IR_Equals) encode(ctx *IR_Context, target encoding.Operand, includeSETE
 		defer ctx.DeallocateRegister(tmpReg)
 		// TODO xor tmpreg
 		sete := asm.SETE(tmpReg.Get8BitRegister())
-		mov := asm.MOV(tmpReg, target)
+		mov := asm.MOV(tmpReg.ForOperandWidth(target.Width()), target)
 		result = append(result, sete)
 		result = append(result, mov)
 		ctx.AddInstruction(sete)

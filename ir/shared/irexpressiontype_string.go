@@ -23,26 +23,28 @@ func _() {
 	_ = x[Bool-12]
 	_ = x[Struct-13]
 	_ = x[StructField-14]
-	_ = x[Not-15]
-	_ = x[Add-16]
-	_ = x[Sub-17]
-	_ = x[Mul-18]
-	_ = x[Div-19]
-	_ = x[Variable-20]
-	_ = x[Equals-21]
-	_ = x[LT-22]
-	_ = x[LTE-23]
-	_ = x[GT-24]
-	_ = x[GTE-25]
-	_ = x[Syscall-26]
-	_ = x[Cast-27]
-	_ = x[Function-28]
-	_ = x[Call-29]
+	_ = x[And-15]
+	_ = x[Or-16]
+	_ = x[Not-17]
+	_ = x[Add-18]
+	_ = x[Sub-19]
+	_ = x[Mul-20]
+	_ = x[Div-21]
+	_ = x[Variable-22]
+	_ = x[Equals-23]
+	_ = x[LT-24]
+	_ = x[LTE-25]
+	_ = x[GT-26]
+	_ = x[GTE-27]
+	_ = x[Syscall-28]
+	_ = x[Cast-29]
+	_ = x[Function-30]
+	_ = x[Call-31]
 }
 
-const _IRExpressionType_name = "Uint8Uint16Uint32Uint64Int8Int16Int32Int64Float64ByteArrayStaticArrayArrayIndexBoolStructStructFieldNotAddSubMulDivVariableEqualsLTLTEGTGTESyscallCastFunctionCall"
+const _IRExpressionType_name = "Uint8Uint16Uint32Uint64Int8Int16Int32Int64Float64ByteArrayStaticArrayArrayIndexBoolStructStructFieldAndOrNotAddSubMulDivVariableEqualsLTLTEGTGTESyscallCastFunctionCall"
 
-var _IRExpressionType_index = [...]uint8{0, 5, 11, 17, 23, 27, 32, 37, 42, 49, 58, 69, 79, 83, 89, 100, 103, 106, 109, 112, 115, 123, 129, 131, 134, 136, 139, 146, 150, 158, 162}
+var _IRExpressionType_index = [...]uint8{0, 5, 11, 17, 23, 27, 32, 37, 42, 49, 58, 69, 79, 83, 89, 100, 103, 105, 108, 111, 114, 117, 120, 128, 134, 136, 139, 141, 144, 151, 155, 163, 167}
 
 func (i IRExpressionType) String() string {
 	if i < 0 || i >= IRExpressionType(len(_IRExpressionType_index)-1) {

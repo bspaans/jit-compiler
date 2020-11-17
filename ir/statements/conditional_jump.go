@@ -79,6 +79,16 @@ func ConditionalJump(ctx *IR_Context, condition IRExpression, stmtLen int) ([]li
 		instr = []lib.Instruction{
 			asm.JE(encoding.Uint8(stmtLen + jmpSize)),
 		}
+	case *expr.IR_And:
+		result, err = condition.(*expr.IR_And).EncodeWithoutSETE(ctx, reg)
+		instr = []lib.Instruction{
+			asm.JE(encoding.Uint8(stmtLen + jmpSize)),
+		}
+	case *expr.IR_Or:
+		result, err = condition.(*expr.IR_Or).EncodeWithoutSETE(ctx, reg)
+		instr = []lib.Instruction{
+			asm.JE(encoding.Uint8(stmtLen + jmpSize)),
+		}
 	case *expr.IR_Bool:
 		result, err = condition.Encode(ctx, reg)
 		instr = []lib.Instruction{
@@ -86,7 +96,7 @@ func ConditionalJump(ctx *IR_Context, condition IRExpression, stmtLen int) ([]li
 			asm.JNE(encoding.Uint8(stmtLen + jmpSize)),
 		}
 	default:
-		return nil, fmt.Errorf("Unsupported condition %s", condition.String())
+		return nil, fmt.Errorf("Unsupported condition %s (type: %v)", condition.String(), condition.Type())
 	}
 	if err != nil {
 		return nil, err
