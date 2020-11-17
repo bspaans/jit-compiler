@@ -74,6 +74,7 @@ func Test_ParseExecute_Happy(t *testing.T) {
 		`f = (uint16(100) / uint16(2)) + uint16(3)`,
 
 		// int16
+		`f = int16(54) + int16(-1)`,
 		`f = int16(-53) * int16(-1)`,
 		`g= 25555212213;f = int16(-53) / int16(-1)`,
 
@@ -86,6 +87,7 @@ func Test_ParseExecute_Happy(t *testing.T) {
 		`f = (uint32(100) / uint32(2)) + uint32(3)`,
 
 		// int32
+		`f = int32(54) + int32(-1)`,
 		`f = int32(-53) * int32(-1)`,
 		`f = int32(-53) / int32(-1)`,
 

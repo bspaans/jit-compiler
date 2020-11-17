@@ -1,5 +1,8 @@
 # jit-compiler
 
+[![Documentation](https://godoc.org/github.com/bspaans/jit-compiler?status.svg)](https://godoc.org/github.com/bspaans/jit-compiler) 
+
+
 This is a Golang library containing an x86-64 assembler (see 'asm/') and a
 higher level intermediate representation that compiles down into x86-64 (see
 'ir/').
