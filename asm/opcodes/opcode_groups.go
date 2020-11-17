@@ -140,13 +140,44 @@ var OR = []*Opcode{
 }
 var POP = []*Opcode{POP_r64}
 var PUSH = []*Opcode{PUSH_imm32, PUSH_r64}
-var SETA = []*Opcode{SETA_rm8}
-var SETAE = []*Opcode{SETAE_rm8}
-var SETB = []*Opcode{SETB_rm8}
-var SETBE = []*Opcode{SETBE_rm8}
+var SETA = []*Opcode{
+	SETA_rm8,
+	SETA_rm8_no_rex,
+}
+var SETAE = []*Opcode{
+	SETAE_rm8,
+	SETAE_rm8_no_rex,
+}
+var SETB = []*Opcode{
+	SETB_rm8,
+	SETB_rm8_no_rex,
+}
+var SETBE = []*Opcode{
+	SETBE_rm8,
+	SETBE_rm8_no_rex,
+}
 var SETC = []*Opcode{SETC_rm8}
-var SETE = []*Opcode{SETE_rm8}
+var SETE = []*Opcode{
+	SETE_rm8,
+	SETE_rm8_no_rex,
+}
 var SETNE = []*Opcode{SETNE_rm8}
+var SETL = []*Opcode{
+	SETL_rm8,
+	SETL_rm8_no_rex,
+}
+var SETLE = []*Opcode{
+	SETLE_rm8,
+	SETLE_rm8_no_rex,
+}
+var SETG = []*Opcode{
+	SETG_rm8,
+	SETG_rm8_no_rex,
+}
+var SETGE = []*Opcode{
+	SETGE_rm8,
+	SETGE_rm8_no_rex,
+}
 
 var SHL = []*Opcode{
 	SHL_rm8_imm8,

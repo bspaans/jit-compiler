@@ -198,16 +198,28 @@ func SETAE(dest encoding.Operand) lib.Instruction {
 	return opcodes.OpcodesToInstruction("setae", opcodes.SETAE, 1, dest)
 }
 func SETB(dest encoding.Operand) lib.Instruction {
-	return opcodes.OpcodesToInstruction("seta", opcodes.SETB, 1, dest)
+	return opcodes.OpcodesToInstruction("setb", opcodes.SETB, 1, dest)
 }
 func SETBE(dest encoding.Operand) lib.Instruction {
-	return opcodes.OpcodesToInstruction("setae", opcodes.SETBE, 1, dest)
+	return opcodes.OpcodesToInstruction("setbe", opcodes.SETBE, 1, dest)
 }
 func SETC(dest encoding.Operand) lib.Instruction {
-	return opcodes.OpcodesToInstruction("seta", opcodes.SETC, 1, dest)
+	return opcodes.OpcodesToInstruction("setc", opcodes.SETC, 1, dest)
 }
 func SETE(dest encoding.Operand) lib.Instruction {
 	return opcodes.OpcodesToInstruction("sete", opcodes.SETE, 1, dest)
+}
+func SETL(dest encoding.Operand) lib.Instruction {
+	return opcodes.OpcodesToInstruction("setl", opcodes.SETL, 1, dest)
+}
+func SETLE(dest encoding.Operand) lib.Instruction {
+	return opcodes.OpcodesToInstruction("setle", opcodes.SETLE, 1, dest)
+}
+func SETG(dest encoding.Operand) lib.Instruction {
+	return opcodes.OpcodesToInstruction("setg", opcodes.SETG, 1, dest)
+}
+func SETGE(dest encoding.Operand) lib.Instruction {
+	return opcodes.OpcodesToInstruction("setge", opcodes.SETGE, 1, dest)
 }
 func SETNE(dest encoding.Operand) lib.Instruction {
 	return opcodes.OpcodesToInstruction("setne", opcodes.SETNE, 1, dest)

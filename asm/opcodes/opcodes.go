@@ -754,25 +754,45 @@ var (
 		[]OpcodeOperand{},
 	}
 	// Set byte if above (CF=0, ZF=0)
-	SETA_rm8 = &Opcode{"seta", []uint8{}, []uint8{0x0f, 0x97}, []OpcodeExtensions{},
+	SETA_rm8 = &Opcode{"seta", []uint8{}, []uint8{0x0f, 0x97}, []OpcodeExtensions{Rex},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_rm8, ModRM_rm_r},
+		},
+	}
+	SETA_rm8_no_rex = &Opcode{"seta", []uint8{}, []uint8{0x0f, 0x97}, []OpcodeExtensions{},
 		[]OpcodeOperand{
 			OpcodeOperand{OT_rm8, ModRM_rm_r},
 		},
 	}
 	// Set byte if above or equal (CF=0, ZF=0)
-	SETAE_rm8 = &Opcode{"setae", []uint8{}, []uint8{0x0f, 0x93}, []OpcodeExtensions{},
+	SETAE_rm8 = &Opcode{"setae", []uint8{}, []uint8{0x0f, 0x93}, []OpcodeExtensions{Rex},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_rm8, ModRM_rm_r},
+		},
+	}
+	SETAE_rm8_no_rex = &Opcode{"setae", []uint8{}, []uint8{0x0f, 0x93}, []OpcodeExtensions{},
 		[]OpcodeOperand{
 			OpcodeOperand{OT_rm8, ModRM_rm_r},
 		},
 	}
 	// Set byte if below (CF=1)
-	SETB_rm8 = &Opcode{"setb", []uint8{}, []uint8{0x0f, 0x92}, []OpcodeExtensions{},
+	SETB_rm8 = &Opcode{"setb", []uint8{}, []uint8{0x0f, 0x92}, []OpcodeExtensions{Rex},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_rm8, ModRM_rm_r},
+		},
+	}
+	SETB_rm8_no_rex = &Opcode{"setb", []uint8{}, []uint8{0x0f, 0x92}, []OpcodeExtensions{},
 		[]OpcodeOperand{
 			OpcodeOperand{OT_rm8, ModRM_rm_r},
 		},
 	}
 	// Set byte if below or equal (CF=1 or ZF=1)
-	SETBE_rm8 = &Opcode{"setbe", []uint8{}, []uint8{0x0f, 0x96}, []OpcodeExtensions{},
+	SETBE_rm8 = &Opcode{"setbe", []uint8{}, []uint8{0x0f, 0x96}, []OpcodeExtensions{Rex},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_rm8, ModRM_rm_r},
+		},
+	}
+	SETBE_rm8_no_rex = &Opcode{"setbe", []uint8{}, []uint8{0x0f, 0x96}, []OpcodeExtensions{},
 		[]OpcodeOperand{
 			OpcodeOperand{OT_rm8, ModRM_rm_r},
 		},
@@ -784,11 +804,62 @@ var (
 		},
 	}
 	// Set byte if equal (ZF=1)
-	SETE_rm8 = &Opcode{"sete", []uint8{}, []uint8{0x0f, 0x94}, []OpcodeExtensions{},
+	SETE_rm8 = &Opcode{"sete", []uint8{}, []uint8{0x0f, 0x94}, []OpcodeExtensions{Rex},
 		[]OpcodeOperand{
 			OpcodeOperand{OT_rm8, ModRM_rm_r},
 		},
 	}
+	SETE_rm8_no_rex = &Opcode{"sete", []uint8{}, []uint8{0x0f, 0x94}, []OpcodeExtensions{},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_rm8, ModRM_rm_r},
+		},
+	}
+	// Set byte if less (SF != OF)
+	SETL_rm8 = &Opcode{"setl", []uint8{}, []uint8{0x0f, 0x9c}, []OpcodeExtensions{Rex},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_rm8, ModRM_rm_r},
+		},
+	}
+	SETL_rm8_no_rex = &Opcode{"setl", []uint8{}, []uint8{0x0f, 0x9c}, []OpcodeExtensions{},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_rm8, ModRM_rm_r},
+		},
+	}
+	// Set byte if less or equal (ZF = 1 or SF != OF)
+	SETLE_rm8 = &Opcode{"setle", []uint8{}, []uint8{0x0f, 0x9e}, []OpcodeExtensions{Rex},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_rm8, ModRM_rm_r},
+		},
+	}
+	SETLE_rm8_no_rex = &Opcode{"setle", []uint8{}, []uint8{0x0f, 0x9e}, []OpcodeExtensions{},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_rm8, ModRM_rm_r},
+		},
+	}
+
+	// Set byte if greater (ZF = 0 and SF=OF)
+	SETG_rm8 = &Opcode{"setg", []uint8{}, []uint8{0x0f, 0x9f}, []OpcodeExtensions{Rex},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_rm8, ModRM_rm_r},
+		},
+	}
+	SETG_rm8_no_rex = &Opcode{"setg", []uint8{}, []uint8{0x0f, 0x9f}, []OpcodeExtensions{},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_rm8, ModRM_rm_r},
+		},
+	}
+	// Set byte if greater or equal (SF = OF)
+	SETGE_rm8 = &Opcode{"setge", []uint8{}, []uint8{0x0f, 0x9d}, []OpcodeExtensions{Rex},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_rm8, ModRM_rm_r},
+		},
+	}
+	SETGE_rm8_no_rex = &Opcode{"setge", []uint8{}, []uint8{0x0f, 0x9d}, []OpcodeExtensions{},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_rm8, ModRM_rm_r},
+		},
+	}
+
 	// Set byte if not equal (ZF=0)
 	SETNE_rm8 = &Opcode{"setne", []uint8{}, []uint8{0x0f, 0x95}, []OpcodeExtensions{},
 		[]OpcodeOperand{
