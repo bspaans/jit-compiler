@@ -52,6 +52,8 @@ hence projects like these.
 
 ## What's supported
 
+### Assembler
+
 The following x86-64 instructions are supported in the assembler. For a detailed 
 overview see `asm/opcodes/opcodes.go` and `asm/opcodes/opcode_groups.go`:
 
@@ -74,27 +76,41 @@ overview see `asm/opcodes/opcodes.go` and `asm/opcodes/opcode_groups.go`:
 * Immediate values
 * Addressing modes: direct and indirect registers, displaced registers, RIP relative, SIB
 
-In the higher level language the following constructs work:
+### Higher Level Language
+
+The higher level language is kind of like a very stripped down Go/C like
+language that makes it easier to generate code. It currently supports:
+
+#### Data Types
 
 * Unsigned 8bit, 16bit, 32bit and 64bit integers
+* Signed 8bit, 16bit, 32bit and 64bit integers
 * 64bit floating point numbers
 * Booleans
 * Static size arrays
+
+#### Expressions
+
+* Signed and unsigned integer arithmetic `(+, -, *, /)`
+* Float arithmetic `(+, -, *, /)`
 * Array indexing
+* Function calls
+* Syscalls
+* Equality testing
+* NOT logic expression
+
+#### Statements
+
 * Assigning to variables
 * Assigning to arrays
 * If statements
 * While loops
-* Defining and calling functions
-* Equals
-* NOT logic expression
-* Syscalls
+* Function definitions
 * Return
-* Int arithmetic `(+, -, *)`
-* Float arithmetic `(+, -, *, /)`
-* Parsing
 
-Register allocation is really noddy and works until you run out of registers;
+#### Register allocation
+
+Register allocation is really simple and works until you run out of registers;
 there is no allocating on the stack or heap yet; preserving registers across
 calls and syscalls is supported however.
 
