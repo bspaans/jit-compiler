@@ -64,7 +64,7 @@ overview see `asm/opcodes/opcodes.go` and `asm/opcodes/opcode_groups.go`:
 * ADDSD, SUBSD, MULSD and DIVSD (float arithmetic)
 * INC and DEC
 * SHL and SHR (shift to the left and right)
-* XOR
+* AND, OR and XOR (logic operations)
 * CMP (compare numbers)
 * CBW, CWD, CDQ, CQO (sign extend %al, %ax, %eax and %rax)
 * CVTSI2SD, CVTTSD2SI (convert int to and from float)
@@ -93,13 +93,13 @@ language that makes it easier to generate code. It currently supports:
 #### Expressions
 
 * Signed and unsigned integer arithmetic `(+, -, *, /)`
+* Signed and unsigned integer comparisons `(==, !=, <, <=, >, >=)`
 * Float arithmetic `(+, -, *, /)`
 * Array indexing
 * Function calls
 * Syscalls
 * Casting types
 * Equality testing
-* Value comparisons `(==, !=, <, <=, >, >=)`
 * NOT logic expression
 * Struct field indexing
 

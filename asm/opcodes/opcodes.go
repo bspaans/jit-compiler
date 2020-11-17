@@ -73,6 +73,67 @@ var (
 			OpcodeOperand{OT_xmm2m64, ModRM_rm_r},
 		},
 	}
+	// Logical AND
+	AND_r8_rm8 = &Opcode{"and", []uint8{}, []uint8{0x22}, []OpcodeExtensions{Rex, SlashR},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_r8, ModRM_reg_rw},
+			OpcodeOperand{OT_rm8, ModRM_rm_r},
+		},
+	}
+	AND_r8_rm8_no_rex = &Opcode{"and", []uint8{}, []uint8{0x22}, []OpcodeExtensions{SlashR},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_r8, ModRM_reg_rw},
+			OpcodeOperand{OT_rm8, ModRM_rm_r},
+		},
+	}
+	AND_rm8_r8 = &Opcode{"and", []uint8{}, []uint8{0x20}, []OpcodeExtensions{Rex, SlashR},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_rm8, ModRM_rm_rw},
+			OpcodeOperand{OT_r8, ModRM_reg_r},
+		},
+	}
+	AND_rm8_r8_no_rex = &Opcode{"and", []uint8{}, []uint8{0x20}, []OpcodeExtensions{SlashR},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_rm8, ModRM_rm_rw},
+			OpcodeOperand{OT_r8, ModRM_reg_r},
+		},
+	}
+	AND_rm16_r16 = &Opcode{"and", []uint8{0xff}, []uint8{0x21}, []OpcodeExtensions{SlashR},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_rm16, ModRM_rm_rw},
+			OpcodeOperand{OT_r16, ModRM_reg_r},
+		},
+	}
+	AND_r16_rm16 = &Opcode{"and", []uint8{0x66}, []uint8{0x23}, []OpcodeExtensions{SlashR},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_r16, ModRM_reg_rw},
+			OpcodeOperand{OT_rm16, ModRM_rm_r},
+		},
+	}
+	AND_rm32_r32 = &Opcode{"and", []uint8{}, []uint8{0x21}, []OpcodeExtensions{SlashR},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_rm32, ModRM_rm_rw},
+			OpcodeOperand{OT_r32, ModRM_reg_r},
+		},
+	}
+	AND_r32_rm32 = &Opcode{"and", []uint8{}, []uint8{0x23}, []OpcodeExtensions{SlashR},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_r32, ModRM_reg_rw},
+			OpcodeOperand{OT_rm32, ModRM_rm_r},
+		},
+	}
+	AND_rm64_r64 = &Opcode{"and", []uint8{}, []uint8{0x21}, []OpcodeExtensions{RexW, SlashR},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_rm64, ModRM_rm_rw},
+			OpcodeOperand{OT_r64, ModRM_reg_r},
+		},
+	}
+	AND_r64_rm64 = &Opcode{"and", []uint8{}, []uint8{0x23}, []OpcodeExtensions{RexW, SlashR},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_r64, ModRM_reg_rw},
+			OpcodeOperand{OT_rm64, ModRM_rm_r},
+		},
+	}
 	CALL_rm64 = &Opcode{"call", []uint8{}, []uint8{0xff}, []OpcodeExtensions{Slash2},
 		[]OpcodeOperand{
 			OpcodeOperand{OT_rm64, ModRM_rm_rw},
@@ -607,6 +668,67 @@ var (
 		[]OpcodeOperand{
 			OpcodeOperand{OT_xmm1, ModRM_reg_rw},
 			OpcodeOperand{OT_xmm2m64, ModRM_rm_r},
+		},
+	}
+	// Logical OR
+	OR_r8_rm8 = &Opcode{"or", []uint8{}, []uint8{0x0a}, []OpcodeExtensions{Rex, SlashR},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_r8, ModRM_reg_rw},
+			OpcodeOperand{OT_rm8, ModRM_rm_r},
+		},
+	}
+	OR_r8_rm8_no_rex = &Opcode{"or", []uint8{}, []uint8{0x0a}, []OpcodeExtensions{SlashR},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_r8, ModRM_reg_rw},
+			OpcodeOperand{OT_rm8, ModRM_rm_r},
+		},
+	}
+	OR_rm8_r8 = &Opcode{"or", []uint8{}, []uint8{0x08}, []OpcodeExtensions{Rex, SlashR},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_rm8, ModRM_rm_rw},
+			OpcodeOperand{OT_r8, ModRM_reg_r},
+		},
+	}
+	OR_rm8_r8_no_rex = &Opcode{"or", []uint8{}, []uint8{0x08}, []OpcodeExtensions{SlashR},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_rm8, ModRM_rm_rw},
+			OpcodeOperand{OT_r8, ModRM_reg_r},
+		},
+	}
+	OR_rm16_r16 = &Opcode{"or", []uint8{0x66}, []uint8{0x09}, []OpcodeExtensions{SlashR},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_rm16, ModRM_rm_rw},
+			OpcodeOperand{OT_r16, ModRM_reg_r},
+		},
+	}
+	OR_r16_rm16 = &Opcode{"or", []uint8{0x66}, []uint8{0x0b}, []OpcodeExtensions{SlashR},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_r16, ModRM_reg_rw},
+			OpcodeOperand{OT_rm16, ModRM_rm_r},
+		},
+	}
+	OR_rm32_r32 = &Opcode{"or", []uint8{}, []uint8{0x09}, []OpcodeExtensions{SlashR},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_rm32, ModRM_rm_rw},
+			OpcodeOperand{OT_r32, ModRM_reg_r},
+		},
+	}
+	OR_r32_rm32 = &Opcode{"or", []uint8{}, []uint8{0x0b}, []OpcodeExtensions{SlashR},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_r32, ModRM_reg_rw},
+			OpcodeOperand{OT_rm32, ModRM_rm_r},
+		},
+	}
+	OR_rm64_r64 = &Opcode{"or", []uint8{}, []uint8{0x09}, []OpcodeExtensions{RexW, SlashR},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_rm64, ModRM_rm_rw},
+			OpcodeOperand{OT_r64, ModRM_reg_r},
+		},
+	}
+	OR_r64_rm64 = &Opcode{"or", []uint8{}, []uint8{0x0b}, []OpcodeExtensions{RexW, SlashR},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_r64, ModRM_reg_rw},
+			OpcodeOperand{OT_rm64, ModRM_rm_r},
 		},
 	}
 	PUSH_imm32 = &Opcode{"push", []uint8{}, []uint8{0x68}, []OpcodeExtensions{},

@@ -22,6 +22,9 @@ import (
 func ADD(src, dest encoding.Operand) lib.Instruction {
 	return opcodes.OpcodesToInstruction("add", opcodes.ADD, 2, dest, src)
 }
+func AND(src, dest encoding.Operand) lib.Instruction {
+	return opcodes.OpcodesToInstruction("and", opcodes.AND, 2, dest, src)
+}
 func CALL(dest encoding.Operand) lib.Instruction {
 	return opcodes.OpcodesToInstruction("call", opcodes.CALL, 1, dest)
 }
@@ -172,6 +175,9 @@ func IMUL2(src, dest encoding.Operand) lib.Instruction {
 }
 func MUL(src encoding.Operand) lib.Instruction {
 	return opcodes.OpcodesToInstruction("mul", opcodes.MUL, 1, src)
+}
+func OR(src, dest encoding.Operand) lib.Instruction {
+	return opcodes.OpcodesToInstruction("or", opcodes.OR, 2, dest, src)
 }
 func POP(dest encoding.Operand) lib.Instruction {
 	return opcodes.OpcodesToInstruction("pop", opcodes.POP, 1, dest)

@@ -16,6 +16,18 @@ var ADD = []*Opcode{
 	ADD_rm64_imm32,
 	ADDSD_xmm1_xmm2m64,
 }
+var AND = []*Opcode{
+	AND_r8_rm8,
+	AND_r8_rm8_no_rex,
+	AND_rm8_r8,
+	AND_rm8_r8_no_rex,
+	AND_r16_rm16,
+	AND_rm16_r16,
+	AND_r32_rm32,
+	AND_rm32_r32,
+	AND_r64_rm64,
+	AND_rm64_r64,
+}
 var CALL = []*Opcode{CALL_rm64}
 var CMP = []*Opcode{
 	CMP_rm8_imm8,
@@ -112,6 +124,19 @@ var MOVZX = []*Opcode{
 	MOVZX_r64_rm8,
 	MOVZX_r32_rm16,
 	MOVZX_r64_rm16,
+}
+
+var OR = []*Opcode{
+	OR_r8_rm8,
+	OR_r8_rm8_no_rex,
+	OR_rm8_r8,
+	OR_rm8_r8_no_rex,
+	OR_r16_rm16,
+	OR_rm16_r16,
+	OR_r32_rm32,
+	OR_rm32_r32,
+	OR_r64_rm64,
+	OR_rm64_r64,
 }
 var POP = []*Opcode{POP_r64}
 var PUSH = []*Opcode{PUSH_imm32, PUSH_r64}
