@@ -38,6 +38,10 @@ const (
 	Div         IRExpressionType = iota
 	Variable    IRExpressionType = iota
 	Equals      IRExpressionType = iota
+	LT          IRExpressionType = iota
+	LTE         IRExpressionType = iota
+	GT          IRExpressionType = iota
+	GTE         IRExpressionType = iota
 	Syscall     IRExpressionType = iota
 	Cast        IRExpressionType = iota
 	Function    IRExpressionType = iota

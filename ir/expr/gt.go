@@ -9,34 +9,34 @@ import (
 	"github.com/bspaans/jit-compiler/lib"
 )
 
-type IR_Equals struct {
+type IR_GT struct {
 	*BaseIRExpression
 	Op1 IRExpression
 	Op2 IRExpression
 }
 
-func NewIR_Equals(op1, op2 IRExpression) *IR_Equals {
-	return &IR_Equals{
-		BaseIRExpression: NewBaseIRExpression(Equals),
+func NewIR_GT(op1, op2 IRExpression) *IR_GT {
+	return &IR_GT{
+		BaseIRExpression: NewBaseIRExpression(GT),
 		Op1:              op1,
 		Op2:              op2,
 	}
 }
 
-func (i *IR_Equals) ReturnType(ctx *IR_Context) Type {
+func (i *IR_GT) ReturnType(ctx *IR_Context) Type {
 	return TBool
 }
 
-func (i *IR_Equals) EncodeWithoutSETE(ctx *IR_Context, target encoding.Operand) ([]lib.Instruction, error) {
+func (i *IR_GT) EncodeWithoutSETE(ctx *IR_Context, target encoding.Operand) ([]lib.Instruction, error) {
 	return i.encode(ctx, target, false)
 }
 
-func (i *IR_Equals) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.Instruction, error) {
+func (i *IR_GT) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.Instruction, error) {
 	return i.encode(ctx, target, true)
 }
 
-func (i *IR_Equals) encode(ctx *IR_Context, target encoding.Operand, includeSETE bool) ([]lib.Instruction, error) {
-	result, err := Compare(i.Op1, i.Op2, ctx)
+func (i *IR_GT) encode(ctx *IR_Context, target encoding.Operand, includeSETE bool) ([]lib.Instruction, error) {
+	resugt, err := Compare(i.Op1, i.Op2, ctx)
 	if err != nil {
 		return nil, fmt.Errorf("%s in %s", err.Error(), i.String())
 	}
@@ -44,21 +44,22 @@ func (i *IR_Equals) encode(ctx *IR_Context, target encoding.Operand, includeSETE
 		tmpReg := ctx.AllocateRegister(TUint64)
 		defer ctx.DeallocateRegister(tmpReg)
 		// TODO xor tmpreg
+		// TODO use right SET depending on sign
 		sete := asm.SETE(tmpReg.Get8BitRegister())
 		mov := asm.MOV(tmpReg, target)
-		result = append(result, sete)
-		result = append(result, mov)
+		resugt = append(resugt, sete)
+		resugt = append(resugt, mov)
 		ctx.AddInstruction(sete)
 		ctx.AddInstruction(mov)
 	}
-	return result, nil
+	return resugt, nil
 }
 
-func (i *IR_Equals) String() string {
-	return fmt.Sprintf("%s == %s", i.Op1.String(), i.Op2.String())
+func (i *IR_GT) String() string {
+	return fmt.Sprintf("%s > %s", i.Op1.String(), i.Op2.String())
 }
 
-func (b *IR_Equals) AddToDataSection(ctx *IR_Context) error {
+func (b *IR_GT) AddToDataSection(ctx *IR_Context) error {
 	if err := b.Op1.AddToDataSection(ctx); err != nil {
 		return err
 	}

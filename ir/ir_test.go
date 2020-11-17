@@ -144,6 +144,10 @@ func Test_ParseExecute_Happy(t *testing.T) {
 
 		// while loops with int64
 		`i = 0; while i != 53 { i = i + 1} ; f = i`,
+		`i = 0; while i < 53 { i = i + 1} ; f = i`,
+		`i = 0; while i <= 52 { i = i + 1} ; f = i`,
+		`i = 100; while i > 53 { i = i - 1} ; f = i`,
+		`i = 100; while i >= 54 { i = i - 1} ; f = i`,
 		`k = 2;j = 1; i = 0; while i != 53 { i = i + 1} ; f = i`,
 		`k = 2;j = 1; i = 0; while i != 53 { i = i + 1} ; f = 53`,
 		`f = 0; while f != 53 { f = f + 1 }`,
@@ -153,7 +157,14 @@ func Test_ParseExecute_Happy(t *testing.T) {
 		`if 15 == 15 { f = 53 } else { f = 100 }`,
 		`k = 21; j = 1; if 15 == 15 { f = 53 } else { f = 100 }`,
 		`if 13 != 15 { f = 53 } else { f = 100 }`,
+		`if 13 < 15 { f = 53 } else { f = 100 }`,
+		`if 14 <= 15 { f = 53 } else { f = 100 }`,
+		`if 15 <= 15 { f = 53 } else { f = 100 }`,
 		`if 13 == 15 { f = 100 } else { f = 53 }`,
+		`if 13 > 15 { f = 100 } else { f = 53 }`,
+		`if 13 >= 15 { f = 100 } else { f = 53 }`,
+		`if 16 > 15 { f = 53 } else { f = 100 }`,
+		`if 15 >= 15 { f = 53 } else { f = 100 }`,
 
 		// structs
 		`b = struct{Field int64}{53}; f = b.Field`,

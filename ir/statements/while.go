@@ -6,7 +6,6 @@ import (
 
 	"github.com/bspaans/jit-compiler/asm"
 	"github.com/bspaans/jit-compiler/asm/encoding"
-	"github.com/bspaans/jit-compiler/ir/expr"
 	. "github.com/bspaans/jit-compiler/ir/shared"
 	"github.com/bspaans/jit-compiler/lib"
 )
@@ -31,9 +30,6 @@ func (i *IR_While) Encode(ctx *IR_Context) ([]lib.Instruction, error) {
 		return nil, errors.New("Unsupported if IR expression")
 	}
 
-	reg := ctx.AllocateRegister(TBool)
-	defer ctx.DeallocateRegister(reg)
-
 	// Get the length of the loop statement
 	stmtLen, err := IR_Length(i.Stmt, ctx)
 	if err != nil {
@@ -42,47 +38,9 @@ func (i *IR_While) Encode(ctx *IR_Context) ([]lib.Instruction, error) {
 
 	beginning := ctx.InstructionPointer
 
-	var result []lib.Instruction
-	switch i.Condition.(type) {
-	case *expr.IR_Equals:
-		result, err = i.Condition.(*expr.IR_Equals).EncodeWithoutSETE(ctx, reg)
-		if err != nil {
-			return nil, err
-		}
-		instr := []lib.Instruction{
-			asm.JNE(encoding.Uint8(stmtLen + int(jmpSize))),
-		}
-		for _, inst := range instr {
-			ctx.AddInstruction(inst)
-			result = append(result, inst)
-		}
-	case *expr.IR_Not:
-		result, err = i.Condition.(*expr.IR_Not).EncodeWithoutSETE(ctx, reg)
-		if err != nil {
-			return nil, err
-		}
-		instr := []lib.Instruction{
-			asm.JE(encoding.Uint8(stmtLen + int(jmpSize))),
-		}
-		for _, inst := range instr {
-			ctx.AddInstruction(inst)
-			result = append(result, inst)
-		}
-	case *expr.IR_Bool:
-		result, err = i.Condition.Encode(ctx, reg)
-		if err != nil {
-			return nil, err
-		}
-		instr := []lib.Instruction{
-			asm.CMP(encoding.Uint32(1), reg),
-			asm.JNE(encoding.Uint8(stmtLen + int(jmpSize))),
-		}
-		for _, inst := range instr {
-			ctx.AddInstruction(inst)
-			result = append(result, inst)
-		}
-	default:
-		return nil, fmt.Errorf("Unsupported while condition %s", i.Condition.String())
+	result, err := ConditionalJump(ctx, i.Condition, stmtLen)
+	if err != nil {
+		return nil, fmt.Errorf("%s in %s", err.Error(), i.String())
 	}
 	s1, err := i.Stmt.Encode(ctx)
 	if err != nil {

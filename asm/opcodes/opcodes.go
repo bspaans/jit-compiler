@@ -299,8 +299,56 @@ var (
 			OpcodeOperand{OT_rel8, ImmediateValue},
 		},
 	}
+	// Jump short if not above (ZF=0)
+	JNA_rel8 = &Opcode{"jna", []uint8{}, []uint8{0x76}, []OpcodeExtensions{ImmediateByte},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_rel8, ImmediateValue},
+		},
+	}
+	// Jump short if not above or equal (CF=1)
+	JNAE_rel8 = &Opcode{"jnae", []uint8{}, []uint8{0x72}, []OpcodeExtensions{ImmediateByte},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_rel8, ImmediateValue},
+		},
+	}
+	// Jump short if not below (CF=0)
+	JNB_rel8 = &Opcode{"jnb", []uint8{}, []uint8{0x73}, []OpcodeExtensions{ImmediateByte},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_rel8, ImmediateValue},
+		},
+	}
+	// Jump short if not below or equal (CF=0 or ZF=0)
+	JNBE_rel8 = &Opcode{"jnbe", []uint8{}, []uint8{0x77}, []OpcodeExtensions{ImmediateByte},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_rel8, ImmediateValue},
+		},
+	}
 	// Jump short if not equal (ZF=0)
 	JNE_rel8 = &Opcode{"jne", []uint8{}, []uint8{0x75}, []OpcodeExtensions{ImmediateByte},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_rel8, ImmediateValue},
+		},
+	}
+	// Jump short if not greater (ZF=1 or SF!=0)
+	JNG_rel8 = &Opcode{"jng", []uint8{}, []uint8{0x7e}, []OpcodeExtensions{ImmediateByte},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_rel8, ImmediateValue},
+		},
+	}
+	// Jump short if not greater or equal (SF!=0)
+	JNGE_rel8 = &Opcode{"jnge", []uint8{}, []uint8{0x7c}, []OpcodeExtensions{ImmediateByte},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_rel8, ImmediateValue},
+		},
+	}
+	// Jump short if not less (SF=OF)
+	JNL_rel8 = &Opcode{"jnl", []uint8{}, []uint8{0x7d}, []OpcodeExtensions{ImmediateByte},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_rel8, ImmediateValue},
+		},
+	}
+	// Jump short if not less or equal (ZF=0 and SF=OF)
+	JNLE_rel8 = &Opcode{"jnle", []uint8{}, []uint8{0x7f}, []OpcodeExtensions{ImmediateByte},
 		[]OpcodeOperand{
 			OpcodeOperand{OT_rel8, ImmediateValue},
 		},

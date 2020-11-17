@@ -6,7 +6,6 @@ import (
 
 	"github.com/bspaans/jit-compiler/asm"
 	"github.com/bspaans/jit-compiler/asm/encoding"
-	"github.com/bspaans/jit-compiler/ir/expr"
 	. "github.com/bspaans/jit-compiler/ir/shared"
 	"github.com/bspaans/jit-compiler/lib"
 )
@@ -44,46 +43,11 @@ func (i *IR_If) Encode(ctx *IR_Context) ([]lib.Instruction, error) {
 		return nil, err
 	}
 
-	jmpSize := 2
-
-	// Add the condition and jump
-	var result []lib.Instruction
-	switch i.Condition.(type) {
-	case *expr.IR_Equals:
-		result, err = i.Condition.(*expr.IR_Equals).EncodeWithoutSETE(ctx, reg)
-		instr := []lib.Instruction{
-			asm.JNE(encoding.Uint8(stmt1Len + jmpSize)),
-		}
-		for _, inst := range instr {
-			ctx.AddInstruction(inst)
-			result = append(result, inst)
-		}
-	case *expr.IR_Not:
-		result, err = i.Condition.(*expr.IR_Not).EncodeWithoutSETE(ctx, reg)
-		instr := []lib.Instruction{
-			asm.JE(encoding.Uint8(stmt1Len)),
-		}
-		for _, inst := range instr {
-			ctx.AddInstruction(inst)
-			result = append(result, inst)
-		}
-	case *expr.IR_Bool:
-		// If it's just a boolean compare it to 1
-		result, err = i.Condition.Encode(ctx, reg)
-		instr := []lib.Instruction{
-			asm.CMP_immediate(1, reg),
-			asm.JNE(encoding.Uint8(stmt1Len)),
-		}
-		for _, inst := range instr {
-			ctx.AddInstruction(inst)
-			result = append(result, inst)
-		}
-	default:
-		return nil, fmt.Errorf("Unsupported if condition %s", i.Condition.String())
-	}
+	result, err := ConditionalJump(ctx, i.Condition, stmt1Len)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("%s in %s", err.Error(), i.String())
 	}
+
 	s1, err := i.Stmt1.Encode(ctx)
 	if err != nil {
 		return nil, err

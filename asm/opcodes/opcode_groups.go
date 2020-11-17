@@ -68,7 +68,15 @@ var JG = []*Opcode{JG_rel8}
 var JGE = []*Opcode{JGE_rel8}
 var JL = []*Opcode{JL_rel8}
 var JLE = []*Opcode{JLE_rel8}
+var JNA = []*Opcode{JNA_rel8}
+var JNAE = []*Opcode{JNAE_rel8}
+var JNB = []*Opcode{JNB_rel8}
+var JNBE = []*Opcode{JNBE_rel8}
 var JNE = []*Opcode{JNE_rel8}
+var JNG = []*Opcode{JNG_rel8}
+var JNGE = []*Opcode{JNGE_rel8}
+var JNL = []*Opcode{JNL_rel8}
+var JNLE = []*Opcode{JNLE_rel8}
 var LEA = []*Opcode{LEA_r64_m}
 var MOV = []*Opcode{
 	MOV_r8_imm8_no_rex,

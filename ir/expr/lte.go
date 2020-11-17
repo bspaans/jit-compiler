@@ -9,33 +9,33 @@ import (
 	"github.com/bspaans/jit-compiler/lib"
 )
 
-type IR_Equals struct {
+type IR_LTE struct {
 	*BaseIRExpression
 	Op1 IRExpression
 	Op2 IRExpression
 }
 
-func NewIR_Equals(op1, op2 IRExpression) *IR_Equals {
-	return &IR_Equals{
-		BaseIRExpression: NewBaseIRExpression(Equals),
+func NewIR_LTE(op1, op2 IRExpression) *IR_LTE {
+	return &IR_LTE{
+		BaseIRExpression: NewBaseIRExpression(LTE),
 		Op1:              op1,
 		Op2:              op2,
 	}
 }
 
-func (i *IR_Equals) ReturnType(ctx *IR_Context) Type {
+func (i *IR_LTE) ReturnType(ctx *IR_Context) Type {
 	return TBool
 }
 
-func (i *IR_Equals) EncodeWithoutSETE(ctx *IR_Context, target encoding.Operand) ([]lib.Instruction, error) {
+func (i *IR_LTE) EncodeWithoutSETE(ctx *IR_Context, target encoding.Operand) ([]lib.Instruction, error) {
 	return i.encode(ctx, target, false)
 }
 
-func (i *IR_Equals) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.Instruction, error) {
+func (i *IR_LTE) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.Instruction, error) {
 	return i.encode(ctx, target, true)
 }
 
-func (i *IR_Equals) encode(ctx *IR_Context, target encoding.Operand, includeSETE bool) ([]lib.Instruction, error) {
+func (i *IR_LTE) encode(ctx *IR_Context, target encoding.Operand, includeSETE bool) ([]lib.Instruction, error) {
 	result, err := Compare(i.Op1, i.Op2, ctx)
 	if err != nil {
 		return nil, fmt.Errorf("%s in %s", err.Error(), i.String())
@@ -44,6 +44,7 @@ func (i *IR_Equals) encode(ctx *IR_Context, target encoding.Operand, includeSETE
 		tmpReg := ctx.AllocateRegister(TUint64)
 		defer ctx.DeallocateRegister(tmpReg)
 		// TODO xor tmpreg
+		// TODO use right SET depending on sign
 		sete := asm.SETE(tmpReg.Get8BitRegister())
 		mov := asm.MOV(tmpReg, target)
 		result = append(result, sete)
@@ -54,11 +55,11 @@ func (i *IR_Equals) encode(ctx *IR_Context, target encoding.Operand, includeSETE
 	return result, nil
 }
 
-func (i *IR_Equals) String() string {
-	return fmt.Sprintf("%s == %s", i.Op1.String(), i.Op2.String())
+func (i *IR_LTE) String() string {
+	return fmt.Sprintf("%s <= %s", i.Op1.String(), i.Op2.String())
 }
 
-func (b *IR_Equals) AddToDataSection(ctx *IR_Context) error {
+func (b *IR_LTE) AddToDataSection(ctx *IR_Context) error {
 	if err := b.Op1.AddToDataSection(ctx); err != nil {
 		return err
 	}

@@ -406,6 +406,10 @@ func ParseOperator() Parser {
 			ParseString("/"),
 			ParseString("=="),
 			ParseString("!="),
+			ParseString("<="),
+			ParseString("<"),
+			ParseString(">="),
+			ParseString(">"),
 		})).AndThen(func(op *ParseResult) Parser {
 			return ParseSpace().And(ParseExpression()).Fmap(func(op2 *ParseResult) *ParseResult {
 				if op.Result.(string) == "+" {
@@ -418,6 +422,14 @@ func ParseOperator() Parser {
 					return ParseSuccess(expr.NewIR_Div(op1.Result.(shared.IRExpression), op2.Result.(shared.IRExpression)), op2.Rest)
 				} else if op.Result.(string) == "==" {
 					return ParseSuccess(expr.NewIR_Equals(op1.Result.(shared.IRExpression), op2.Result.(shared.IRExpression)), op2.Rest)
+				} else if op.Result.(string) == "<" {
+					return ParseSuccess(expr.NewIR_LT(op1.Result.(shared.IRExpression), op2.Result.(shared.IRExpression)), op2.Rest)
+				} else if op.Result.(string) == "<=" {
+					return ParseSuccess(expr.NewIR_LTE(op1.Result.(shared.IRExpression), op2.Result.(shared.IRExpression)), op2.Rest)
+				} else if op.Result.(string) == ">" {
+					return ParseSuccess(expr.NewIR_GT(op1.Result.(shared.IRExpression), op2.Result.(shared.IRExpression)), op2.Rest)
+				} else if op.Result.(string) == ">=" {
+					return ParseSuccess(expr.NewIR_GTE(op1.Result.(shared.IRExpression), op2.Result.(shared.IRExpression)), op2.Rest)
 				} else if op.Result.(string) == "!=" {
 					return ParseSuccess(expr.NewIR_Not(expr.NewIR_Equals(op1.Result.(shared.IRExpression), op2.Result.(shared.IRExpression))), op2.Rest)
 				}

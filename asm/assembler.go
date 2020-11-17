@@ -106,8 +106,32 @@ func JL(dest encoding.Operand) lib.Instruction {
 func JLE(dest encoding.Operand) lib.Instruction {
 	return opcodes.OpcodesToInstruction("jle", opcodes.JLE, 1, dest)
 }
+func JNA(dest encoding.Operand) lib.Instruction {
+	return opcodes.OpcodesToInstruction("jna", opcodes.JNA, 1, dest)
+}
+func JNAE(dest encoding.Operand) lib.Instruction {
+	return opcodes.OpcodesToInstruction("jnae", opcodes.JNAE, 1, dest)
+}
+func JNB(dest encoding.Operand) lib.Instruction {
+	return opcodes.OpcodesToInstruction("jnb", opcodes.JNB, 1, dest)
+}
+func JNBE(dest encoding.Operand) lib.Instruction {
+	return opcodes.OpcodesToInstruction("jnbe", opcodes.JNBE, 1, dest)
+}
 func JNE(dest encoding.Operand) lib.Instruction {
 	return opcodes.OpcodesToInstruction("jne", opcodes.JNE, 1, dest)
+}
+func JNG(dest encoding.Operand) lib.Instruction {
+	return opcodes.OpcodesToInstruction("jng", opcodes.JNG, 1, dest)
+}
+func JNGE(dest encoding.Operand) lib.Instruction {
+	return opcodes.OpcodesToInstruction("jnge", opcodes.JNGE, 1, dest)
+}
+func JNL(dest encoding.Operand) lib.Instruction {
+	return opcodes.OpcodesToInstruction("jnl", opcodes.JNL, 1, dest)
+}
+func JNLE(dest encoding.Operand) lib.Instruction {
+	return opcodes.OpcodesToInstruction("jnle", opcodes.JNLE, 1, dest)
 }
 func JMP(dest encoding.Operand) lib.Instruction {
 	return opcodes.OpcodesToInstruction("jmp", opcodes.JMP, 1, dest)
