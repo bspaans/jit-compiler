@@ -95,7 +95,7 @@ language that makes it easier to generate code. It currently supports:
 * Signed and unsigned integer arithmetic `(+, -, *, /)`
 * Signed and unsigned integer comparisons `(==, !=, <, <=, >, >=)`
 * Float arithmetic `(+, -, *, /)`
-* Logic expressions (&&, ||, !)
+* Logic expressions `(&&, ||, !)`
 * Array indexing
 * Function calls
 * Syscalls

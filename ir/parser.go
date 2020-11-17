@@ -468,7 +468,14 @@ func ParseSingleExpression() Parser {
 		ParseFunction(),
 		ParseVariable(),
 		ParseArray(),
+		ParseNotExpression(),
 		ParseEnclosedExpression(),
+	})
+}
+
+func ParseNotExpression() Parser {
+	return ParseByte('!').And(Lazy(ParseExpression)).Fmap(func(e *ParseResult) *ParseResult {
+		return ParseSuccess(expr.NewIR_Not(e.Result.(shared.IRExpression)), e.Rest)
 	})
 }
 
