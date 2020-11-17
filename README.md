@@ -65,11 +65,11 @@ overview see `asm/opcodes/opcodes.go` and `asm/opcodes/opcode_groups.go`:
 * INC and DEC
 * SHL and SHR (shift to the left and right)
 * XOR
-* CMP
+* CMP (compare numbers)
 * CBW, CWD, CDQ, CQO (sign extend %al, %ax, %eax and %rax)
 * CVTSI2SD, CVTTSD2SI (convert int to and from float)
 * SETA, SETAE, SETB, SETBE, SETE, SETNE
-* JMP, JA, JAE, JB, JBE, JE, JG, JGE, JL, JLE, JNE (jumps and conditional jumps)
+* JMP, JA, JAE, JB, JBE, JE, JG, JGE, JL, JLE, JNA, JNAE, JNB, JNBE, JNE, JNG, JNGE, JNL, JNLE (jumps and conditional jumps)
 * CALL and SYSCALL
 * RET 
 * PUSHFQ (push RFLAGS to the stack)
@@ -97,7 +97,9 @@ language that makes it easier to generate code. It currently supports:
 * Array indexing
 * Function calls
 * Syscalls
+* Casting types
 * Equality testing
+* Value comparisons `(==, !=, <, <=, >, >=)`
 * NOT logic expression
 * Struct field indexing
 

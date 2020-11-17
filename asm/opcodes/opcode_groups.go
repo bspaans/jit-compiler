@@ -20,8 +20,17 @@ var CALL = []*Opcode{CALL_rm64}
 var CMP = []*Opcode{
 	CMP_rm8_imm8,
 	CMP_rm8_imm8_no_rex,
-	CMP_rm64_imm32,
+	CMP_r8_rm8,
+	CMP_r8_rm8_no_rex,
+	CMP_rm8_r8,
+	CMP_rm8_r8_no_rex,
+	CMP_r16_rm16,
+	CMP_rm16_r16,
+	CMP_r32_rm32,
+	CMP_rm32_r32,
+	CMP_r64_rm64,
 	CMP_rm64_r64,
+	CMP_rm64_imm32,
 }
 var CVTSI2SD = []*Opcode{CVTSI2SD_xmm1_rm64}
 var CVTSD2SI = []*Opcode{CVTSD2SI_r64_xmm1m64}

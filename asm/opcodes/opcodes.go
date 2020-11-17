@@ -96,6 +96,60 @@ var (
 			OpcodeOperand{OT_imm32, ImmediateValue},
 		},
 	}
+	CMP_r8_rm8 = &Opcode{"cmp", []uint8{}, []uint8{0x3a}, []OpcodeExtensions{Rex, SlashR},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_r8, ModRM_reg_r},
+			OpcodeOperand{OT_rm8, ModRM_rm_r},
+		},
+	}
+	CMP_r8_rm8_no_rex = &Opcode{"cmp", []uint8{}, []uint8{0x3a}, []OpcodeExtensions{SlashR},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_r8, ModRM_reg_r},
+			OpcodeOperand{OT_rm8, ModRM_rm_r},
+		},
+	}
+	CMP_rm8_r8 = &Opcode{"cmp", []uint8{}, []uint8{0x38}, []OpcodeExtensions{Rex, SlashR},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_rm8, ModRM_rm_r},
+			OpcodeOperand{OT_r8, ModRM_reg_r},
+		},
+	}
+	CMP_rm8_r8_no_rex = &Opcode{"cmp", []uint8{}, []uint8{0x38}, []OpcodeExtensions{SlashR},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_rm8, ModRM_rm_r},
+			OpcodeOperand{OT_r8, ModRM_reg_r},
+		},
+	}
+	CMP_r16_rm16 = &Opcode{"cmp", []uint8{0x66}, []uint8{0x3b}, []OpcodeExtensions{SlashR},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_r16, ModRM_reg_r},
+			OpcodeOperand{OT_rm16, ModRM_rm_r},
+		},
+	}
+	CMP_rm16_r16 = &Opcode{"cmp", []uint8{0x66}, []uint8{0x39}, []OpcodeExtensions{SlashR},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_rm16, ModRM_rm_r},
+			OpcodeOperand{OT_r16, ModRM_reg_r},
+		},
+	}
+	CMP_r32_rm32 = &Opcode{"cmp", []uint8{}, []uint8{0x3b}, []OpcodeExtensions{SlashR},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_r32, ModRM_reg_r},
+			OpcodeOperand{OT_rm32, ModRM_rm_r},
+		},
+	}
+	CMP_rm32_r32 = &Opcode{"cmp", []uint8{}, []uint8{0x39}, []OpcodeExtensions{SlashR},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_rm32, ModRM_rm_r},
+			OpcodeOperand{OT_r32, ModRM_reg_r},
+		},
+	}
+	CMP_r64_rm64 = &Opcode{"cmp", []uint8{}, []uint8{0x3b}, []OpcodeExtensions{RexW, SlashR},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_r64, ModRM_reg_r},
+			OpcodeOperand{OT_rm64, ModRM_rm_r},
+		},
+	}
 	CMP_rm64_r64 = &Opcode{"cmp", []uint8{}, []uint8{0x39}, []OpcodeExtensions{RexW, SlashR},
 		[]OpcodeOperand{
 			OpcodeOperand{OT_rm64, ModRM_rm_r},

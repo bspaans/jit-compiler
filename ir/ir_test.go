@@ -166,6 +166,39 @@ func Test_ParseExecute_Happy(t *testing.T) {
 		`if 16 > 15 { f = 53 } else { f = 100 }`,
 		`if 15 >= 15 { f = 53 } else { f = 100 }`,
 
+		// if statements with uint8
+		`if uint8(13) < uint8(15) { f = 53 } else { f = 100 }`,
+		`if uint8(15) <= uint8(15) { f = 53 } else { f = 100 }`,
+		`if uint8(14) <= uint8(15) { f = 53 } else { f = 100 }`,
+
+		// if statements with uint16
+		`if uint16(13) < uint16(15) { f = 53 } else { f = 100 }`,
+		`if uint16(13) <= uint16(15) { f = 53 } else { f = 100 }`,
+		`if uint16(15) <= uint16(15) { f = 53 } else { f = 100 }`,
+
+		// if statements with uint32
+		`if uint32(13) < uint32(15) { f = 53 } else { f = 100 }`,
+		`if uint32(15) <= uint32(15) { f = 53 } else { f = 100 }`,
+		`if uint32(13) <= uint32(15) { f = 53 } else { f = 100 }`,
+
+		// if statements with int8
+		`if int8(13) < int8(15) { f = 53 } else { f = 100 }`,
+		`if int8(-1) < int8(15) { f = 53 } else { f = 100 }`,
+		`if int8(-1) <= int8(15) { f = 53 } else { f = 100 }`,
+		`if int8(15) <= int8(15) { f = 53 } else { f = 100 }`,
+
+		// if statements with int16
+		`if int16(13) < int16(15) { f = 53 } else { f = 100 }`,
+		`if int16(-1) < int16(15) { f = 53 } else { f = 100 }`,
+		`if int16(-1) <= int16(15) { f = 53 } else { f = 100 }`,
+		`if int16(15) <= int16(15) { f = 53 } else { f = 100 }`,
+
+		// if statements with int32
+		`if int32(13) < int32(15) { f = 53 } else { f = 100 }`,
+		`if int32(-1) < int32(15) { f = 53 } else { f = 100 }`,
+		`if int32(15) <= int32(15) { f = 53 } else { f = 100 }`,
+		`if int32(-1) <= int32(15) { f = 53 } else { f = 100 }`,
+
 		// structs
 		`b = struct{Field int64}{53}; f = b.Field`,
 		`b = struct{Field int64

@@ -12,10 +12,6 @@ const (
 	OT_rel8     OperandType = iota
 	OT_rel16    OperandType = iota
 	OT_rel32    OperandType = iota
-	OT_rm8      OperandType = iota
-	OT_rm16     OperandType = iota
-	OT_rm32     OperandType = iota
-	OT_rm64     OperandType = iota
 	OT_m        OperandType = iota
 	OT_m16      OperandType = iota
 	OT_m32      OperandType = iota
@@ -24,6 +20,10 @@ const (
 	OT_r16      OperandType = iota
 	OT_r32      OperandType = iota
 	OT_r64      OperandType = iota
+	OT_rm8      OperandType = iota
+	OT_rm16     OperandType = iota
+	OT_rm32     OperandType = iota
+	OT_rm64     OperandType = iota
 	OT_imm8     OperandType = iota
 	OT_imm16    OperandType = iota
 	OT_imm32    OperandType = iota

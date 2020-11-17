@@ -67,7 +67,7 @@ func Test_MOV(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	expected := "  48 89 c0"
+	expected := "  48 8b c0"
 	if unit.String() != expected {
 		t.Fatal("Expecting", expected, "got", unit)
 	}
@@ -75,7 +75,7 @@ func Test_MOV(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	expected = "  48 89 c1"
+	expected = "  48 8b c8"
 	if unit.String() != expected {
 		t.Fatal("Expecting", expected, "got", unit)
 	}
@@ -83,7 +83,7 @@ func Test_MOV(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	expected = "  48 89 c8"
+	expected = "  48 8b c1"
 	if unit.String() != expected {
 		t.Fatal("Expecting", expected, "got", unit)
 	}
@@ -91,7 +91,7 @@ func Test_MOV(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	expected = "  49 89 c6"
+	expected = "  4c 8b f0"
 	if unit.String() != expected {
 		t.Fatal("Expecting", expected, "got", unit)
 	}
@@ -99,7 +99,7 @@ func Test_MOV(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	expected = "  4c 89 f0"
+	expected = "  49 8b c6"
 	if unit.String() != expected {
 		t.Fatal("Expecting", expected, "got", unit)
 	}

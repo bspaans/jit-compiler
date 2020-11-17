@@ -11,18 +11,18 @@ func _() {
 	_ = x[OT_rel8-0]
 	_ = x[OT_rel16-1]
 	_ = x[OT_rel32-2]
-	_ = x[OT_rm8-3]
-	_ = x[OT_rm16-4]
-	_ = x[OT_rm32-5]
-	_ = x[OT_rm64-6]
-	_ = x[OT_m-7]
-	_ = x[OT_m16-8]
-	_ = x[OT_m32-9]
-	_ = x[OT_m64-10]
-	_ = x[OT_r8-11]
-	_ = x[OT_r16-12]
-	_ = x[OT_r32-13]
-	_ = x[OT_r64-14]
+	_ = x[OT_m-3]
+	_ = x[OT_m16-4]
+	_ = x[OT_m32-5]
+	_ = x[OT_m64-6]
+	_ = x[OT_r8-7]
+	_ = x[OT_r16-8]
+	_ = x[OT_r32-9]
+	_ = x[OT_r64-10]
+	_ = x[OT_rm8-11]
+	_ = x[OT_rm16-12]
+	_ = x[OT_rm32-13]
+	_ = x[OT_rm64-14]
 	_ = x[OT_imm8-15]
 	_ = x[OT_imm16-16]
 	_ = x[OT_imm32-17]
@@ -34,9 +34,9 @@ func _() {
 	_ = x[OT_xmm2m128-23]
 }
 
-const _OperandType_name = "OT_rel8OT_rel16OT_rel32OT_rm8OT_rm16OT_rm32OT_rm64OT_mOT_m16OT_m32OT_m64OT_r8OT_r16OT_r32OT_r64OT_imm8OT_imm16OT_imm32OT_imm64OT_xmm1OT_xmm1m64OT_xmm2OT_xmm2m64OT_xmm2m128"
+const _OperandType_name = "OT_rel8OT_rel16OT_rel32OT_mOT_m16OT_m32OT_m64OT_r8OT_r16OT_r32OT_r64OT_rm8OT_rm16OT_rm32OT_rm64OT_imm8OT_imm16OT_imm32OT_imm64OT_xmm1OT_xmm1m64OT_xmm2OT_xmm2m64OT_xmm2m128"
 
-var _OperandType_index = [...]uint8{0, 7, 15, 23, 29, 36, 43, 50, 54, 60, 66, 72, 77, 83, 89, 95, 102, 110, 118, 126, 133, 143, 150, 160, 171}
+var _OperandType_index = [...]uint8{0, 7, 15, 23, 27, 33, 39, 45, 50, 56, 62, 68, 74, 81, 88, 95, 102, 110, 118, 126, 133, 143, 150, 160, 171}
 
 func (i OperandType) String() string {
 	if i < 0 || i >= OperandType(len(_OperandType_index)-1) {
