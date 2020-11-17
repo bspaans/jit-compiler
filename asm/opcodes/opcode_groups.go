@@ -27,9 +27,10 @@ var CVTSI2SD = []*Opcode{CVTSI2SD_xmm1_rm64}
 var CVTSD2SI = []*Opcode{CVTSD2SI_r64_xmm1m64}
 var CVTTSD2SI = []*Opcode{CVTTSD2SI_r64_xmm1m64}
 var DEC = []*Opcode{DEC_rm64}
-var IDIV = []*Opcode{DIVSD_xmm1_xmm2m64}
+var IDIV1 = []*Opcode{IDIV_rm8, IDIV_rm8_no_rex, IDIV_rm16, IDIV_rm32, IDIV_rm64}
+var IDIV2 = []*Opcode{DIVSD_xmm1_xmm2m64}
 var DIV = []*Opcode{DIV_rm8, DIV_rm16, DIV_rm32, DIV_rm64}
-var IMUL1 = []*Opcode{IMUL_rm8, IMUL_rm16, IMUL_rm32, IMUL_rm64}
+var IMUL1 = []*Opcode{IMUL_rm8, IMUL_rm8_no_rex, IMUL_rm16, IMUL_rm32, IMUL_rm64}
 var IMUL2 = []*Opcode{MULSD_xmm1_xmm2m64, IMUL_r64_rm64}
 var MUL = []*Opcode{MUL_rm8, MUL_rm16, MUL_rm32, MUL_rm64}
 var INC = []*Opcode{INC_rm64}
@@ -47,6 +48,14 @@ var MOV = []*Opcode{
 	MOV_rm64_r64, MOV_r64_rm64,
 	MOV_r64_imm64, MOV_rm64_imm32,
 	MOVQ_xmm_rm64, MOVSD_xmm1m64_xmm2,
+}
+var MOVSX = []*Opcode{
+	MOVSX_r16_rm8,
+	MOVSX_r32_rm8,
+	MOVSX_r32_rm16,
+	MOVSX_r64_rm8,
+	MOVSX_r64_rm16,
+	MOVSX_r64_rm32,
 }
 var MOVZX = []*Opcode{
 	MOVZX_r16_rm8,

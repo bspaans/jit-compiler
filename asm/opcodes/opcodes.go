@@ -157,6 +157,31 @@ var (
 			OpcodeOperand{OT_xmm2m64, ModRM_rm_r},
 		},
 	}
+	IDIV_rm8 = &Opcode{"idiv", []uint8{}, []uint8{0xf6}, []OpcodeExtensions{RexW, Slash7},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_rm8, ModRM_rm_r},
+		},
+	}
+	IDIV_rm8_no_rex = &Opcode{"idiv", []uint8{}, []uint8{0xf6}, []OpcodeExtensions{Slash7},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_rm8, ModRM_rm_r},
+		},
+	}
+	IDIV_rm16 = &Opcode{"idiv", []uint8{0x66}, []uint8{0xf7}, []OpcodeExtensions{Slash7},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_rm16, ModRM_rm_r},
+		},
+	}
+	IDIV_rm32 = &Opcode{"idiv", []uint8{}, []uint8{0xf7}, []OpcodeExtensions{Slash7},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_rm32, ModRM_rm_r},
+		},
+	}
+	IDIV_rm64 = &Opcode{"idiv", []uint8{}, []uint8{0xf7}, []OpcodeExtensions{RexW, Slash7},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_rm64, ModRM_rm_r},
+		},
+	}
 	INC_rm64 = &Opcode{"inc", []uint8{}, []uint8{0xff}, []OpcodeExtensions{RexW, Slash0},
 		[]OpcodeOperand{
 			OpcodeOperand{OT_rm64, ModRM_rm_rw},
@@ -319,10 +344,48 @@ var (
 			OpcodeOperand{OT_rm64, ModRM_rm_r},
 		},
 	}
+	// Move or Merge Scalar Double-Precision Floating-Point Value
 	MOVSD_xmm1m64_xmm2 = &Opcode{"movsd", []uint8{}, []uint8{0xf2, 0x0f, 0x11}, []OpcodeExtensions{SlashR},
 		[]OpcodeOperand{
 			OpcodeOperand{OT_xmm1m64, ModRM_rm_rw},
 			OpcodeOperand{OT_xmm2, ModRM_reg_r},
+		},
+	}
+	// Move with sign-extend
+	MOVSX_r16_rm8 = &Opcode{"movsx", []uint8{0x66}, []uint8{0x0f, 0xbe}, []OpcodeExtensions{SlashR},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_r32, ModRM_reg_rw},
+			OpcodeOperand{OT_rm8, ModRM_rm_r},
+		},
+	}
+	MOVSX_r32_rm8 = &Opcode{"movsx", []uint8{}, []uint8{0x0f, 0xbe}, []OpcodeExtensions{SlashR},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_r32, ModRM_reg_rw},
+			OpcodeOperand{OT_rm8, ModRM_rm_r},
+		},
+	}
+	MOVSX_r32_rm16 = &Opcode{"movsx", []uint8{}, []uint8{0x0f, 0xbf}, []OpcodeExtensions{SlashR},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_r32, ModRM_reg_rw},
+			OpcodeOperand{OT_rm32, ModRM_rm_r},
+		},
+	}
+	MOVSX_r64_rm8 = &Opcode{"movsx", []uint8{}, []uint8{0x0f, 0xbe}, []OpcodeExtensions{RexW, SlashR},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_r64, ModRM_reg_rw},
+			OpcodeOperand{OT_rm8, ModRM_rm_r},
+		},
+	}
+	MOVSX_r64_rm16 = &Opcode{"movsx", []uint8{}, []uint8{0x0f, 0xbf}, []OpcodeExtensions{RexW, SlashR},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_r64, ModRM_reg_rw},
+			OpcodeOperand{OT_rm16, ModRM_rm_r},
+		},
+	}
+	MOVSX_r64_rm32 = &Opcode{"movsx", []uint8{}, []uint8{0x63}, []OpcodeExtensions{RexW, SlashR},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_r64, ModRM_reg_rw},
+			OpcodeOperand{OT_rm32, ModRM_rm_r},
 		},
 	}
 	// Move with zero-extend

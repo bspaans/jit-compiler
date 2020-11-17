@@ -50,8 +50,11 @@ func DEC(dest encoding.Operand) lib.Instruction {
 func DIV(src encoding.Operand) lib.Instruction {
 	return opcodes.OpcodesToInstruction("div", opcodes.DIV, 1, src)
 }
-func IDIV(src, dest encoding.Operand) lib.Instruction {
-	return opcodes.OpcodesToInstruction("div", opcodes.IDIV, 2, dest, src)
+func IDIV1(dest encoding.Operand) lib.Instruction {
+	return opcodes.OpcodesToInstruction("div", opcodes.IDIV1, 1, dest)
+}
+func IDIV2(src, dest encoding.Operand) lib.Instruction {
+	return opcodes.OpcodesToInstruction("div", opcodes.IDIV2, 2, dest, src)
 }
 func INC(dest encoding.Operand) lib.Instruction {
 	return opcodes.OpcodesToInstruction("inc", opcodes.INC, 1, dest)
@@ -82,6 +85,9 @@ func MOV_immediate(v uint64, dest encoding.Operand) lib.Instruction {
 		return MOV(encoding.Uint32(v), dest)
 	}
 	return MOV(encoding.Uint64(v), dest)
+}
+func MOVSX(src, dest encoding.Operand) lib.Instruction {
+	return opcodes.OpcodesToInstruction("movsx", opcodes.MOVSX, 2, dest, src)
 }
 func MOVZX(src, dest encoding.Operand) lib.Instruction {
 	return opcodes.OpcodesToInstruction("movzx", opcodes.MOVZX, 2, dest, src)

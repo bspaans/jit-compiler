@@ -35,7 +35,7 @@ func (i *IR_Div) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.Instruc
 		return nil, fmt.Errorf("Unsupported types (%s, %s) in / IR operation: %s", returnType1, returnType2, i.String())
 	}
 	if shared.IsFloat(returnType1) {
-		return NewIR_Operator(asm.IDIV, "*", i.Op1, i.Op2).Encode(ctx, target)
+		return NewIR_Operator(asm.IDIV2, "/", i.Op1, i.Op2).Encode(ctx, target)
 	}
 	if shared.IsInteger(returnType1) {
 
@@ -69,10 +69,11 @@ func (i *IR_Div) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.Instruc
 			TUint16: encoding.Dx,
 			TUint32: encoding.Edx,
 			TUint64: encoding.Rdx,
-			TInt8:   encoding.Ah,
-			TInt16:  encoding.Dx,
-			TInt32:  encoding.Edx,
-			TInt64:  encoding.Rdx,
+			// TODO: if signed it shouldn't zero but sign extend
+			TInt8:  encoding.Ah,
+			TInt16: encoding.Dx,
+			TInt32: encoding.Edx,
+			TInt64: encoding.Rdx,
 		}
 		zero := zeroRegisters[returnType1]
 		xor := asm.XOR(zero, zero)
@@ -123,6 +124,9 @@ func (i *IR_Div) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.Instruc
 			result = lib.Instructions(result).Add(expr)
 		}
 		instr := asm.DIV(reg)
+		if shared.IsSignedInteger(returnType1) {
+			instr = asm.IDIV1(reg)
+		}
 		ctx.AddInstruction(instr)
 		result = append(result, instr)
 

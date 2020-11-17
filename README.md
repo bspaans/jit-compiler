@@ -52,10 +52,10 @@ hence projects like these.
 The following x86-64 instructions are supported in the assembler. For a detailed 
 overview see `asm/opcodes/opcodes.go` and `asm/opcodes/opcode_groups.go`:
 
-* MOV, MOVQ, MOVSD, MOVZX (moving things in and out of registers and memory)
+* MOV, MOVQ, MOVSD, MOVSX, MOVZX (moving things in and out of registers and memory)
 * LEA (loading the address of memory locations into a register)
 * PUSH and POP (stack em up)
-* ADD, SUB, MUL, DIV (arithmetic)
+* ADD, SUB, MUL, DIV, IMUL, IDIV (arithmetic)
 * ADDSD, SUBSD, MULSD and DIVSD (float arithmetic)
 * INC and DEC
 * SHL and SHR (shift to the left and right)
