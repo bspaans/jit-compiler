@@ -12,29 +12,33 @@ func _() {
 	_ = x[Uint16-1]
 	_ = x[Uint32-2]
 	_ = x[Uint64-3]
-	_ = x[Float64-4]
-	_ = x[ByteArray-5]
-	_ = x[StaticArray-6]
-	_ = x[ArrayIndex-7]
-	_ = x[Bool-8]
-	_ = x[Struct-9]
-	_ = x[StructField-10]
-	_ = x[Not-11]
-	_ = x[Add-12]
-	_ = x[Sub-13]
-	_ = x[Mul-14]
-	_ = x[Div-15]
-	_ = x[Variable-16]
-	_ = x[Equals-17]
-	_ = x[Syscall-18]
-	_ = x[Cast-19]
-	_ = x[Function-20]
-	_ = x[Call-21]
+	_ = x[Int8-4]
+	_ = x[Int16-5]
+	_ = x[Int32-6]
+	_ = x[Int64-7]
+	_ = x[Float64-8]
+	_ = x[ByteArray-9]
+	_ = x[StaticArray-10]
+	_ = x[ArrayIndex-11]
+	_ = x[Bool-12]
+	_ = x[Struct-13]
+	_ = x[StructField-14]
+	_ = x[Not-15]
+	_ = x[Add-16]
+	_ = x[Sub-17]
+	_ = x[Mul-18]
+	_ = x[Div-19]
+	_ = x[Variable-20]
+	_ = x[Equals-21]
+	_ = x[Syscall-22]
+	_ = x[Cast-23]
+	_ = x[Function-24]
+	_ = x[Call-25]
 }
 
-const _IRExpressionType_name = "Uint8Uint16Uint32Uint64Float64ByteArrayStaticArrayArrayIndexBoolStructStructFieldNotAddSubMulDivVariableEqualsSyscallCastFunctionCall"
+const _IRExpressionType_name = "Uint8Uint16Uint32Uint64Int8Int16Int32Int64Float64ByteArrayStaticArrayArrayIndexBoolStructStructFieldNotAddSubMulDivVariableEqualsSyscallCastFunctionCall"
 
-var _IRExpressionType_index = [...]uint8{0, 5, 11, 17, 23, 30, 39, 50, 60, 64, 70, 81, 84, 87, 90, 93, 96, 104, 110, 117, 121, 129, 133}
+var _IRExpressionType_index = [...]uint8{0, 5, 11, 17, 23, 27, 32, 37, 42, 49, 58, 69, 79, 83, 89, 100, 103, 106, 109, 112, 115, 123, 129, 136, 140, 148, 152}
 
 func (i IRExpressionType) String() string {
 	if i < 0 || i >= IRExpressionType(len(_IRExpressionType_index)-1) {

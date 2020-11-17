@@ -86,8 +86,11 @@ func MOV_immediate(v uint64, dest encoding.Operand) lib.Instruction {
 func MOVZX(src, dest encoding.Operand) lib.Instruction {
 	return opcodes.OpcodesToInstruction("movzx", opcodes.MOVZX, 2, dest, src)
 }
-func IMUL(src, dest encoding.Operand) lib.Instruction {
-	return opcodes.OpcodesToInstruction("imul", opcodes.IMUL, 2, dest, src)
+func IMUL1(dest encoding.Operand) lib.Instruction {
+	return opcodes.OpcodesToInstruction("imul", opcodes.IMUL1, 1, dest)
+}
+func IMUL2(src, dest encoding.Operand) lib.Instruction {
+	return opcodes.OpcodesToInstruction("imul", opcodes.IMUL2, 2, dest, src)
 }
 func MUL(src encoding.Operand) lib.Instruction {
 	return opcodes.OpcodesToInstruction("mul", opcodes.MUL, 1, src)

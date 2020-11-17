@@ -162,6 +162,31 @@ var (
 			OpcodeOperand{OT_rm64, ModRM_rm_rw},
 		},
 	}
+	IMUL_rm8 = &Opcode{"imul", []uint8{}, []uint8{0xf6}, []OpcodeExtensions{RexW, Slash5},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_rm8, ModRM_rm_rw},
+		},
+	}
+	IMUL_rm8_no_rex = &Opcode{"imul", []uint8{}, []uint8{0xf6}, []OpcodeExtensions{Slash5},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_rm8, ModRM_rm_rw},
+		},
+	}
+	IMUL_rm16 = &Opcode{"imul", []uint8{0x66}, []uint8{0xf7}, []OpcodeExtensions{Slash5},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_rm16, ModRM_rm_rw},
+		},
+	}
+	IMUL_rm32 = &Opcode{"imul", []uint8{}, []uint8{0xf7}, []OpcodeExtensions{Slash5},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_rm32, ModRM_rm_rw},
+		},
+	}
+	IMUL_rm64 = &Opcode{"imul", []uint8{}, []uint8{0xf7}, []OpcodeExtensions{RexW, Slash5},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_rm64, ModRM_rm_rw},
+		},
+	}
 	IMUL_r64_rm64 = &Opcode{"imul", []uint8{}, []uint8{0x0f, 0xaf}, []OpcodeExtensions{RexW, Slash6},
 		[]OpcodeOperand{
 			OpcodeOperand{OT_r64, ModRM_reg_rw},

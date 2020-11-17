@@ -12,16 +12,20 @@ func _() {
 	_ = x[T_Uint16-1]
 	_ = x[T_Uint32-2]
 	_ = x[T_Uint64-3]
-	_ = x[T_Float64-4]
-	_ = x[T_Bool-5]
-	_ = x[T_Array-6]
-	_ = x[T_Function-7]
-	_ = x[T_Struct-8]
+	_ = x[T_Int8-4]
+	_ = x[T_Int16-5]
+	_ = x[T_Int32-6]
+	_ = x[T_Int64-7]
+	_ = x[T_Float64-8]
+	_ = x[T_Bool-9]
+	_ = x[T_Array-10]
+	_ = x[T_Function-11]
+	_ = x[T_Struct-12]
 }
 
-const _TypeNr_name = "T_Uint8T_Uint16T_Uint32T_Uint64T_Float64T_BoolT_ArrayT_FunctionT_Struct"
+const _TypeNr_name = "T_Uint8T_Uint16T_Uint32T_Uint64T_Int8T_Int16T_Int32T_Int64T_Float64T_BoolT_ArrayT_FunctionT_Struct"
 
-var _TypeNr_index = [...]uint8{0, 7, 15, 23, 31, 40, 46, 53, 63, 71}
+var _TypeNr_index = [...]uint8{0, 7, 15, 23, 31, 37, 44, 51, 58, 67, 73, 80, 90, 98}
 
 func (i TypeNr) String() string {
 	if i < 0 || i >= TypeNr(len(_TypeNr_index)-1) {

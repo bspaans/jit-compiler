@@ -5,6 +5,7 @@ import (
 
 	"github.com/bspaans/jit-compiler/asm"
 	"github.com/bspaans/jit-compiler/asm/encoding"
+	"github.com/bspaans/jit-compiler/ir/shared"
 	. "github.com/bspaans/jit-compiler/ir/shared"
 	"github.com/bspaans/jit-compiler/lib"
 )
@@ -33,14 +34,14 @@ func (i *IR_Div) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.Instruc
 	if returnType1 != returnType2 {
 		return nil, fmt.Errorf("Unsupported types (%s, %s) in / IR operation: %s", returnType1, returnType2, i.String())
 	}
-	if returnType1 == TFloat64 {
+	if shared.IsFloat(returnType1) {
 		return NewIR_Operator(asm.IDIV, "*", i.Op1, i.Op2).Encode(ctx, target)
 	}
-	if returnType1 == TUint64 || returnType1 == TUint32 || returnType1 == TUint16 || returnType1 == TUint8 {
+	if shared.IsInteger(returnType1) {
 
 		raxInUse := ctx.Registers[0]
 
-		shouldPreserveRdx := (returnType1 == TUint64 || returnType1 == TUint32 || returnType1 == TUint16) && ctx.Registers[2]
+		shouldPreserveRdx := (returnType1.Width() != lib.BYTE) && ctx.Registers[2]
 		shouldPreserveRax := target.(*encoding.Register).Register != 0 && raxInUse
 		var tmpRdx *encoding.Register
 		var tmpRax *encoding.Register
@@ -68,6 +69,10 @@ func (i *IR_Div) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.Instruc
 			TUint16: encoding.Dx,
 			TUint32: encoding.Edx,
 			TUint64: encoding.Rdx,
+			TInt8:   encoding.Ah,
+			TInt16:  encoding.Dx,
+			TInt32:  encoding.Edx,
+			TInt64:  encoding.Rdx,
 		}
 		zero := zeroRegisters[returnType1]
 		xor := asm.XOR(zero, zero)
@@ -78,7 +83,7 @@ func (i *IR_Div) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.Instruc
 		if shouldPreserveRax {
 			ctxCopy = ctxCopy.Copy()
 			// Make sure we don't allocate %rdx
-			if !ctxCopy.Registers[2] && (returnType1 == TUint64 || returnType1 == TUint32 || returnType1 == TUint16) {
+			if !ctxCopy.Registers[2] && (returnType1.Width() != lib.BYTE) {
 				ctxCopy.Registers[2] = true
 			}
 			tmpRax = ctxCopy.AllocateRegister(TUint64)

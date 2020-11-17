@@ -14,6 +14,10 @@ const (
 	T_Uint16   TypeNr = iota
 	T_Uint32   TypeNr = iota
 	T_Uint64   TypeNr = iota
+	T_Int8     TypeNr = iota
+	T_Int16    TypeNr = iota
+	T_Int32    TypeNr = iota
+	T_Int64    TypeNr = iota
 	T_Float64  TypeNr = iota
 	T_Bool     TypeNr = iota
 	T_Array    TypeNr = iota
@@ -35,12 +39,26 @@ func (b *BaseType) Type() TypeNr {
 	return b.TypeNr
 }
 
+func IsInteger(b Type) bool {
+	return b.Type() >= T_Uint8 && b.Type() <= T_Int64
+}
+func IsSignedInteger(b Type) bool {
+	return b.Type() >= T_Int8 && b.Type() <= T_Int64
+}
+func IsFloat(b Type) bool {
+	return b.Type() == T_Float64
+}
+
 func (b *BaseType) String() string {
 	return map[TypeNr]string{
 		T_Uint8:    "uint8",
 		T_Uint16:   "uint16",
 		T_Uint32:   "uint32",
 		T_Uint64:   "uint64",
+		T_Int8:     "int8",
+		T_Int16:    "int16",
+		T_Int32:    "int32",
+		T_Int64:    "int64",
 		T_Float64:  "float64",
 		T_Bool:     "bool",
 		T_Array:    "array",
@@ -54,6 +72,10 @@ func (b *BaseType) Width() lib.Size {
 		T_Uint16:  lib.WORD,
 		T_Uint32:  lib.DOUBLE,
 		T_Uint64:  lib.QUADWORD,
+		T_Int8:    lib.BYTE,
+		T_Int16:   lib.WORD,
+		T_Int32:   lib.DOUBLE,
+		T_Int64:   lib.QUADWORD,
 		T_Float64: lib.QUADWORD,
 		T_Bool:    lib.BYTE,
 	}[b.TypeNr]
@@ -64,6 +86,10 @@ var (
 	TUint16  = &BaseType{T_Uint16}
 	TUint32  = &BaseType{T_Uint32}
 	TUint64  = &BaseType{T_Uint64}
+	TInt8    = &BaseType{T_Int8}
+	TInt16   = &BaseType{T_Int16}
+	TInt32   = &BaseType{T_Int32}
+	TInt64   = &BaseType{T_Int64}
 	TFloat64 = &BaseType{T_Float64}
 	TBool    = &BaseType{T_Bool}
 )

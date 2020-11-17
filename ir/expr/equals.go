@@ -1,7 +1,6 @@
 package expr
 
 import (
-	"errors"
 	"fmt"
 
 	"github.com/bspaans/jit-compiler/asm"
@@ -39,40 +38,52 @@ func (i *IR_Equals) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.Inst
 func (i *IR_Equals) encode(ctx *IR_Context, target encoding.Operand, includeSETE bool) ([]lib.Instruction, error) {
 	result := []lib.Instruction{}
 
+	returnType1, returnType2 := i.Op1.ReturnType(ctx), i.Op2.ReturnType(ctx)
+	if returnType1 != returnType2 {
+		return nil, fmt.Errorf("Unsupported types (%s, %s) in == IR operation: %s", returnType1, returnType2, i.String())
+	}
+
 	var reg1, reg2 encoding.Operand
 
 	if i.Op1.Type() == Variable {
 		variable := i.Op1.(*IR_Variable).Value
 		reg1 = ctx.VariableMap[variable]
-	} else if i.Op1.Type() == Uint64 {
-		value := i.Op1.(*IR_Uint64).Value
-		reg1 = ctx.AllocateRegister(TUint64)
-		defer ctx.DeallocateRegister(reg1.(*encoding.Register))
-		result = append(result, asm.MOV_immediate(value, reg1))
 	} else {
-		return nil, errors.New("Unsupported cmp IR operation")
+		reg1 = ctx.AllocateRegister(returnType1)
+		defer ctx.DeallocateRegister(reg1.(*encoding.Register))
+		expr1, err := i.Op1.Encode(ctx, reg1)
+		if err != nil {
+			return nil, err
+		}
+		result = lib.Instructions(result).Add(expr1)
 	}
 
 	if i.Op2.Type() == Variable {
 		variable := i.Op2.(*IR_Variable).Value
 		reg2 = ctx.VariableMap[variable]
-	} else if i.Op2.Type() == Uint64 {
-		value := i.Op2.(*IR_Uint64).Value
-		reg2 = ctx.AllocateRegister(TUint64)
-		defer ctx.DeallocateRegister(reg2.(*encoding.Register))
-		result = append(result, asm.MOV_immediate(value, reg2))
 	} else {
-		return nil, errors.New("Unsupported add IR operation")
+		reg2 = ctx.AllocateRegister(returnType1)
+		defer ctx.DeallocateRegister(reg2.(*encoding.Register))
+		expr2, err := i.Op2.Encode(ctx, reg2)
+		if err != nil {
+			return nil, err
+		}
+		result = lib.Instructions(result).Add(expr2)
 	}
-	tmpReg := ctx.AllocateRegister(TUint64)
-	defer ctx.DeallocateRegister(tmpReg)
-	result = append(result, asm.CMP(reg1, reg2))
+	cmp := asm.CMP(reg1, reg2)
+	result = append(result, cmp)
+	ctx.AddInstruction(cmp)
 	if includeSETE {
+		tmpReg := ctx.AllocateRegister(TUint64)
+		defer ctx.DeallocateRegister(tmpReg)
 		// TODO xor tmpreg
-		result = append(result, asm.SETE(tmpReg.Get8BitRegister()))
-		result = append(result, asm.MOV(tmpReg, target))
+		sete := asm.SETE(tmpReg.Get8BitRegister())
+		mov := asm.MOV(tmpReg, target)
+		result = append(result, sete)
+		result = append(result, mov)
+		ctx.AddInstruction(sete)
+		ctx.AddInstruction(mov)
 	}
-	ctx.AddInstructions(result)
 	return result, nil
 }
 

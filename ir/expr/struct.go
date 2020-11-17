@@ -54,6 +54,8 @@ func (b *IR_Struct) AddToDataSection(ctx *IR_Context) error {
 		bytes := []uint8{}
 		if ir, ok := v.(*IR_Uint64); ok {
 			bytes = encoding.Uint64(ir.Value).Encode()
+		} else if ir, ok := v.(*IR_Int64); ok {
+			bytes = encoding.Uint64(ir.Value).Encode()
 		} else if ir, ok := v.(*IR_Float64); ok {
 			bytes = encoding.Float64(ir.Value).Encode()
 		} else {

@@ -46,6 +46,9 @@ func (i *IR_While) Encode(ctx *IR_Context) ([]lib.Instruction, error) {
 	switch i.Condition.(type) {
 	case *expr.IR_Equals:
 		result, err = i.Condition.(*expr.IR_Equals).EncodeWithoutSETE(ctx, reg)
+		if err != nil {
+			return nil, err
+		}
 		instr := []lib.Instruction{
 			asm.JNE(encoding.Uint8(stmtLen + int(jmpSize))),
 		}
@@ -55,6 +58,9 @@ func (i *IR_While) Encode(ctx *IR_Context) ([]lib.Instruction, error) {
 		}
 	case *expr.IR_Not:
 		result, err = i.Condition.(*expr.IR_Not).EncodeWithoutSETE(ctx, reg)
+		if err != nil {
+			return nil, err
+		}
 		instr := []lib.Instruction{
 			asm.JE(encoding.Uint8(stmtLen + int(jmpSize))),
 		}
@@ -64,6 +70,9 @@ func (i *IR_While) Encode(ctx *IR_Context) ([]lib.Instruction, error) {
 		}
 	case *expr.IR_Bool:
 		result, err = i.Condition.Encode(ctx, reg)
+		if err != nil {
+			return nil, err
+		}
 		instr := []lib.Instruction{
 			asm.CMP(encoding.Uint32(1), reg),
 			asm.JNE(encoding.Uint8(stmtLen + int(jmpSize))),

@@ -33,6 +33,8 @@ func Test_ShouldRun(t *testing.T) {
 
 func Test_ParseExecute_Happy(t *testing.T) {
 	units := []string{
+
+		// int64 (default)
 		`f = 53`,
 		`f = 51 + 2`,
 		`f = 55 - 2`,
@@ -40,89 +42,117 @@ func Test_ParseExecute_Happy(t *testing.T) {
 		`f = (2 * 25) + 3`,
 		`f = 3 + (2 * 25)`,
 		`f = (100 / 2) + 3`,
-		`f = 3 + (100 / 2)`,
+		`f = 3 + (100 / 2)`, // TODO: use IDIV
 		`h = 2; f = (h * 25) + 3`,
 		`h = 25; f = (2 * h) + 3`,
 		`h = 3; f = (2 * 25) + h`,
+
+		// uint8
 		`f = uint8(51) + uint8(2)`,
 		`f = uint8(55) - uint8(2)`,
 		`f = (uint8(2) * uint8(25)) + uint8(3)`,
 		`f = uint8(3) + (uint8(2) * uint8(25))`,
 		`f = uint8(3) + (uint8(100) / uint8(2))`,
 		`f = (uint8(100) / uint8(2)) + uint8(3)`,
+
+		// int8
+		`f = int8(54) + int8(-1)`,
+
+		// uint16
 		`f = uint16(51) + uint16(2)`,
 		`f = uint16(55) - uint16(2)`,
 		`f = (uint16(2) * uint16(25)) + uint16(3)`,
 		`f = uint16(3) + (uint16(2) * uint16(25))`,
 		`f = uint16(3) + (uint16(100) / uint16(2))`,
 		`f = (uint16(100) / uint16(2)) + uint16(3)`,
+
+		// uint32
 		`f = uint32(51) + uint32(2)`,
 		`f = uint32(55) - uint32(2)`,
 		`f = (uint32(2) * uint32(25)) + uint32(3)`,
 		`f = uint32(3) + (uint32(2) * uint32(25))`,
 		`f = uint32(3) + (uint32(100) / uint32(2))`,
 		`f = (uint32(100) / uint32(2)) + uint32(3)`,
+
+		// []uint64
 		`f = []uint64{53}[0]`,
 		`f = []uint64{42,52,53}[2]`,
 		`f = ([]uint64{42,52,53})[2]`,
 		`g = []uint64{42,52,53}; f = g[2]`,
 		`g = []uint64{42,52,53}; h = []uint64{42,52,53}; f = g[2]`,
 		`g = []uint64{42,52,53}; h = []uint64{42,52,53}; f = h[2]`,
-		`i = 0; while i != 53 { i = i + 1} ; f = i`,
-		`k = 2;j = 1; i = 0; while i != 53 { i = i + 1} ; f = i`,
-		`k = 2;j = 1; i = 0; while i != 53 { i = i + 1} ; f = 53`,
 		`g = []uint64{13,13}; i = 0; while i != 53 { i = i + 1} ; f = i`,
 		`g = []uint64{13,13}; i = 0; while i != 53 { h = 2; i = i + 1} ; f = 53`,
 		`g = []uint64{42,52,53}; f = g[2]`,
 		`g = []uint64{42,52,53}; g[2] = g[2]; f = g[2]`,
-		`g = []uint64{42,52,53}; f = g[0] + 11`,
-		`g = []uint64{42,52,53}; g[0] = 53; f = g[0]`,
+		`g = []uint64{42,52,53}; f = g[0] + uint64(11)`,
+		`g = []uint64{42,52,53}; g[0] = 53; f = g[0]`, // TODO this shouldn't actually work without auto casting
 		`g = []uint64{42,52,53}; g[1] = 53; f = g[1]`,
 		`g = []uint64{42,52,33}; g[2] = 53; f = g[2]`,
 		`g = []uint64{42,52,53}; g[0] = 42 + 11; f = g[0]`,
-		`g = []uint64{42,52,53}; g[0] = 11 + g[0]; f = g[0]`,
-		`g = []uint64{42,52,53}; g[0] = 1 + g[1]; f = g[0]`,
-		`g = []uint64{42,52,53}; g[0] = g[0] + 11; f = g[0]`,
-		`g = []uint64{42,52,53}; g[1] = g[1] + 1; f = g[1]`,
+		`g = []uint64{42,52,53}; g[0] = uint64(11) + g[0]; f = g[0]`,
+		`g = []uint64{42,52,53}; g[0] = uint64(1) + g[1]; f = g[0]`,
+		`g = []uint64{42,52,53}; g[0] = g[0] + uint64(11); f = g[0]`,
+		`g = []uint64{42,52,53}; g[1] = g[1] + uint64(1); f = g[1]`,
+
+		// []uint8
 		`g = []uint8{42,52,53}; g[0] = uint8(42) + uint8(11); f = g[0]`,
 		`g = []uint8{42,52,53}; g[0] = g[0] + uint8(11); f = g[0]`,
-		`g = []uint32{42,52,53}; g[0] = uint32(42) + uint32(11); f = g[0]`,
-		`g = []uint32{42,52,53}; g[0] = g[0] + uint32(11); f = g[0]`,
-		`g = []uint16{42,52,53}; g[0] = uint16(42) + uint16(11); f = g[0]`,
-		`g = []uint16{42,52,53}; g[0] = g[0] + uint16(11); f = g[0]`,
-		`g = []float64{53.0}; h = uint64(g[0]) ; f = h`,
-		`g = []float64{53.0}; h =g[0] ; f = uint64(h)`,
-		`g = []float64{51.0}; g[0] = g[0] + 2.0 ; f = uint64(g[0])`,
 		`g = []uint8{53} ; f = uint64(g[0])`,
 		`g = []uint8{52,53} ; f = uint64(g[1])`,
 		`g = []uint8{51} ; g[0] = g[0] + uint8(2); f = uint64(g[0])`,
-		`g = []uint8{51} ; f = 2 + uint64(g[0])`,
-		`g = []uint32{53} ; f = uint64(g[0])`,
-		`g = []uint32{52,53} ; f = uint64(g[1])`,
-		`g = []uint32{51} ; g[0] = g[0] + uint32(2); f = uint64(g[0])`,
-		`g = []uint32{51} ; f = 2 + uint64(g[0])`,
+		`g = []uint8{51} ; f = uint64(2) + uint64(g[0])`,
+		// TODO `g = []uint8{51} ; f = 2 + uint64(g[0])`,
+
+		// []uint16
+		`g = []uint16{42,52,53}; g[0] = uint16(42) + uint16(11); f = g[0]`,
+		`g = []uint16{42,52,53}; g[0] = g[0] + uint16(11); f = g[0]`,
 		`g = []uint16{53} ; f = uint64(g[0])`,
 		`g = []uint16{52,53} ; f = uint64(g[1])`,
 		`g = []uint16{51} ; g[0] = g[0] + uint16(2); f = uint64(g[0])`,
-		`g = []uint16{51} ; f = 2 + uint64(g[0])`,
+		`g = []uint16{51} ; f = uint64(2) + uint64(g[0])`,
+
+		// []uint32
+		`g = []uint32{42,52,53}; g[0] = uint32(42) + uint32(11); f = g[0]`,
+		`g = []uint32{42,52,53}; g[0] = g[0] + uint32(11); f = g[0]`,
+		`g = []uint32{53} ; f = uint64(g[0])`,
+		`g = []uint32{52,53} ; f = uint64(g[1])`,
+		`g = []uint32{51} ; g[0] = g[0] + uint32(2); f = uint64(g[0])`,
+		`g = []uint32{51} ; f = uint64(2) + uint64(g[0])`,
+
+		// []float64
+		`g = []float64{53.0}; h = uint64(g[0]) ; f = h`,
+		`g = []float64{53.0}; h =g[0] ; f = uint64(h)`,
+		`g = []float64{51.0}; g[0] = g[0] + 2.0 ; f = uint64(g[0])`,
+
+		// while loops with int64
+		`i = 0; while i != 53 { i = i + 1} ; f = i`,
+		`k = 2;j = 1; i = 0; while i != 53 { i = i + 1} ; f = i`,
+		`k = 2;j = 1; i = 0; while i != 53 { i = i + 1} ; f = 53`,
 		`f = 0; while f != 53 { f = f + 1 }`,
+		`j = 1; i = 5; while i == 5 { j = j + 1; if j == 5 { i = 53 } else { i = 5 }}; f = i`,
+
+		// if statements with int64
 		`if 15 == 15 { f = 53 } else { f = 100 }`,
 		`k = 21; j = 1; if 15 == 15 { f = 53 } else { f = 100 }`,
 		`if 13 != 15 { f = 53 } else { f = 100 }`,
 		`if 13 == 15 { f = 100 } else { f = 53 }`,
-		`b = struct{Field uint64}{53}; f = b.Field`,
-		`b = struct{Field uint64
-		            Field2 uint64}{51, 53}; f = b.Field2`,
-		`b = func(i uint64) uint64 { return i - 2 }; f = b(55)`,
-		`func b(i uint64) uint64 { return i - 2}; f = b(55)`,
-		`j = 1; i = 5; while i == 5 { j = j + 1; if j == 5 { i = 53 } else { i = 5 }}; f = i`,
+
+		// structs
+		`b = struct{Field int64}{53}; f = b.Field`,
+		`b = struct{Field int64
+		            Field2 int64}{51, 53}; f = b.Field2`,
+
+		// functions
+		`b = func(i uint64) uint64 { return i - uint64(2) }; f = b(55)`,
+		`func b(i uint64) uint64 { return i - uint64(2)}; f = b(55)`,
 	}
 	for _, ir := range units {
 		i, err := ParseIR(ir + "; return f")
 		if err != nil {
 			t.Fatal(err, "in", ir)
 		}
-		debug := false
+		debug := true
 		b, err := Compile([]IR{i}, debug)
 		if err != nil {
 			if !debug {

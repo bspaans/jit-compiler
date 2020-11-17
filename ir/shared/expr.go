@@ -20,6 +20,10 @@ const (
 	Uint16      IRExpressionType = iota
 	Uint32      IRExpressionType = iota
 	Uint64      IRExpressionType = iota
+	Int8        IRExpressionType = iota
+	Int16       IRExpressionType = iota
+	Int32       IRExpressionType = iota
+	Int64       IRExpressionType = iota
 	Float64     IRExpressionType = iota
 	ByteArray   IRExpressionType = iota
 	StaticArray IRExpressionType = iota

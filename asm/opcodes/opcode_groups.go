@@ -29,7 +29,8 @@ var CVTTSD2SI = []*Opcode{CVTTSD2SI_r64_xmm1m64}
 var DEC = []*Opcode{DEC_rm64}
 var IDIV = []*Opcode{DIVSD_xmm1_xmm2m64}
 var DIV = []*Opcode{DIV_rm8, DIV_rm16, DIV_rm32, DIV_rm64}
-var IMUL = []*Opcode{MULSD_xmm1_xmm2m64, IMUL_r64_rm64}
+var IMUL1 = []*Opcode{IMUL_rm8, IMUL_rm16, IMUL_rm32, IMUL_rm64}
+var IMUL2 = []*Opcode{MULSD_xmm1_xmm2m64, IMUL_r64_rm64}
 var MUL = []*Opcode{MUL_rm8, MUL_rm16, MUL_rm32, MUL_rm64}
 var INC = []*Opcode{INC_rm64}
 var JMP = []*Opcode{JMP_rel8, JMP_rel32, JMP_rm64}
@@ -63,6 +64,7 @@ var SETBE = []*Opcode{SETBE_rm8}
 var SETC = []*Opcode{SETC_rm8}
 var SETE = []*Opcode{SETE_rm8}
 var SETNE = []*Opcode{SETNE_rm8}
+
 var SHL = []*Opcode{
 	SHL_rm8_imm8,
 	SHL_rm8_imm8_no_rex,
@@ -83,7 +85,9 @@ var SUB = []*Opcode{
 	SUB_rm16_r16, SUB_r16_rm16,
 	SUB_rm32_r32, SUB_r32_rm32,
 	SUB_rm64_r64, SUB_r64_rm64, SUB_rm64_imm32,
-	SUBSD_xmm1_xmm2m64}
+	SUBSD_xmm1_xmm2m64,
+}
+
 var XOR = []*Opcode{
 	XOR_r8_rm8,
 	XOR_r8_rm8_no_rex,

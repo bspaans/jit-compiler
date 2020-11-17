@@ -189,29 +189,26 @@ func ParseString(s string) Parser {
 	}
 }
 
-func ParseTypeUint8() Parser {
-	return ParseString("uint8").Success(shared.TUint8)
-}
-func ParseTypeUint16() Parser {
-	return ParseString("uint16").Success(shared.TUint16)
-}
-func ParseTypeUint32() Parser {
-	return ParseString("uint32").Success(shared.TUint32)
-}
-func ParseTypeUint64() Parser {
-	return ParseString("uint64").Success(shared.TUint64)
-}
-func ParseTypeFloat64() Parser {
-	return ParseString("float64").Success(shared.TFloat64)
-}
 func ParseSimpleType() Parser {
-	return OneOf([]Parser{
-		ParseTypeUint8(),
-		ParseTypeUint16(),
-		ParseTypeUint32(),
-		ParseTypeUint64(),
-		ParseTypeFloat64(),
-	})
+	types := map[string]shared.Type{
+		"uint8":   shared.TUint8,
+		"uint16":  shared.TUint16,
+		"uint32":  shared.TUint32,
+		"uint64":  shared.TUint64,
+		"int8":    shared.TInt8,
+		"int16":   shared.TInt16,
+		"int32":   shared.TInt32,
+		"int64":   shared.TInt64,
+		"float64": shared.TFloat64,
+	}
+	return func(str string) *ParseResult {
+		for tyStr, typ := range types {
+			if strings.HasPrefix(str, tyStr) {
+				return ParseSuccess(typ, str[len(tyStr):])
+			}
+		}
+		return NilParseResult(str)
+	}
 }
 func ParseTypeArray() Parser {
 	return ParseString("[]").And(Lazy(ParseType)).Fmap(func(p *ParseResult) *ParseResult {
@@ -229,7 +226,7 @@ func ParseType() Parser {
 func ParseArrayItems() Parser {
 	itemParser := OneOf([]Parser{
 		ParseFloat64(),
-		ParseUint64(),
+		ParseInt64(),
 		ParseBool(),
 	})
 	return ParseList(itemParser).Fmap(func(items *ParseResult) *ParseResult {
@@ -237,11 +234,37 @@ func ParseArrayItems() Parser {
 	})
 }
 
+func ConvertInteger(typ shared.Type, v int64) shared.IRExpression {
+	switch typ {
+	case shared.TUint8:
+		return expr.NewIR_Uint8(uint8(v))
+	case shared.TUint16:
+		return expr.NewIR_Uint16(uint16(v))
+	case shared.TUint32:
+		return expr.NewIR_Uint32(uint32(v))
+	case shared.TUint64:
+		return expr.NewIR_Uint64(uint64(v))
+	}
+	return expr.NewIR_Int64(v)
+}
+
 func ParseArray() Parser {
 	return ParseString("[]").And(ParseType()).AndThen(func(elemType *ParseResult) Parser {
 		return ParseByte('{').And(ParseSpace()).And(ParseArrayItems()).AndThen(func(elems *ParseResult) Parser {
 			return ParseSpace().And(ParseByte('}')).Fmap(func(b *ParseResult) *ParseResult {
-				return ParseSuccess(expr.NewIR_StaticArray(elemType.Result.(shared.Type), elems.Result.([]shared.IRExpression)), b.Rest)
+				typ := elemType.Result.(shared.Type)
+				elems := elems.Result.([]shared.IRExpression)
+				// "cast" the elements to the right int type so that we don't have to
+				// deal with that during codegen
+				if shared.IsInteger(typ) && typ != shared.TInt64 {
+					newElems := make([]shared.IRExpression, len(elems))
+					for i, e := range elems {
+						v := e.(*expr.IR_Int64).Value
+						newElems[i] = ConvertInteger(typ, v)
+					}
+					elems = newElems
+				}
+				return ParseSuccess(expr.NewIR_StaticArray(typ, elems), b.Rest)
 			})
 		})
 	})
@@ -289,16 +312,26 @@ func InterfaceArrayToIRExpressionArray(values interface{}) []shared.IRExpression
 	return chars
 }
 
-func ParseUint64() Parser {
-	return ParseByteRange('0', '9').Many1().Fmap(func(sub *ParseResult) *ParseResult {
-		chars := InterfaceArrayToByteArray(sub.Result)
-		int_, err := strconv.Atoi(string(chars))
-		return &ParseResult{
-			Result: expr.NewIR_Uint64(uint64(int_)),
-			Rest:   sub.Rest,
-			Error:  err,
+func ParseInt64() Parser {
+	return func(str string) *ParseResult {
+		negative := false
+		if strings.HasPrefix(str, "-") {
+			negative = true
+			str = str[1:]
 		}
-	})
+		return ParseByteRange('0', '9').Many1().Fmap(func(sub *ParseResult) *ParseResult {
+			chars := string(InterfaceArrayToByteArray(sub.Result))
+			if negative {
+				chars = "-" + chars
+			}
+			int_, err := strconv.Atoi(chars)
+			return &ParseResult{
+				Result: expr.NewIR_Int64(int64(int_)),
+				Rest:   sub.Rest,
+				Error:  err,
+			}
+		})(str)
+	}
 }
 
 func ParseFloat64() Parser {
@@ -405,7 +438,7 @@ func ParseSingleExpression() Parser {
 		ParseArrayIndex(),
 		ParseBool(),
 		ParseFloat64(),
-		ParseUint64(),
+		ParseInt64(),
 		ParseFunctionCall(),
 		ParseFunction(),
 		ParseVariable(),
@@ -540,7 +573,11 @@ func ParseFunctionCall() Parser {
 
 				if ty := ParseType()(function); ty.Result != nil && ty.Error == nil {
 					if len(args) == 1 {
-						result = expr.NewIR_Cast(args[0], ty.Result.(shared.Type))
+						if v, ok := args[0].(*expr.IR_Int64); ok && ty.Result.(shared.Type) != shared.TInt64 {
+							result = ConvertInteger(ty.Result.(shared.Type), v.Value)
+						} else {
+							result = expr.NewIR_Cast(args[0], ty.Result.(shared.Type))
+						}
 					} else {
 						return ParseError(fmt.Errorf("Too many parameters for call to %v", function))
 					}
