@@ -244,6 +244,12 @@ func ConvertInteger(typ shared.Type, v int64) shared.IRExpression {
 		return expr.NewIR_Uint32(uint32(v))
 	case shared.TUint64:
 		return expr.NewIR_Uint64(uint64(v))
+	case shared.TInt8:
+		return expr.NewIR_Int8(int8(v))
+	case shared.TInt16:
+		return expr.NewIR_Int16(int16(v))
+	case shared.TInt32:
+		return expr.NewIR_Int32(int32(v))
 	}
 	return expr.NewIR_Int64(v)
 }

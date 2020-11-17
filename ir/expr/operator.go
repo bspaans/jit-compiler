@@ -6,6 +6,7 @@ import (
 	"github.com/bspaans/jit-compiler/asm/encoding"
 	"github.com/bspaans/jit-compiler/lib"
 
+	"github.com/bspaans/jit-compiler/ir/shared"
 	. "github.com/bspaans/jit-compiler/ir/shared"
 )
 
@@ -36,7 +37,7 @@ func (i *IR_Operator) ReturnType(ctx *IR_Context) Type {
 func (i *IR_Operator) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.Instruction, error) {
 	ctx.AddInstruction("operator " + encoding.Comment(i.String()))
 	returnType1, returnType2 := i.Op1.ReturnType(ctx), i.Op2.ReturnType(ctx)
-	if returnType1 == returnType2 && (returnType1 == TFloat64 || returnType1 == TUint64 || returnType1 == TUint8 || returnType1 == TUint32 || returnType1 == TUint16 || returnType1 == TInt64) {
+	if returnType1 == returnType2 && shared.IsNumber(returnType1) {
 		result, err := i.Op1.Encode(ctx, target)
 		if err != nil {
 			return nil, err

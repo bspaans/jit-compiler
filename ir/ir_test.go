@@ -169,7 +169,7 @@ func Test_ParseExecute_Happy(t *testing.T) {
 		if err != nil {
 			t.Fatal(err, "in", ir)
 		}
-		debug := false
+		debug := true
 		b, err := Compile([]IR{i}, debug)
 		if err != nil {
 			if !debug {

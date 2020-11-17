@@ -48,6 +48,9 @@ func IsSignedInteger(b Type) bool {
 func IsFloat(b Type) bool {
 	return b.Type() == T_Float64
 }
+func IsNumber(b Type) bool {
+	return IsFloat(b) || IsInteger(b)
+}
 
 func (b *BaseType) String() string {
 	return map[TypeNr]string{

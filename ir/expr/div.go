@@ -141,9 +141,11 @@ func (i *IR_Div) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.Instruc
 		ctx.AddInstruction(instr)
 		result = append(result, instr)
 
-		mov := asm.MOV(rax, target)
-		ctx.AddInstruction(mov)
-		result = append(result, mov)
+		if rax != target {
+			mov := asm.MOV(rax, target)
+			ctx.AddInstruction(mov)
+			result = append(result, mov)
+		}
 
 		// Restore %rax
 		if shouldPreserveRax {

@@ -46,6 +46,10 @@ func (i *IR_Return) Encode(ctx *IR_Context) ([]lib.Instruction, error) {
 
 		if reg.Width() == lib.BYTE || reg.Width() == lib.WORD {
 			movzx := asm.MOVZX(reg, cast)
+			// TODO? use movsx for signed integers?
+			//if shared.IsSignedInteger(i.Expr.ReturnType(ctx)) {
+			//	movzx = asm.MOVSX(reg, cast)
+			//}
 			result = append(result, movzx)
 			ctx.AddInstruction(movzx)
 		} else {

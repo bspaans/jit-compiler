@@ -124,7 +124,7 @@ var (
 		},
 	}
 	// Convert Byte to Word; ax = sign extend(al)
-	CBW = &Opcode{"cbw", []uint8{}, []uint8{0x98}, []OpcodeExtensions{}, []OpcodeOperand{}}
+	CBW = &Opcode{"cbw", []uint8{0x66}, []uint8{0x98}, []OpcodeExtensions{}, []OpcodeOperand{}}
 	// Convert Word to Doubleword; dx:ax = sign extend(ax)
 	CWD = &Opcode{"cwd", []uint8{0x66}, []uint8{0x99}, []OpcodeExtensions{}, []OpcodeOperand{}}
 	// Convert Double word to Quadword; edx:eax = sign extend(eax)
