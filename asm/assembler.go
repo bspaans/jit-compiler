@@ -45,6 +45,11 @@ func CVTTSD2SI(src, dest encoding.Operand) lib.Instruction {
 	return opcodes.OpcodesToInstruction("cvttsd2si", opcodes.CVTTSD2SI, 2, dest, src)
 }
 
+// Convert Byte to Word; al:ah = sign extend(ah)
+func CBW() lib.Instruction {
+	return opcodes.OpcodesToInstruction("cbw", []*encoding.Opcode{opcodes.CBW}, 0)
+}
+
 // Convert Word to Doubleword; dx:ax = sign extend(ax)
 func CWD() lib.Instruction {
 	return opcodes.OpcodesToInstruction("cwd", []*encoding.Opcode{opcodes.CWD}, 0)
@@ -101,9 +106,13 @@ func MOV_immediate(v uint64, dest encoding.Operand) lib.Instruction {
 	}
 	return MOV(encoding.Uint64(v), dest)
 }
+
+// Move with sign-extend
 func MOVSX(src, dest encoding.Operand) lib.Instruction {
 	return opcodes.OpcodesToInstruction("movsx", opcodes.MOVSX, 2, dest, src)
 }
+
+// Move with zero-extend
 func MOVZX(src, dest encoding.Operand) lib.Instruction {
 	return opcodes.OpcodesToInstruction("movzx", opcodes.MOVZX, 2, dest, src)
 }

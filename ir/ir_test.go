@@ -42,12 +42,12 @@ func Test_ParseExecute_Happy(t *testing.T) {
 		`f = (2 * 25) + 3`,
 		`f = 3 + (2 * 25)`,
 		`f = (100 / 2) + 3`,
-		`f = 3 + (100 / 2)`, // TODO: use IDIV
+		`f = 3 + (100 / 2)`,
 		`h = 2; f = (h * 25) + 3`,
 		`h = 25; f = (2 * h) + 3`,
 		`h = 3; f = (2 * 25) + h`,
 		`f = -53 * -1`,
-		//`f = -53 / -1`,
+		`f = -53 / -1`,
 
 		// uint8
 		`f = uint8(51) + uint8(2)`,
@@ -60,6 +60,10 @@ func Test_ParseExecute_Happy(t *testing.T) {
 		// int8
 		`f = int8(54) + int8(-1)`,
 		`f = int8(106) / int8(2)`,
+		`f = int8(-53) / int8(-1)`,
+		`f = int8(-53) / int8(-1)`,
+		`f = int8(-53) * int8(-1)`,
+		`g= 255552;f = int8(-53) / int8(-1)`,
 
 		// uint16
 		`f = uint16(51) + uint16(2)`,
@@ -69,6 +73,10 @@ func Test_ParseExecute_Happy(t *testing.T) {
 		`f = uint16(3) + (uint16(100) / uint16(2))`,
 		`f = (uint16(100) / uint16(2)) + uint16(3)`,
 
+		// int16
+		`f = int16(-53) * int16(-1)`,
+		`g= 25555212213;f = int16(-53) / int16(-1)`,
+
 		// uint32
 		`f = uint32(51) + uint32(2)`,
 		`f = uint32(55) - uint32(2)`,
@@ -76,6 +84,10 @@ func Test_ParseExecute_Happy(t *testing.T) {
 		`f = uint32(3) + (uint32(2) * uint32(25))`,
 		`f = uint32(3) + (uint32(100) / uint32(2))`,
 		`f = (uint32(100) / uint32(2)) + uint32(3)`,
+
+		// int32
+		`f = int32(-53) * int32(-1)`,
+		`f = int32(-53) / int32(-1)`,
 
 		// []uint64
 		`f = []uint64{53}[0]`,
@@ -155,7 +167,7 @@ func Test_ParseExecute_Happy(t *testing.T) {
 		if err != nil {
 			t.Fatal(err, "in", ir)
 		}
-		debug := true
+		debug := false
 		b, err := Compile([]IR{i}, debug)
 		if err != nil {
 			if !debug {

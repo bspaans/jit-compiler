@@ -64,22 +64,6 @@ func (i *IR_Div) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.Instruc
 				}
 			}
 		}
-		zeroRegisters := map[Type]*encoding.Register{
-			TUint8:  encoding.Ah,
-			TUint16: encoding.Dx,
-			TUint32: encoding.Edx,
-			TUint64: encoding.Rdx,
-			// TODO: if signed it shouldn't zero but sign extend
-			TInt8:  encoding.Ah,
-			TInt16: encoding.Dx,
-			TInt32: encoding.Edx,
-			TInt64: encoding.Rdx,
-		}
-		zero := zeroRegisters[returnType1]
-		xor := asm.XOR(zero, zero)
-		result = append(result, xor)
-		ctx.AddInstructions(result)
-
 		// Preserve the %rax register
 		if shouldPreserveRax {
 			ctxCopy = ctxCopy.Copy()
@@ -123,6 +107,33 @@ func (i *IR_Div) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.Instruc
 			}
 			result = lib.Instructions(result).Add(expr)
 		}
+
+		zeroRegisters := map[Type]*encoding.Register{
+			TUint8:  encoding.Ah,
+			TUint16: encoding.Dx,
+			TUint32: encoding.Edx,
+			TUint64: encoding.Rdx,
+		}
+		if shared.IsSignedInteger(returnType1) {
+			var instr lib.Instruction
+			if returnType1 == TInt64 {
+				instr = asm.CQO()
+			} else if returnType1 == TInt32 {
+				instr = asm.CDQ()
+			} else if returnType1 == TInt16 {
+				instr = asm.CWD()
+			} else if returnType1 == TInt8 {
+				instr = asm.CBW()
+			}
+			result = append(result, instr)
+			ctx.AddInstructions(result)
+		} else {
+			zero := zeroRegisters[returnType1]
+			xor := asm.XOR(zero, zero)
+			result = append(result, xor)
+			ctx.AddInstructions(result)
+		}
+
 		instr := asm.DIV(reg)
 		if shared.IsSignedInteger(returnType1) {
 			instr = asm.IDIV1(reg)

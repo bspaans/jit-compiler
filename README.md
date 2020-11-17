@@ -61,7 +61,7 @@ overview see `asm/opcodes/opcodes.go` and `asm/opcodes/opcode_groups.go`:
 * SHL and SHR (shift to the left and right)
 * XOR
 * CMP
-* CWD, CDQ, CQO (sign extend ax, eax and rax)
+* CBW, CWD, CDQ, CQO (sign extend %al, %ax, %eax and %rax)
 * CVTSI2SD, CVTTSD2SI (convert int to and from float)
 * SETA, SETAE, SETB, SETBE, SETE, SETNE
 * JMP, JNE, JMPE
