@@ -341,19 +341,30 @@ func ParseInt64() Parser {
 }
 
 func ParseFloat64() Parser {
-	return ParseByteRange('0', '9').Many1().AndThen(func(s *ParseResult) Parser {
-		return ParseByte('.').And(ParseByteRange('0', '9').Many1()).Fmap(func(r *ParseResult) *ParseResult {
-			chars := InterfaceArrayToByteArray(s.Result)
-			remainder := InterfaceArrayToByteArray(r.Result)
-			f := string(chars) + "." + string(remainder)
-			float, err := strconv.ParseFloat(f, 64)
-			return &ParseResult{
-				Result: expr.NewIR_Float64(float),
-				Rest:   r.Rest,
-				Error:  err,
-			}
-		})
-	})
+	return func(str string) *ParseResult {
+		negative := false
+		if strings.HasPrefix(str, "-") {
+			negative = true
+			str = str[1:]
+		}
+		return ParseByteRange('0', '9').Many1().AndThen(func(s *ParseResult) Parser {
+			return ParseByte('.').And(ParseByteRange('0', '9').Many1()).Fmap(func(r *ParseResult) *ParseResult {
+				chars := string(InterfaceArrayToByteArray(s.Result))
+				remainder := InterfaceArrayToByteArray(r.Result)
+				if negative {
+					chars = "-" + chars
+				}
+
+				f := chars + "." + string(remainder)
+				float, err := strconv.ParseFloat(f, 64)
+				return &ParseResult{
+					Result: expr.NewIR_Float64(float),
+					Rest:   r.Rest,
+					Error:  err,
+				}
+			})
+		})(str)
+	}
 }
 
 func ParseIdent() Parser {
