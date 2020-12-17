@@ -13,7 +13,7 @@ import (
 type IR_Struct struct {
 	*BaseIRExpression
 	StructType *TStruct
-	Values     []IRExpression
+	Values     []IRExpression // only literals are supported
 	address    int
 }
 

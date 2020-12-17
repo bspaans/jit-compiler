@@ -92,5 +92,6 @@ func (b *IR_Function) AddToDataSection(ctx *IR_Context) error {
 	return nil
 }
 func (b *IR_Function) SSA_Transform(ctx *SSA_Context) (SSA_Rewrites, IRExpression) {
-	return nil, b
+	newBody := b.Body.SSA_Transform(ctx)
+	return nil, NewIR_Function(b.Signature, newBody)
 }

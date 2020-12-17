@@ -13,7 +13,7 @@ import (
 type IR_StaticArray struct {
 	*BaseIRExpression
 	ElemType Type
-	Value    []IRExpression
+	Value    []IRExpression // only literals are supported
 	address  int
 }
 
@@ -85,6 +85,9 @@ func (b *IR_StaticArray) AddToDataSection(ctx *IR_Context) error {
 		} else if b.ElemType == TFloat64 {
 			ir := v.(*IR_Float64)
 			bytes = encoding.Float64(ir.Value).Encode()
+		} else if b.ElemType == TInt64 {
+			ir := v.(*IR_Int64)
+			bytes = encoding.Uint64(ir.Value).Encode()
 		} else {
 			return fmt.Errorf("Unsupported array type %s", v.Type().String())
 		}

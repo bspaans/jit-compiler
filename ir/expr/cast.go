@@ -105,5 +105,11 @@ func (i *IR_Cast) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.Instru
 	return nil, fmt.Errorf("Unsupported cast operation %s -> (%s) in: %s", valueType.String(), i.CastToType.String(), i.String())
 }
 func (b *IR_Cast) SSA_Transform(ctx *SSA_Context) (SSA_Rewrites, IRExpression) {
-	return nil, b
+	if IsLiteralOrVariable(b.Value) {
+		return nil, b
+	}
+	rewrites, expr := b.Value.SSA_Transform(ctx)
+	v := ctx.GenerateVariable()
+	rewrites = append(rewrites, NewSSA_Rewrite(v, expr))
+	return rewrites, NewIR_Cast(NewIR_Variable(v), b.CastToType)
 }

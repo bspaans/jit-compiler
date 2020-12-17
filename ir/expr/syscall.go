@@ -66,7 +66,27 @@ func (b *IR_Syscall) AddToDataSection(ctx *IR_Context) error {
 	return nil
 }
 func (b *IR_Syscall) SSA_Transform(ctx *SSA_Context) (SSA_Rewrites, IRExpression) {
-	return nil, b
+	rewrites, expr := b.Syscall.SSA_Transform(ctx)
+	newArgs := make([]IRExpression, len(b.Args))
+	for i, arg := range b.Args {
+		if IsLiteralOrVariable(arg) {
+			newArgs[i] = arg
+		} else {
+			rw, expr := arg.SSA_Transform(ctx)
+			for _, rewrite := range rw {
+				rewrites = append(rewrites, rewrite)
+			}
+			v := ctx.GenerateVariable()
+			rewrites = append(rewrites, NewSSA_Rewrite(v, expr))
+			newArgs[i] = NewIR_Variable(v)
+		}
+	}
+	if IsLiteralOrVariable(b.Syscall) {
+		return rewrites, NewIR_Syscall(b.Syscall, newArgs)
+	}
+	v := ctx.GenerateVariable()
+	rewrites = append(rewrites, NewSSA_Rewrite(v, expr))
+	return rewrites, NewIR_Syscall(NewIR_Variable(v), newArgs)
 }
 
 type IR_Syscall_Linux uint

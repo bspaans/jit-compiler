@@ -22,6 +22,9 @@ func NewIR_Variable(v string) *IR_Variable {
 }
 
 func (i *IR_Variable) ReturnType(ctx *IR_Context) Type {
+	if _, ok := ctx.VariableTypes[i.Value]; !ok {
+		panic("Unknown variable: " + i.Value)
+	}
 	return ctx.VariableTypes[i.Value]
 }
 

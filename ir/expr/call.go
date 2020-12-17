@@ -80,5 +80,20 @@ func (b *IR_Call) AddToDataSection(ctx *IR_Context) error {
 	return nil
 }
 func (b *IR_Call) SSA_Transform(ctx *SSA_Context) (SSA_Rewrites, IRExpression) {
-	return nil, b
+	newArgs := make([]IRExpression, len(b.Args))
+	rewrites := SSA_Rewrites{}
+	for i, arg := range b.Args {
+		if IsLiteralOrVariable(arg) {
+			newArgs[i] = arg
+		} else {
+			rw, expr := arg.SSA_Transform(ctx)
+			for _, rewrite := range rw {
+				rewrites = append(rewrites, rewrite)
+			}
+			v := ctx.GenerateVariable()
+			rewrites = append(rewrites, NewSSA_Rewrite(v, expr))
+			newArgs[i] = NewIR_Variable(v)
+		}
+	}
+	return rewrites, NewIR_Call(b.Function, newArgs)
 }

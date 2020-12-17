@@ -75,5 +75,11 @@ func (b *IR_StructField) AddToDataSection(ctx *IR_Context) error {
 }
 
 func (b *IR_StructField) SSA_Transform(ctx *SSA_Context) (SSA_Rewrites, IRExpression) {
-	return nil, b
+	if IsLiteralOrVariable(b.Struct) {
+		return nil, b
+	}
+	rewrites, expr := b.Struct.SSA_Transform(ctx)
+	v := ctx.GenerateVariable()
+	rewrites = append(rewrites, NewSSA_Rewrite(v, expr))
+	return rewrites, NewIR_StructField(NewIR_Variable(v), b.Field)
 }
