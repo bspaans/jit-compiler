@@ -69,3 +69,7 @@ func (i *IR_While) AddToDataSection(ctx *IR_Context) error {
 	}
 	return nil
 }
+
+func (i *IR_While) SSA_Transform(ctx *SSA_Context) IR {
+	return i
+}

@@ -85,3 +85,7 @@ func (i *IR_If) AddToDataSection(ctx *IR_Context) error {
 	}
 	return nil
 }
+
+func (i *IR_If) SSA_Transform(ctx *SSA_Context) IR {
+	return i
+}

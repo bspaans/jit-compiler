@@ -69,3 +69,7 @@ func (i *IR_ArrayAssignment) AddToDataSection(ctx *IR_Context) error {
 	}
 	return i.Expr.AddToDataSection(ctx)
 }
+
+func (i *IR_ArrayAssignment) SSA_Transform(ctx *SSA_Context) IR {
+	return i
+}

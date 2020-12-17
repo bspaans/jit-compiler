@@ -182,3 +182,6 @@ func (i *IR_Not) String() string {
 func (b *IR_Not) AddToDataSection(ctx *IR_Context) error {
 	return b.Op1.AddToDataSection(ctx)
 }
+func (b *IR_Not) SSA_Transform(ctx *SSA_Context) (SSA_Rewrites, IRExpression) {
+	return nil, b
+}

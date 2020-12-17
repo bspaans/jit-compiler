@@ -120,3 +120,7 @@ func (b *IR_ArrayIndex) AddToDataSection(ctx *IR_Context) error {
 	}
 	return b.Index.AddToDataSection(ctx)
 }
+
+func (b *IR_ArrayIndex) SSA_Transform(ctx *SSA_Context) (SSA_Rewrites, IRExpression) {
+	return nil, b
+}

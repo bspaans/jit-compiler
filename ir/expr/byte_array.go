@@ -45,3 +45,6 @@ func (b *IR_ByteArray) AddToDataSection(ctx *IR_Context) error {
 	b.address = ctx.AddToDataSection(b.Value)
 	return nil
 }
+func (b *IR_ByteArray) SSA_Transform(ctx *SSA_Context) (SSA_Rewrites, IRExpression) {
+	return nil, b
+}

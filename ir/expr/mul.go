@@ -147,3 +147,6 @@ func (b *IR_Mul) AddToDataSection(ctx *IR_Context) error {
 	}
 	return b.Op2.AddToDataSection(ctx)
 }
+func (b *IR_Mul) SSA_Transform(ctx *SSA_Context) (SSA_Rewrites, IRExpression) {
+	return nil, b
+}

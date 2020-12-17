@@ -46,3 +46,12 @@ func (i *IR_Assignment) String() string {
 func (i *IR_Assignment) AddToDataSection(ctx *IR_Context) error {
 	return i.Expr.AddToDataSection(ctx)
 }
+
+func (i *IR_Assignment) SSA_Transform(ctx *SSA_Context) IR {
+	rewrites, expr := i.Expr.SSA_Transform(ctx)
+	ir := SSA_Rewrites_to_IR(rewrites)
+	if ir == nil {
+		return i
+	}
+	return NewIR_AndThen(ir, NewIR_Assignment(i.Variable, expr))
+}

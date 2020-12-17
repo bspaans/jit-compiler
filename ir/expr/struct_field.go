@@ -73,3 +73,7 @@ func (i *IR_StructField) Encode(ctx *IR_Context, target encoding.Operand) ([]lib
 func (b *IR_StructField) AddToDataSection(ctx *IR_Context) error {
 	return b.Struct.AddToDataSection(ctx)
 }
+
+func (b *IR_StructField) SSA_Transform(ctx *SSA_Context) (SSA_Rewrites, IRExpression) {
+	return nil, b
+}

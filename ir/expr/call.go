@@ -79,3 +79,6 @@ func (b *IR_Call) AddToDataSection(ctx *IR_Context) error {
 	}
 	return nil
 }
+func (b *IR_Call) SSA_Transform(ctx *SSA_Context) (SSA_Rewrites, IRExpression) {
+	return nil, b
+}

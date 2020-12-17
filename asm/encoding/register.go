@@ -1,7 +1,6 @@
 package encoding
 
 import (
-	"github.com/bspaans/jit-compiler/lib"
 	. "github.com/bspaans/jit-compiler/lib"
 )
 
@@ -32,12 +31,12 @@ func (r *Register) Width() Size {
 	return r.Size
 }
 
-func (r *Register) ForOperandWidth(w lib.Size) *Register {
-	if w == lib.BYTE {
+func (r *Register) ForOperandWidth(w Size) *Register {
+	if w == BYTE {
 		return r.Get8BitRegister()
-	} else if w == lib.WORD {
+	} else if w == WORD {
 		return r.Get16BitRegister()
-	} else if w == lib.DOUBLE {
+	} else if w == DOUBLE {
 		return r.Get32BitRegister()
 	}
 	return r

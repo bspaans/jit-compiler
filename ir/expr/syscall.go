@@ -65,6 +65,9 @@ func (b *IR_Syscall) AddToDataSection(ctx *IR_Context) error {
 	}
 	return nil
 }
+func (b *IR_Syscall) SSA_Transform(ctx *SSA_Context) (SSA_Rewrites, IRExpression) {
+	return nil, b
+}
 
 type IR_Syscall_Linux uint
 

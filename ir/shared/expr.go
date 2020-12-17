@@ -12,6 +12,7 @@ type IRExpression interface {
 	AddToDataSection(ctx *IR_Context) error
 	Encode(ctx *IR_Context, target encoding.Operand) ([]lib.Instruction, error)
 	String() string
+	SSA_Transform(*SSA_Context) (SSA_Rewrites, IRExpression)
 }
 
 //go:generate stringer -type=IRExpressionType
@@ -65,6 +66,21 @@ func (b *BaseIRExpression) Type() IRExpressionType {
 }
 func (b *BaseIRExpression) AddToDataSection(ctx *IR_Context) error {
 	return nil
+}
+
+func IsLiteral(e IRExpression) bool {
+	t := e.Type()
+	return t == Uint8 || t == Uint16 || t == Uint32 || t == Uint64 ||
+		t == Int8 || t == Int16 || t == Int32 || t == Int64 ||
+		t == Float64 || t == ByteArray || t == StaticArray || t == Bool
+}
+
+func IsVariable(e IRExpression) bool {
+	return e.Type() == Variable
+}
+
+func IsLiteralOrVariable(e IRExpression) bool {
+	return IsVariable(e) || IsLiteral(e)
 }
 
 func IREXpression_length(expr IRExpression, ctx *IR_Context, target encoding.Operand) (int, error) {

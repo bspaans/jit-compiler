@@ -69,3 +69,6 @@ func (b *IR_GTE) AddToDataSection(ctx *IR_Context) error {
 	}
 	return b.Op2.AddToDataSection(ctx)
 }
+func (b *IR_GTE) SSA_Transform(ctx *SSA_Context) (SSA_Rewrites, IRExpression) {
+	return nil, b
+}

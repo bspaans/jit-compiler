@@ -35,3 +35,7 @@ func (i *IR_Uint32) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.Inst
 	ctx.AddInstructions(result)
 	return result, nil
 }
+
+func (b *IR_Uint32) SSA_Transform(ctx *SSA_Context) (SSA_Rewrites, IRExpression) {
+	return nil, b
+}

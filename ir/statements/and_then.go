@@ -49,3 +49,9 @@ func (i *IR_AndThen) AddToDataSection(ctx *IR_Context) error {
 	}
 	return nil
 }
+
+func (i *IR_AndThen) SSA_Transform(ctx *SSA_Context) IR {
+	i.Stmt1 = i.Stmt1.SSA_Transform(ctx)
+	i.Stmt2 = i.Stmt2.SSA_Transform(ctx)
+	return i
+}

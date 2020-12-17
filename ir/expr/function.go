@@ -91,3 +91,6 @@ func (b *IR_Function) AddToDataSection(ctx *IR_Context) error {
 	b.Address = ctx.AddToDataSection(code)
 	return nil
 }
+func (b *IR_Function) SSA_Transform(ctx *SSA_Context) (SSA_Rewrites, IRExpression) {
+	return nil, b
+}

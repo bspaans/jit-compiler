@@ -21,6 +21,7 @@ func main() {
 
 		}
 		debug := true
+		statements = statements.SSA_Transform(shared.NewSSA_Context())
 		instr, err := ir.Compile([]shared.IR{statements}, debug)
 		if err != nil {
 			fmt.Println("Compile error: ", err.Error())

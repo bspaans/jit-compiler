@@ -40,3 +40,7 @@ func (i *IR_Float64) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.Ins
 	ctx.AddInstructions(result)
 	return result, nil
 }
+
+func (b *IR_Float64) SSA_Transform(ctx *SSA_Context) (SSA_Rewrites, IRExpression) {
+	return nil, b
+}

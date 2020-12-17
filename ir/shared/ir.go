@@ -19,6 +19,7 @@ type IR interface {
 	String() string
 	AddToDataSection(ctx *IR_Context) error
 	Encode(*IR_Context) ([]lib.Instruction, error)
+	SSA_Transform(*SSA_Context) IR
 }
 
 type BaseIR struct {

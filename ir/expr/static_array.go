@@ -95,3 +95,7 @@ func (b *IR_StaticArray) AddToDataSection(ctx *IR_Context) error {
 	}
 	return nil
 }
+
+func (b *IR_StaticArray) SSA_Transform(ctx *SSA_Context) (SSA_Rewrites, IRExpression) {
+	return nil, b
+}

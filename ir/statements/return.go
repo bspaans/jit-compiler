@@ -81,3 +81,7 @@ func (i *IR_Return) String() string {
 func (i *IR_Return) AddToDataSection(ctx *IR_Context) error {
 	return i.Expr.AddToDataSection(ctx)
 }
+
+func (i *IR_Return) SSA_Transform(ctx *SSA_Context) IR {
+	return i
+}

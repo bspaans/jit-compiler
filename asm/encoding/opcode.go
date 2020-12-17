@@ -84,6 +84,7 @@ func (o *OpcodeOperand) String() string {
 }
 
 func (o OpcodeOperand) TypeCheck(op Operand) bool {
+	// TODO
 	return true
 }
 
