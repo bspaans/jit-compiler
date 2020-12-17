@@ -70,7 +70,7 @@ func (i *IR_If) Encode(ctx *IR_Context) ([]lib.Instruction, error) {
 }
 
 func (i *IR_If) String() string {
-	return fmt.Sprintf("if %s; then %s; else %s;", i.Condition.String(), i.Stmt1.String(), i.Stmt2.String())
+	return fmt.Sprintf("if %s { %s } else { %s }", i.Condition.String(), i.Stmt1.String(), i.Stmt2.String())
 }
 
 func (i *IR_If) AddToDataSection(ctx *IR_Context) error {
@@ -87,5 +87,11 @@ func (i *IR_If) AddToDataSection(ctx *IR_Context) error {
 }
 
 func (i *IR_If) SSA_Transform(ctx *SSA_Context) IR {
-	return i
+	rewrites, expr := i.Condition.SSA_Transform(ctx)
+	ir := SSA_Rewrites_to_IR(rewrites)
+	if ir == nil {
+		return NewIR_If(i.Condition, i.Stmt1.SSA_Transform(ctx), i.Stmt2.SSA_Transform(ctx))
+	} else {
+		return NewIR_AndThen(ir, NewIR_If(expr, i.Stmt1.SSA_Transform(ctx), i.Stmt2.SSA_Transform(ctx)))
+	}
 }

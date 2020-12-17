@@ -46,5 +46,7 @@ func (i *IR_FunctionDef) AddToDataSection(ctx *IR_Context) error {
 }
 
 func (i *IR_FunctionDef) SSA_Transform(ctx *SSA_Context) IR {
+	_, e := i.Expr.SSA_Transform(ctx)
+	i.Expr = e.(*expr.IR_Function)
 	return i
 }

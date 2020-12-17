@@ -71,5 +71,7 @@ func (i *IR_While) AddToDataSection(ctx *IR_Context) error {
 }
 
 func (i *IR_While) SSA_Transform(ctx *SSA_Context) IR {
+	// TODO: transform i.Condition => changes the encoding though
+	i.Stmt = i.Stmt.SSA_Transform(ctx)
 	return i
 }

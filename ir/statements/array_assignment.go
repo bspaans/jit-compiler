@@ -71,5 +71,14 @@ func (i *IR_ArrayAssignment) AddToDataSection(ctx *IR_Context) error {
 }
 
 func (i *IR_ArrayAssignment) SSA_Transform(ctx *SSA_Context) IR {
-	return i
+	rewrites, expr := i.Index.SSA_Transform(ctx)
+	rewrites2, expr2 := i.Expr.SSA_Transform(ctx)
+	for _, rw := range rewrites2 {
+		rewrites = append(rewrites, rw)
+	}
+	ir := SSA_Rewrites_to_IR(rewrites)
+	if ir == nil {
+		return i
+	}
+	return NewIR_AndThen(ir, NewIR_ArrayAssignment(i.Variable, expr, expr2))
 }

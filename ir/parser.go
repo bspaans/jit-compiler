@@ -491,7 +491,7 @@ func ParseNotExpression() Parser {
 }
 
 func ParseEnclosedExpression() Parser {
-	return ParseEnclosed(ParseSpace().And(ParseByte('(')), Lazy(ParseExpression), ParseSpace().And(ParseByte(')')))
+	return ParseEnclosed(ParseSpace().And(ParseByte('(')).And(ParseSpace()), Lazy(ParseExpression), ParseSpace().And(ParseByte(')')))
 }
 
 func ParseExpression() Parser {
