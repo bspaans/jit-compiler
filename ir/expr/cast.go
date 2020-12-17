@@ -40,8 +40,36 @@ func (i *IR_Cast) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.Instru
 	}
 	// TODO: use movsx and movzx
 	if i.CastToType == TUint64 {
-		if valueType == TUint64 || valueType == TUint32 || valueType == TUint16 || valueType == TUint8 {
+		if valueType == TUint64 {
 			return i.Value.Encode(ctx, target)
+		} else if valueType == TUint32 {
+			tmpReg := ctx.AllocateRegister(valueType)
+			defer ctx.DeallocateRegister(tmpReg)
+			expr, err := i.Value.Encode(ctx, tmpReg)
+			if err != nil {
+				return nil, err
+			}
+			for _, code := range expr {
+				result = append(result, code)
+			}
+			mov := asm.MOV(tmpReg.Get64BitRegister(), target)
+			ctx.AddInstruction(mov)
+			result = append(result, mov)
+			return result, nil
+		} else if valueType == TUint16 || valueType == TUint8 {
+			tmpReg := ctx.AllocateRegister(valueType)
+			defer ctx.DeallocateRegister(tmpReg)
+			expr, err := i.Value.Encode(ctx, tmpReg)
+			if err != nil {
+				return nil, err
+			}
+			for _, code := range expr {
+				result = append(result, code)
+			}
+			mov := asm.MOVZX(tmpReg, target)
+			ctx.AddInstruction(mov)
+			result = append(result, mov)
+			return result, nil
 		} else if valueType == TFloat64 {
 			tmpReg := ctx.AllocateRegister(TFloat64)
 			defer ctx.DeallocateRegister(tmpReg)

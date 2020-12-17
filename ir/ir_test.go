@@ -265,6 +265,16 @@ func Test_ParseExecute_Happy(t *testing.T) {
 			}
 			t.Fatal("Expecting 53 got", value, "in", ir, "\n", b)
 		}
+
+		b2, err := Compile([]IR{i.SSA_Transform(NewSSA_Context())}, debug)
+		if err != nil {
+			t.Fatal(err)
+		}
+		value = b2.Execute(debug)
+		if value != uint(53) {
+			t.Fatal("Expecting 53 got", value, "in", ir, " after SSA transform\n", b)
+		}
+
 	}
 
 }
