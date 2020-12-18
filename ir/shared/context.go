@@ -89,6 +89,7 @@ func (i *IR_Context) Copy() *IR_Context {
 		returns = append(returns, d)
 	}
 	return &IR_Context{
+		ABI:                     i.ABI,
 		Registers:               regs,
 		RegistersAllocated:      i.RegistersAllocated,
 		FloatRegisters:          floatRegs,

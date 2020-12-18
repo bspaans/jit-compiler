@@ -60,7 +60,9 @@ func (i *IR_Call) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.Instru
 	}
 
 	call := asm.CALL(function)
-	mov := asm.MOV(encoding.Rax, target)
+	tmpReg := ctx.AllocateRegister(TUint64)
+	defer ctx.DeallocateRegister(tmpReg)
+	mov := asm.MOV(encoding.Rax, tmpReg)
 	ctx.AddInstruction(call)
 	ctx.AddInstruction(mov)
 	result = append(result, call)
@@ -68,6 +70,10 @@ func (i *IR_Call) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.Instru
 
 	restore := RestoreRegisters(ctx, clobbered)
 	result = result.Add(restore)
+
+	mov = asm.MOV(tmpReg, target)
+	ctx.AddInstruction(mov)
+	result = append(result, mov)
 	return result, nil
 }
 

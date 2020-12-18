@@ -70,6 +70,7 @@ func (b *IR_And) AddToDataSection(ctx *IR_Context) error {
 	}
 	return b.Op2.AddToDataSection(ctx)
 }
+
 func (b *IR_And) SSA_Transform(ctx *SSA_Context) (SSA_Rewrites, IRExpression) {
 	if IsLiteralOrVariable(b.Op1) {
 		if IsLiteralOrVariable(b.Op2) {

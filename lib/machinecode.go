@@ -24,7 +24,7 @@ func (m MachineCode) String() string {
 	return string(result)
 }
 
-func (m MachineCode) Execute(debug bool) uint {
+func (m MachineCode) Execute(debug bool) int {
 	mmapFunc, err := syscall.Mmap(
 		-1,
 		0,
@@ -37,7 +37,7 @@ func (m MachineCode) Execute(debug bool) uint {
 	for i, b := range m {
 		mmapFunc[i] = b
 	}
-	type execFunc func() uint
+	type execFunc func() int
 	unsafeFunc := (uintptr)(unsafe.Pointer(&mmapFunc))
 	f := *(*execFunc)(unsafe.Pointer(&unsafeFunc))
 	value := f()

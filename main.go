@@ -14,7 +14,7 @@ func main() {
 	for {
 		fmt.Print("> ")
 		text, _ := reader.ReadString('\n')
-		statements, err := ir.ParseIR(text)
+		statements, err := ir.ParseIR(ir.Stdlib + text)
 		if err != nil {
 			fmt.Println("Parse error: ", err.Error())
 			continue

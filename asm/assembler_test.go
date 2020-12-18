@@ -293,7 +293,7 @@ func Test_Execute(t *testing.T) {
 			t.Fatal(err, "in", unit)
 		}
 		value := b.Execute(debug)
-		if value != uint(5) {
+		if value != int(5) {
 			t.Fatal("Expecting 5 got", value, "in", unit, "\n", b)
 		}
 	}

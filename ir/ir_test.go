@@ -258,7 +258,7 @@ func Test_ParseExecute_Happy(t *testing.T) {
 			t.Fatal(err, "in", ir)
 		}
 		value := b.Execute(debug)
-		if value != uint(53) {
+		if value != int(53) {
 			if !debug {
 				Compile([]IR{i}, true)
 				b.Execute(true)
@@ -271,7 +271,7 @@ func Test_ParseExecute_Happy(t *testing.T) {
 			t.Fatal(err)
 		}
 		value = b2.Execute(debug)
-		if value != uint(53) {
+		if value != int(53) {
 			t.Fatal("Expecting 53 got", value, "in", ir, " after SSA transform\n", b)
 		}
 
@@ -357,7 +357,7 @@ func Test_Execute_Result(t *testing.T) {
 			t.Fatal(err)
 		}
 		value := b.Execute(debug)
-		if value != uint(53) {
+		if value != int(53) {
 			t.Fatal("Expecting 53 got", value, "in", ir, "\n", b)
 		}
 	}
