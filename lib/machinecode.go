@@ -29,7 +29,7 @@ func (m MachineCode) Execute(debug bool) int {
 		-1,
 		0,
 		len(m),
-		syscall.PROT_READ|syscall.PROT_WRITE|syscall.PROT_EXEC, syscall.MAP_PRIVATE|syscall.MAP_ANONYMOUS,
+		syscall.PROT_READ|syscall.PROT_WRITE|syscall.PROT_EXEC, syscall.MAP_PRIVATE|mmapFlags,
 	)
 	if err != nil {
 		fmt.Printf("mmap err: %v", err)
