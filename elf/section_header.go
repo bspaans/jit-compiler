@@ -108,5 +108,5 @@ type SectionHeader struct {
 	Link      uint32
 	Info      uint32
 	AddrAlign uint32
-	EntSize   unit32
+	EntSize   uint32
 }
