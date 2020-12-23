@@ -52,15 +52,19 @@ func (a *ABI_AMDSystemV) ReturnTypeToOperand(arg Type) encoding.Operand {
 
 // returns instructions and clobbered registers
 func PreserveRegisters(ctx *IR_Context, argTypes []Type, returnType Type) (lib.Instructions, map[encoding.Operand]encoding.Operand, []encoding.Operand) {
-	regs := ctx.ABI.GetRegistersForArgs(argTypes)
-	returnOp := ctx.ABI.ReturnTypeToOperand(returnType)
 	clobbered := []encoding.Operand{}
 	result := []lib.Instruction{}
 	mapping := map[encoding.Operand]encoding.Operand{}
+
+	// push the return register; TODO: check if in use?
+	returnOp := ctx.ABI.ReturnTypeToOperand(returnType)
 	push := asm.PUSH(returnOp)
 	result = append(result, push)
 	clobbered = append(clobbered, returnOp)
 	ctx.AddInstruction(push)
+
+	// Push registers that are already in use
+	regs := ctx.ABI.GetRegistersForArgs(argTypes)
 	var inUse bool
 	for i, arg := range argTypes {
 		reg := regs[i]
@@ -75,6 +79,8 @@ func PreserveRegisters(ctx *IR_Context, argTypes []Type, returnType Type) (lib.I
 			clobbered = append(clobbered, reg)
 		}
 	}
+	// Build the register -> location on the stack mapping
+	mappedClobbered := 1 // set to 1, to account for the return op TODO
 	for i, arg := range argTypes {
 		reg := regs[i]
 		if arg.Type() == T_Float64 {
@@ -83,7 +89,9 @@ func PreserveRegisters(ctx *IR_Context, argTypes []Type, returnType Type) (lib.I
 			inUse = ctx.Registers[reg.Register]
 		}
 		if inUse {
-			mapping[reg] = &encoding.DisplacedRegister{encoding.Rsp, uint8((len(clobbered) - 2 - i) * 4)}
+			offset := (len(clobbered) - mappedClobbered) * int(arg.Width())
+			mapping[reg] = &encoding.DisplacedRegister{encoding.Rsp, uint8(offset)}
+			mappedClobbered += 1
 		}
 	}
 	return result, mapping, clobbered
@@ -101,11 +109,6 @@ func ABI_Call_Setup(ctx *IR_Context, args []IRExpression, returnType Type) (lib.
 	regs := ctx.ABI.GetRegistersForArgs(argTypes)
 
 	ctx_ := ctx.Copy()
-	for variable, location := range ctx_.VariableMap {
-		if newLocation, found := mapping[location]; found {
-			ctx_.VariableMap[variable] = newLocation
-		}
-	}
 	for _, reg := range regs {
 		if reg.Size == lib.QUADDOUBLE {
 			ctx_.FloatRegisters[reg.Register] = true
@@ -125,6 +128,11 @@ func ABI_Call_Setup(ctx *IR_Context, args []IRExpression, returnType Type) (lib.
 		}
 		ctx.AddInstructions(instr)
 		result = result.Add(instr)
+	}
+	for variable, location := range ctx_.VariableMap {
+		if newLocation, found := mapping[location]; found {
+			ctx_.VariableMap[variable] = newLocation
+		}
 	}
 
 	return result, mapping, clobbered, nil

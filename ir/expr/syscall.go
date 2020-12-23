@@ -43,10 +43,12 @@ func (i *IR_Syscall) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.Ins
 	for _, inst := range instr {
 		result = append(result, inst)
 	}
+	tmpTarget := ctx.AllocateRegister(TUint64)
+	defer ctx.DeallocateRegister(tmpTarget)
 
 	instr = []lib.Instruction{
 		asm.SYSCALL(),
-		asm.MOV(encoding.Rax, target),
+		asm.MOV(encoding.Rax, tmpTarget),
 	}
 	for _, inst := range instr {
 		result = append(result, inst)
@@ -54,6 +56,9 @@ func (i *IR_Syscall) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.Ins
 	}
 	restore := RestoreRegisters(ctx, clobbered)
 	result = result.Add(restore)
+	mov := asm.MOV(tmpTarget, target)
+	ctx.AddInstruction(mov)
+	result = append(result, mov)
 	return result, nil
 }
 
