@@ -5,12 +5,27 @@ import (
 
 	"github.com/bspaans/jit-compiler/asm"
 	"github.com/bspaans/jit-compiler/asm/encoding"
+	"github.com/bspaans/jit-compiler/elf"
 	. "github.com/bspaans/jit-compiler/ir/shared"
 	"github.com/bspaans/jit-compiler/lib"
 )
 
 func Compile(stmts []IR, debug bool) (lib.MachineCode, error) {
 	ctx := NewIRContext()
+	return CompileWithContext(stmts, debug, ctx)
+}
+
+func CompileToBinary(stmts []IR, debug bool, path string) error {
+	ctx := NewIRContext()
+	ctx.ReturnOperandStack = []encoding.Operand{encoding.Rax}
+	code, err := CompileWithContext(stmts, debug, ctx)
+	if err != nil {
+		return err
+	}
+	return elf.CreateTinyBinary(code, path)
+}
+
+func CompileWithContext(stmts []IR, debug bool, ctx *IR_Context) (lib.MachineCode, error) {
 	result := []uint8{}
 	if debug {
 		fmt.Println(".data:")
@@ -31,7 +46,7 @@ func Compile(stmts []IR, debug bool) (lib.MachineCode, error) {
 		}
 	}
 	if debug {
-		fmt.Println(".start:")
+		fmt.Println("_start:")
 	}
 	if len(ctx.DataSection) > 0 {
 		jmp := asm.JMP(encoding.Uint8(len(ctx.DataSection)))

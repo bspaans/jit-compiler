@@ -121,9 +121,9 @@ type ELFHeader struct {
 func NewELFHeader() *ELFHeader {
 	return &ELFHeader{
 		Class:       ELFCLASS64,
-		Data:        ELFDATA2MSB,
+		Data:        ELFDATA2LSB,
 		OS_ABI:      ELF_OS_ABI_LINUX,
-		ABI_Version: 0, // TODO?
+		ABI_Version: 0,
 		Type:        ET_EXEC,
 		Machine:     EM_X86_64,
 		Version:     EV_CURRENT,
@@ -201,7 +201,7 @@ func (e *ELFHeader) GetByteOrder() binary.ByteOrder {
 	return binary.BigEndian
 }
 
-func (e *ELFHeader) Encode() []uint8 {
+func (e *ELFHeader) Encode() ([]uint8, error) {
 	e_ident := make([]uint8, 16)
 	e_ident[0] = 0x7f
 	e_ident[1] = 'E'
@@ -212,7 +212,49 @@ func (e *ELFHeader) Encode() []uint8 {
 	e_ident[6] = uint8(EV_CURRENT)
 	e_ident[7] = uint8(e.OS_ABI)
 	e_ident[8] = uint8(e.ABI_Version)
-	return e_ident
+	byteOrder := e.GetByteOrder()
+	buffer := bytes.NewBuffer(e_ident)
+	if err := binary.Write(buffer, byteOrder, e.Type); err != nil {
+		return nil, err
+	}
+	if err := binary.Write(buffer, byteOrder, e.Machine); err != nil {
+		return nil, err
+	}
+	if err := binary.Write(buffer, byteOrder, e.Version); err != nil {
+		return nil, err
+	}
+	if err := binary.Write(buffer, byteOrder, e.Entry); err != nil {
+		return nil, err
+	}
+	if err := binary.Write(buffer, byteOrder, e.ProgramHeaderTableOffset); err != nil {
+		return nil, err
+	}
+	if err := binary.Write(buffer, byteOrder, e.SectionHeaderTableOffset); err != nil {
+		return nil, err
+	}
+	if err := binary.Write(buffer, byteOrder, e.Flags); err != nil {
+		return nil, err
+	}
+	if err := binary.Write(buffer, byteOrder, e.HeaderSize); err != nil {
+		return nil, err
+	}
+	if err := binary.Write(buffer, byteOrder, e.ProgramHeaderEntrySize); err != nil {
+		return nil, err
+	}
+	if err := binary.Write(buffer, byteOrder, e.ProgramHeaderNumberOfEntries); err != nil {
+		return nil, err
+	}
+	if err := binary.Write(buffer, byteOrder, e.SectionHeaderEntrySize); err != nil {
+		return nil, err
+	}
+	if err := binary.Write(buffer, byteOrder, e.SectionHeaderNumberOfEntries); err != nil {
+		return nil, err
+	}
+	if err := binary.Write(buffer, byteOrder, e.Shstrndx); err != nil {
+		return nil, err
+	}
+
+	return buffer.Bytes(), nil
 }
 
 func (e *ELFHeader) String() string {

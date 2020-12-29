@@ -96,6 +96,9 @@ func NewTextSection() *Section {
 }
 
 func ParseSections(header *ELFHeader, shTable []*SectionHeader, r *bytes.Reader) ([]*Section, error) {
+	if header.SectionHeaderNumberOfEntries == 0 {
+		return []*Section{}, nil
+	}
 	if header.Shstrndx == SHN_UNDEF {
 		return nil, errors.New("ELF files without a section header string table are unsupported")
 	}

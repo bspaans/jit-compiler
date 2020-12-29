@@ -54,3 +54,55 @@ func Test_ELF_parse_header_happy(t *testing.T) {
 		}
 	}
 }
+
+func Test_ELF_encode(t *testing.T) {
+
+	elf := NewELFHeader()
+	elf.Class = ELFCLASS32
+	elf.Data = ELFDATA2LSB
+	elf.OS_ABI = ELF_OS_ABI_LINUX
+	elf.ABI_Version = 9
+	elf.Type = ET_EXEC
+	elf.Machine = EM_88K
+	elf.Version = EV_CURRENT
+	elf.Entry = 0xff
+	elf.ProgramHeaderTableOffset = 0x1234
+
+	headerBytes, err := elf.Encode()
+	if err != nil {
+		t.Fatal(err)
+	}
+	reader := bytes.NewReader(headerBytes)
+
+	parsedHeader, err := ParseELFHeader(reader)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if parsedHeader.Class != ELFCLASS32 {
+		t.Errorf("Wrong class %v", parsedHeader.Class)
+	}
+	if parsedHeader.Data != ELFDATA2LSB {
+		t.Errorf("Wrong data %v", parsedHeader.Data)
+	}
+	if parsedHeader.OS_ABI != ELF_OS_ABI_LINUX {
+		t.Errorf("Wrong OS ABI %v", parsedHeader.OS_ABI)
+	}
+	if parsedHeader.ABI_Version != 9 {
+		t.Errorf("Wrong ABI version %v", parsedHeader.ABI_Version)
+	}
+	if parsedHeader.Type != ET_EXEC {
+		t.Errorf("Wrong type %v", parsedHeader.Type)
+	}
+	if parsedHeader.Machine != EM_88K {
+		t.Errorf("Wrong machine %v", parsedHeader.Machine)
+	}
+	if parsedHeader.Version != EV_CURRENT {
+		t.Errorf("Wrong version %v", parsedHeader.Version)
+	}
+	if parsedHeader.Entry != 0xff {
+		t.Errorf("Wrong entry %v", parsedHeader.Entry)
+	}
+	if parsedHeader.ProgramHeaderTableOffset != 0x1234 {
+		t.Errorf("Wrong ph offset %v", parsedHeader.ProgramHeaderTableOffset)
+	}
+}

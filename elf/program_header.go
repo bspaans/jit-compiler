@@ -57,11 +57,21 @@ const (
 	PF_X PHFlags = 0x1
 	// Write
 	PF_W PHFlags = 0x2
+	// Execute & Write
+	PF_WX PHFlags = 0x3
 	// Read
 	PF_R PHFlags = 0x4
+	// Read & Execute
+	PF_RX PHFlags = 0x5
+	// Read & Write
+	PF_RW PHFlags = 0x6
+	// Read & Write & Execute
+	PF_RWX PHFlags = 0x7
 	// Unspecified
 	PF_MASKPROC PHFlags = 0xf0000000
 )
+
+const ProgramHeaderSize64 uint16 = 56
 
 type ProgramHeader struct {
 	// This member tells what kind of segment this array element describes or
@@ -75,19 +85,26 @@ type ProgramHeader struct {
 	// This member gives the virtual address at which the first byte of the
 	// segment resides in memory
 	SegmentVirtualAddress Elf64_Addr
-	// On systems for which physical addressing is relevant, thismember is
+	// On systems for which physical addressing is relevant, this member is
 	// reserved for the segment’s physical address.  Because System V ignores
 	// physical addressing for application programs,this member has unspecified
-	// contents for executable files andshared objects
+	// contents for executable files and shared objects
 	SegmentPhysicalAddress Elf64_Addr
 	// Segment size in file
-	Filesize uint32
+	Filesize uint64
 	// Segment size in memory
-	Memsize uint32
+	Memsize uint64
 	// Segment alignment, file & memory
-	Align uint32
+	Align uint64
 
 	Data []byte
+}
+
+func NewProgramHeader(typ PHType, flags PHFlags) *ProgramHeader {
+	return &ProgramHeader{
+		Type:  typ,
+		Flags: flags,
+	}
 }
 
 func ParseProgramHeader(header *ELFHeader, r *bytes.Reader) (*ProgramHeader, error) {
@@ -120,6 +137,36 @@ func ParseProgramHeader(header *ELFHeader, r *bytes.Reader) (*ProgramHeader, err
 	return result, nil
 }
 
+func (s *ProgramHeader) Encode(header *ELFHeader) ([]byte, error) {
+	buffer := bytes.NewBuffer([]byte{})
+	byteOrder := header.GetByteOrder()
+	if err := binary.Write(buffer, byteOrder, s.Type); err != nil {
+		return nil, err
+	}
+	if err := binary.Write(buffer, byteOrder, s.Flags); err != nil {
+		return nil, err
+	}
+	if err := binary.Write(buffer, byteOrder, s.Offset); err != nil {
+		return nil, err
+	}
+	if err := binary.Write(buffer, byteOrder, s.SegmentVirtualAddress); err != nil {
+		return nil, err
+	}
+	if err := binary.Write(buffer, byteOrder, s.SegmentPhysicalAddress); err != nil {
+		return nil, err
+	}
+	if err := binary.Write(buffer, byteOrder, s.Filesize); err != nil {
+		return nil, err
+	}
+	if err := binary.Write(buffer, byteOrder, s.Memsize); err != nil {
+		return nil, err
+	}
+	if err := binary.Write(buffer, byteOrder, s.Align); err != nil {
+		return nil, err
+	}
+	return buffer.Bytes(), nil
+}
+
 func (s *ProgramHeader) String() string {
 	table := [][]string{
 		[]string{"Program Header:"},
@@ -128,9 +175,9 @@ func (s *ProgramHeader) String() string {
 		[]string{"  Offset:           ", fmt.Sprintf("0x%x", s.Offset)},
 		[]string{"  Virtual Address:  ", fmt.Sprintf("0x%x", s.SegmentVirtualAddress)},
 		[]string{"  Physical Address: ", fmt.Sprintf("0x%x", s.SegmentPhysicalAddress)},
-		[]string{"  File Size:        ", fmt.Sprintf("0x%x", s.Filesize)},
-		[]string{"  Memory Size:      ", fmt.Sprintf("0x%x", s.Memsize)},
-		[]string{"  Address Align:    ", fmt.Sprintf("0x%x", s.Align)},
+		[]string{"  File Size:        ", fmt.Sprintf("0x%x (%v)", s.Filesize, s.Filesize)},
+		[]string{"  Memory Size:      ", fmt.Sprintf("0x%x (%v)", s.Memsize, s.Memsize)},
+		[]string{"  Address Align:    ", fmt.Sprintf("0x%x (%v)", s.Align, s.Align)},
 	}
 	result := []string{}
 	for _, row := range table {
@@ -147,21 +194,38 @@ func ParseProgramHeaderTable(header *ELFHeader, r *bytes.Reader) ([]*ProgramHead
 		offset := int64(header.ProgramHeaderTableOffset)
 		offset += int64(i) * int64(header.ProgramHeaderEntrySize)
 		if _, err := r.Seek(offset, io.SeekStart); err != nil {
-			return nil, err
+			return nil, fmt.Errorf("failed seek(1): %s", err.Error())
 		}
 		ph, err := ParseProgramHeader(header, r)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("failed parse: %s", err.Error())
 		}
 		if _, err := r.Seek(int64(ph.Offset), io.SeekStart); err != nil {
-			return nil, err
+			return nil, fmt.Errorf("failed seek(2): %s", err.Error())
 		}
 		tmpData := make([]byte, ph.Filesize)
 		if _, err := r.Read(tmpData); err != nil {
-			return nil, err
+			return nil, fmt.Errorf("failed read from %d for %d bytes: %s", ph.Offset, ph.Filesize, err.Error())
 		}
 		ph.Data = tmpData
 		result = append(result, ph)
+	}
+	return result, nil
+}
+
+type ProgramHeaderTable []*ProgramHeader
+
+func (p ProgramHeaderTable) Encode(header *ELFHeader) ([]byte, error) {
+	result := make([]byte, int(header.ProgramHeaderEntrySize)*len(p))
+	fmt.Println(len(result), header.ProgramHeaderEntrySize, len(p))
+	for i, ph := range p {
+		phBytes, err := ph.Encode(header)
+		if err != nil {
+			return nil, err
+		}
+		for j, b := range phBytes {
+			result[i*int(header.ProgramHeaderEntrySize)+j] = b
+		}
 	}
 	return result, nil
 }
