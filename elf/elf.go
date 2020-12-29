@@ -2,6 +2,7 @@ package elf
 
 import (
 	"bytes"
+	"fmt"
 	"io/ioutil"
 )
 
@@ -22,7 +23,7 @@ type ELF struct {
 	// A program header table, if present, tells the system how to create a
 	// process image. Files used to build a process image (execute a program)
 	// must have a program header table; relocatable files do not need one.
-	//ProgramHeaderTable
+	ProgramHeaders []*ProgramHeader
 
 	Sections []*Section
 }
@@ -41,9 +42,14 @@ func ParseELF(r *bytes.Reader) (*ELF, error) {
 	if err != nil {
 		return nil, err
 	}
+	programHeaders, err := ParseProgramHeaderTable(header, r)
+	if err != nil {
+		return nil, err
+	}
 	return &ELF{
-		ELFHeader: header,
-		Sections:  sections,
+		ELFHeader:      header,
+		Sections:       sections,
+		ProgramHeaders: programHeaders,
 	}, nil
 }
 
@@ -57,6 +63,9 @@ func ParseELFFile(path string) (*ELF, error) {
 
 func (e *ELF) String() string {
 	result := e.ELFHeader.String()
+	for _, header := range e.ProgramHeaders {
+		result += "\n" + header.String()
+	}
 	for _, section := range e.Sections {
 		result += "\n" + section.String()
 	}
@@ -72,12 +81,10 @@ func (e *ELF) GetSection(name string) *Section {
 }
 
 func init() {
-	/*
-		elf, err := ParseELFFile("../jit-compiler")
-		if err != nil {
-			panic(err)
-		}
-		fmt.Println(elf)
-		fmt.Println(string(elf.GetSection(".note.go.buildid").Data))
-	*/
+	elf, err := ParseELFFile("../inctest")
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(elf)
+	fmt.Println(string(elf.ProgramHeaders[1].Data))
 }

@@ -6,11 +6,6 @@ import (
 	"testing"
 )
 
-func Test_ELF(t *testing.T) {
-
-	fmt.Println(NewELFHeader().Encode())
-}
-
 func Test_ELF_parse_header_sad(t *testing.T) {
 	cases := [][]uint8{
 		[]uint8{0x7f, 'E', 'L', 'K'},
