@@ -1,7 +1,7 @@
 package expr
 
 import (
-	"github.com/bspaans/jit-compiler/asm"
+	"github.com/bspaans/jit-compiler/asm/x86_64"
 	. "github.com/bspaans/jit-compiler/ir/shared"
 )
 
