@@ -55,7 +55,7 @@ hence projects like these.
 ### Assembler
 
 The following x86-64 instructions are supported in the assembler. For a detailed 
-overview see `asm/opcodes/opcodes.go` and `asm/opcodes/opcode_groups.go`:
+overview see [`asm/x86_64/opcodes/`](https://github.com/bspaans/jit-compiler/tree/master/asm/x86_64/opcodes):
 
 * MOV, MOVQ, MOVSD, MOVSX, MOVZX (moving things in and out of registers and memory)
 * LEA (loading the address of memory locations into a register)
