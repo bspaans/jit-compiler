@@ -27,25 +27,24 @@ func CompileToBinary(targetArchitecture Architecture, stmts []IR, debug bool, pa
 
 func CompileWithContext(stmts []IR, debug bool, ctx *IR_Context) (lib.MachineCode, error) {
 	result := []uint8{}
-	readonly, rw, err := ctx.Architecture.EncodeDataSection(stmts, ctx)
+	segments, err := ctx.Architecture.EncodeDataSection(stmts, ctx)
 	if err != nil {
 		return nil, err
 	}
 	if debug {
-		fmt.Println(".rodata:")
-		fmt.Println(readonly)
-		fmt.Println(".data:")
-		fmt.Println(rw)
+		fmt.Println(segments.String())
 	}
 	// TODO: do this properly
-	ctx.DataSection = append(readonly, rw...)
-	ctx.InstructionPointer += uint(len(ctx.DataSection))
+	ctx.Segments = segments
+	dataSection := segments.Encode()
+
+	ctx.InstructionPointer += uint(len(dataSection))
 	if debug {
 		fmt.Println("_start:")
 	}
-	if len(ctx.DataSection) > 0 {
+	if len(dataSection) > 0 {
 		// TODO make Architecture dependent
-		jmp := x86_64.JMP(encoding.Uint8(len(ctx.DataSection)))
+		jmp := x86_64.JMP(encoding.Uint8(len(dataSection)))
 		if debug {
 			fmt.Printf("0x%x: %s\n", 0, jmp.String())
 		}
@@ -57,14 +56,11 @@ func CompileWithContext(stmts []IR, debug bool, ctx *IR_Context) (lib.MachineCod
 		if debug {
 			fmt.Println(lib.MachineCode(result_))
 		}
-		for _, d := range ctx.DataSection {
-			result = append(result, d)
-		}
+		result = append(result, dataSection...)
 	} else {
-		ctx.DataSectionOffset = 0
 		ctx.InstructionPointer = 0
 	}
-	address := uint(ctx.DataSectionOffset + len(ctx.DataSection))
+	address := uint(2 + len(dataSection))
 	for _, stmt := range stmts {
 		code, err := ctx.Architecture.EncodeStatement(stmt, ctx)
 		if err != nil {

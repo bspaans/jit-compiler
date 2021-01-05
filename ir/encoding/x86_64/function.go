@@ -12,13 +12,13 @@ import (
 
 func encode_IR_Function(i *expr.IR_Function, ctx *IR_Context, target encoding.Operand) ([]lib.Instruction, error) {
 	ownLength := uint(7)
-	diff := uint(ctx.InstructionPointer+ownLength) - uint(i.Address)
+	diff := uint(ctx.InstructionPointer+ownLength) - uint(ctx.Segments.GetAddress(i.Address))
 	result := []lib.Instruction{x86_64.LEA(&encoding.RIPRelative{encoding.Int32(int32(-diff))}, target)}
 	ctx.AddInstructions(result)
 	return result, nil
 }
 
-func encode_IR_Function_for_DataSection(b *expr.IR_Function, ctx *IR_Context, readonly, rw []uint8) ([]uint8, []uint8, error) {
+func encode_IR_Function_for_DataSection(b *expr.IR_Function, ctx *IR_Context, segments *Segments) error {
 
 	// TODO: restore rbx, rbp, r12-r15
 	targets := []*encoding.Register{encoding.Rdi, encoding.Rsi, encoding.Rdx, encoding.R10, encoding.R8, encoding.R9}
@@ -29,7 +29,7 @@ func encode_IR_Function_for_DataSection(b *expr.IR_Function, ctx *IR_Context, re
 	variableTypes := map[string]Type{}
 	for i, arg := range b.Signature.Args {
 		if arg.Type() == T_Float64 {
-			return nil, nil, fmt.Errorf("Float arguments not supported")
+			return fmt.Errorf("Float arguments not supported")
 		}
 		v := b.Signature.ArgNames[i]
 		registers[targets[i].Register] = true
@@ -46,17 +46,15 @@ func encode_IR_Function_for_DataSection(b *expr.IR_Function, ctx *IR_Context, re
 	ctx_.VariableTypes = variableTypes
 	instr, err := encodeStatement(b.Body, ctx_)
 	if err != nil {
-		return nil, nil, err
+		return err
 	}
 	for _, i := range instr {
 		fmt.Println(i)
 	}
-	// TODO: should go to executable segment
 	bytes, err := lib.Instructions(instr).Encode()
 	if err != nil {
-		return nil, nil, err
+		return err
 	}
-	b.Address = len(rw) + 2
-	rw = append(rw, bytes...)
-	return readonly, rw, nil
+	b.Address = segments.Add(Executable, bytes...)
+	return nil
 }

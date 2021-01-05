@@ -15,13 +15,13 @@ func encode_IR_Struct(i *expr.IR_Struct, ctx *IR_Context, target encoding.Operan
 	// pointing to the *next* instruction) and the address of our byte array,
 	// and load the resulting address into target using a LEA instruction.
 	ownLength := uint(7)
-	diff := uint(ctx.InstructionPointer+ownLength) - uint(i.Address)
+	diff := uint(ctx.InstructionPointer+ownLength) - uint(ctx.Segments.GetAddress(i.Address))
 	result := []lib.Instruction{x86_64.LEA(&encoding.RIPRelative{encoding.Int32(int32(-diff))}, target)}
 	ctx.AddInstructions(result)
 	return result, nil
 }
-func encode_IR_Struct_for_DataSection(b *expr.IR_Struct, ctx *IR_Context, readonly, rw []uint8) ([]uint8, []uint8, error) {
-	b.Address = -1
+func encode_IR_Struct_for_DataSection(b *expr.IR_Struct, ctx *IR_Context, segments *Segments) error {
+	b.Address = nil
 	for _, v := range b.Values {
 		bytes := []uint8{}
 		if ir, ok := v.(*expr.IR_Uint64); ok {
@@ -31,12 +31,12 @@ func encode_IR_Struct_for_DataSection(b *expr.IR_Struct, ctx *IR_Context, readon
 		} else if ir, ok := v.(*expr.IR_Float64); ok {
 			bytes = encoding.Float64(ir.Value).Encode()
 		} else {
-			return nil, nil, fmt.Errorf("Unsupported struct type %s", v.Type())
+			return fmt.Errorf("Unsupported struct type %s", v.Type())
 		}
-		if b.Address == -1 {
-			b.Address = len(rw) + 2
+		addr := segments.Add(ReadWrite, bytes...)
+		if b.Address == nil {
+			b.Address = addr
 		}
-		rw = append(rw, bytes...)
 	}
-	return readonly, rw, nil
+	return nil
 }

@@ -12,7 +12,7 @@ type IR_StaticArray struct {
 	ElemType Type
 	Value    []IRExpression // only literals are supported
 	// Set during EncodeDataSection
-	Address int
+	Address *SegmentPointer
 }
 
 func NewIR_StaticArray(elemType Type, value []IRExpression) *IR_StaticArray {

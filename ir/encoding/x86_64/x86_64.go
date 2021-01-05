@@ -21,16 +21,14 @@ func (x *X86_64) EncodeStatement(stmt IR, ctx *IR_Context) ([]lib.Instruction, e
 	return encodeStatement(stmt, ctx)
 }
 
-func (x *X86_64) EncodeDataSection(stmts []IR, ctx *IR_Context) (readonly, rw []uint8, err error) {
+func (x *X86_64) EncodeDataSection(stmts []IR, ctx *IR_Context) (*Segments, error) {
+	segments := NewSegments()
 	for _, stmt := range stmts {
-		readonly_, rw_, err := encodeDataSection(stmt, ctx, readonly, rw)
-		if err != nil {
-			return nil, nil, err
+		if err := encodeDataSection(stmt, ctx, segments); err != nil {
+			return nil, err
 		}
-		readonly = readonly_
-		rw = rw_
 	}
-	return readonly, rw, nil
+	return segments, nil
 }
 
 func encodeExpression(e IRExpression, ctx *IR_Context, target encoding.Operand) ([]lib.Instruction, error) {
@@ -125,115 +123,101 @@ func encodeStatement(stmt IR, ctx *IR_Context) ([]lib.Instruction, error) {
 	}
 }
 
-func encodeDataSection(i IR, ctx *IR_Context, readonly, rw []uint8) ([]uint8, []uint8, error) {
+func encodeDataSection(i IR, ctx *IR_Context, segments *Segments) error {
 	switch v := i.(type) {
 	case *statements.IR_AndThen:
-		readonly_, rw_, err := encodeDataSection(v.Stmt1, ctx, readonly, rw)
-		if err != nil {
-			return nil, nil, err
+		if err := encodeDataSection(v.Stmt1, ctx, segments); err != nil {
+			return err
 		}
-		return encodeDataSection(v.Stmt2, ctx, readonly_, rw_)
+		return encodeDataSection(v.Stmt2, ctx, segments)
 	case *statements.IR_ArrayAssignment:
-		readonly_, rw_, err := encodeExpressionForDataSection(v.Index, ctx, readonly, rw)
-		if err != nil {
-			return nil, nil, err
+		if err := encodeExpressionForDataSection(v.Index, ctx, segments); err != nil {
+			return err
 		}
-		return encodeExpressionForDataSection(v.Expr, ctx, readonly_, rw_)
+		return encodeExpressionForDataSection(v.Expr, ctx, segments)
 	case *statements.IR_Assignment:
-		return encodeExpressionForDataSection(v.Expr, ctx, readonly, rw)
+		return encodeExpressionForDataSection(v.Expr, ctx, segments)
 	case *statements.IR_FunctionDef:
-		return encodeExpressionForDataSection(v.Expr, ctx, readonly, rw)
+		return encodeExpressionForDataSection(v.Expr, ctx, segments)
 	case *statements.IR_If:
+		// TODO
 	case *statements.IR_Return:
+		// TODO
 	case *statements.IR_While:
 	default:
-		return nil, nil, fmt.Errorf("Unsupported '%s' statement in x86_64 data section encoder", i.String())
+		return fmt.Errorf("Unsupported '%s' statement in x86_64 data section encoder", i.String())
 	}
-	return readonly, rw, nil
+	return nil
 }
 
-func encodeExpressionForDataSection(i IRExpression, ctx *IR_Context, readonly, rw []uint8) ([]uint8, []uint8, error) {
-	encodeOperators := func(op1, op2 IRExpression, readonly, rw []uint8) ([]uint8, []uint8, error) {
-		readonly_, rw_, err := encodeExpressionForDataSection(op1, ctx, readonly, rw)
-		if err != nil {
-			return nil, nil, err
+func encodeExpressionForDataSection(i IRExpression, ctx *IR_Context, segments *Segments) error {
+	encodeOperators := func(op1, op2 IRExpression) error {
+		if err := encodeExpressionForDataSection(op1, ctx, segments); err != nil {
+			return err
 		}
-		return encodeExpressionForDataSection(op2, ctx, readonly_, rw_)
+		return encodeExpressionForDataSection(op2, ctx, segments)
 	}
 	switch v := i.(type) {
 	case *expr.IR_ByteArray:
-		v.Address = len(rw) + 2
-		rw = append(rw, v.Value...)
-		return readonly, rw, nil
+		v.Address = segments.Add(ReadWrite, v.Value...)
+		return nil
 	case *expr.IR_Add:
-		return encodeOperators(v.Op1, v.Op2, readonly, rw)
+		return encodeOperators(v.Op1, v.Op2)
 	case *expr.IR_And:
-		return encodeOperators(v.Op1, v.Op2, readonly, rw)
+		return encodeOperators(v.Op1, v.Op2)
 	case *expr.IR_ArrayIndex:
-		return encodeOperators(v.Array, v.Index, readonly, rw)
+		return encodeOperators(v.Array, v.Index)
 	case *expr.IR_Call:
 		for _, arg := range v.Args {
-			readonly_, rw_, err := encodeExpressionForDataSection(arg, ctx, readonly, rw)
-			if err != nil {
-				return nil, nil, err
+			if err := encodeExpressionForDataSection(arg, ctx, segments); err != nil {
+				return err
 			}
-			readonly = readonly_
-			rw = rw_
 		}
-		return readonly, rw, nil
+		return nil
 	case *expr.IR_Div:
-		return encodeOperators(v.Op1, v.Op2, readonly, rw)
+		return encodeOperators(v.Op1, v.Op2)
 	case *expr.IR_Equals:
-		return encodeOperators(v.Op1, v.Op2, readonly, rw)
+		return encodeOperators(v.Op1, v.Op2)
 	case *expr.IR_Function:
-		readonly_, rw_, err := encodeDataSection(v.Body, ctx, readonly, rw)
-		if err != nil {
-			return nil, nil, err
+		if err := encodeDataSection(v.Body, ctx, segments); err != nil {
+			return err
 		}
-		readonly_, rw_, err = encode_IR_Function_for_DataSection(v, ctx, readonly_, rw_)
-
-		if err != nil {
-			return nil, nil, err
-		}
-		return readonly_, rw_, nil
+		return encode_IR_Function_for_DataSection(v, ctx, segments)
 	case *expr.IR_GT:
-		return encodeOperators(v.Op1, v.Op2, readonly, rw)
+		return encodeOperators(v.Op1, v.Op2)
 	case *expr.IR_GTE:
-		return encodeOperators(v.Op1, v.Op2, readonly, rw)
+		return encodeOperators(v.Op1, v.Op2)
 	case *expr.IR_LT:
-		return encodeOperators(v.Op1, v.Op2, readonly, rw)
+		return encodeOperators(v.Op1, v.Op2)
 	case *expr.IR_LTE:
-		return encodeOperators(v.Op1, v.Op2, readonly, rw)
+		return encodeOperators(v.Op1, v.Op2)
 	case *expr.IR_Mul:
-		return encodeOperators(v.Op1, v.Op2, readonly, rw)
+		return encodeOperators(v.Op1, v.Op2)
 	case *expr.IR_Not:
-		return encodeExpressionForDataSection(v.Op1, ctx, readonly, rw)
+		return encodeExpressionForDataSection(v.Op1, ctx, segments)
 	case *expr.IR_Or:
-		return encodeOperators(v.Op1, v.Op2, readonly, rw)
+		return encodeOperators(v.Op1, v.Op2)
 	case *expr.IR_StaticArray:
-		return encode_IR_StaticArray_for_DataSection(v, ctx, readonly, rw)
+		return encode_IR_StaticArray_for_DataSection(v, segments)
 	case *expr.IR_Struct:
-		return encode_IR_Struct_for_DataSection(v, ctx, readonly, rw)
+		return encode_IR_Struct_for_DataSection(v, ctx, segments)
 	case *expr.IR_StructField:
-		return encodeExpressionForDataSection(v.Struct, ctx, readonly, rw)
+		return encodeExpressionForDataSection(v.Struct, ctx, segments)
 	case *expr.IR_Syscall:
 		for _, arg := range v.Args {
-			readonly_, rw_, err := encodeExpressionForDataSection(arg, ctx, readonly, rw)
-			if err != nil {
-				return nil, nil, err
+			if err := encodeExpressionForDataSection(arg, ctx, segments); err != nil {
+				return err
 			}
-			readonly = readonly_
-			rw = rw_
 		}
-		return readonly, rw, nil
+		return nil
 	case *expr.IR_Sub:
-		return encodeOperators(v.Op1, v.Op2, readonly, rw)
+		return encodeOperators(v.Op1, v.Op2)
 	case *expr.IR_Bool, *expr.IR_Cast, *expr.IR_Variable, *expr.IR_Float64,
 		*expr.IR_Uint8, *expr.IR_Uint16, *expr.IR_Uint32, *expr.IR_Uint64,
 		*expr.IR_Int8, *expr.IR_Int16, *expr.IR_Int32, *expr.IR_Int64:
-		return readonly, rw, nil
+		return nil
 	default:
-		return nil, nil, fmt.Errorf("Unsupported '%s' expr in x86_64 data section encoder", i.String())
+		return fmt.Errorf("Unsupported '%s' expr in x86_64 data section encoder", i.String())
 	}
-	return readonly, rw, nil
+	return nil
 }

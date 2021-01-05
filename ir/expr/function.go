@@ -11,7 +11,7 @@ type IR_Function struct {
 	*BaseIRExpression
 	Signature *TFunction
 	Body      IR
-	Address   int
+	Address   *SegmentPointer
 }
 
 func NewIR_Function(signature *TFunction, body IR) *IR_Function {

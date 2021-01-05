@@ -16,14 +16,14 @@ func encode_IR_StaticArray(i *expr.IR_StaticArray, ctx *IR_Context, target encod
 	// and load the resulting address into target using a LEA instruction.
 	ownLength := uint(7)
 	// TODO: instead of address + 2; use datasectionOffset + len(ctx.ReadonlySegment) + address; in JIT mode
-	diff := uint(ctx.InstructionPointer+ownLength) - uint(i.Address)
+	diff := uint(ctx.InstructionPointer+ownLength) - uint(ctx.Segments.GetAddress(i.Address))
 	result := []lib.Instruction{x86_64.LEA(&encoding.RIPRelative{encoding.Int32(int32(-diff))}, target)}
 	ctx.AddInstructions(result)
 	return result, nil
 }
 
-func encode_IR_StaticArray_for_DataSection(b *expr.IR_StaticArray, ctx *IR_Context, readonly, rw []uint8) ([]uint8, []uint8, error) {
-	b.Address = -1
+func encode_IR_StaticArray_for_DataSection(b *expr.IR_StaticArray, segments *Segments) error {
+	b.Address = nil
 	for _, v := range b.Value {
 		bytes := []uint8{}
 		if b.ElemType == TUint8 {
@@ -33,7 +33,7 @@ func encode_IR_StaticArray_for_DataSection(b *expr.IR_StaticArray, ctx *IR_Conte
 			case *expr.IR_Uint64:
 				bytes = []uint8{uint8(c.Value)}
 			default:
-				return nil, nil, fmt.Errorf("Unsupport uint8 array type %s in %s", b.ElemType, b.String())
+				return fmt.Errorf("Unsupport uint8 array type %s in %s", b.ElemType, b.String())
 			}
 		} else if b.ElemType == TUint16 {
 			switch c := v.(type) {
@@ -42,7 +42,7 @@ func encode_IR_StaticArray_for_DataSection(b *expr.IR_StaticArray, ctx *IR_Conte
 			case *expr.IR_Uint64:
 				bytes = encoding.Uint16(uint16(c.Value)).Encode()
 			default:
-				return nil, nil, fmt.Errorf("Unsupport uint16 array type %s in %s", b.ElemType, b.String())
+				return fmt.Errorf("Unsupport uint16 array type %s in %s", b.ElemType, b.String())
 			}
 		} else if b.ElemType == TUint32 {
 			switch c := v.(type) {
@@ -51,7 +51,7 @@ func encode_IR_StaticArray_for_DataSection(b *expr.IR_StaticArray, ctx *IR_Conte
 			case *expr.IR_Uint64:
 				bytes = encoding.Uint32(uint32(c.Value)).Encode()
 			default:
-				return nil, nil, fmt.Errorf("Unsupport uint32 array type %s in %s", b.ElemType, b.String())
+				return fmt.Errorf("Unsupport uint32 array type %s in %s", b.ElemType, b.String())
 			}
 		} else if b.ElemType == TUint64 {
 			ir := v.(*expr.IR_Uint64)
@@ -63,12 +63,12 @@ func encode_IR_StaticArray_for_DataSection(b *expr.IR_StaticArray, ctx *IR_Conte
 			ir := v.(*expr.IR_Int64)
 			bytes = encoding.Uint64(ir.Value).Encode()
 		} else {
-			return nil, nil, fmt.Errorf("Unsupported array type %s", v.Type().String())
+			return fmt.Errorf("Unsupported array type %s", v.Type().String())
 		}
-		if b.Address == -1 {
-			b.Address = len(rw) + 2
+		addr := segments.Add(ReadWrite, bytes...)
+		if b.Address == nil {
+			b.Address = addr
 		}
-		rw = append(rw, bytes...)
 	}
-	return readonly, rw, nil
+	return nil
 }

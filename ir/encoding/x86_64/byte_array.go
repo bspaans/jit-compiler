@@ -13,7 +13,7 @@ func encode_IR_ByteArray(i *expr.IR_ByteArray, ctx *IR_Context, target encoding.
 	// pointing to the *next* instruction) and the address of our byte array,
 	// and load the resulting address into target using a LEA instruction.
 	ownLength := uint(7)
-	diff := uint(ctx.InstructionPointer+ownLength) - uint(i.Address)
+	diff := uint(ctx.InstructionPointer+ownLength) - uint(ctx.Segments.GetAddress(i.Address))
 	result := []lib.Instruction{x86_64.LEA(&encoding.RIPRelative{encoding.Int32(int32(-diff))}, target)}
 	ctx.AddInstructions(result)
 	return result, nil

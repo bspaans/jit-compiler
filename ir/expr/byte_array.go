@@ -11,7 +11,7 @@ type IR_ByteArray struct {
 	Value []uint8
 
 	// Set during EncodeDataSection
-	Address int
+	Address *SegmentPointer
 }
 
 func NewIR_ByteArray(value []uint8) *IR_ByteArray {

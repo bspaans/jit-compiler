@@ -8,7 +8,7 @@ import (
 type Architecture interface {
 	EncodeExpression(expr IRExpression, ctx *IR_Context, target encoding.Operand) ([]lib.Instruction, error)
 	EncodeStatement(stmt IR, ctx *IR_Context) ([]lib.Instruction, error)
-	EncodeDataSection(stmts []IR, ctx *IR_Context) ([]uint8, []uint8, error)
+	EncodeDataSection(stmts []IR, ctx *IR_Context) (*Segments, error)
 }
 
 type IR_Context struct {
@@ -21,9 +21,8 @@ type IR_Context struct {
 	VariableMap             map[string]encoding.Operand
 	VariableTypes           map[string]Type
 	ReturnOperandStack      []encoding.Operand
-	DataSection             []uint8
+	Segments                *Segments
 	InstructionPointer      uint
-	DataSectionOffset       int
 	StackPointer            int
 	Commit                  bool // if false turns AddInstruction into a noop
 
@@ -41,8 +40,6 @@ func NewIRContext(arch Architecture) *IR_Context {
 		VariableMap:             map[string]encoding.Operand{},
 		VariableTypes:           map[string]Type{},
 		ReturnOperandStack:      []encoding.Operand{&encoding.DisplacedRegister{encoding.Rsp, 8}},
-		DataSection:             []uint8{},
-		DataSectionOffset:       2,
 		InstructionPointer:      2,
 		StackPointer:            8,
 		Commit:                  true,
@@ -84,10 +81,6 @@ func (i *IR_Context) Copy() *IR_Context {
 	for arg, ty := range i.VariableTypes {
 		variableTypes[arg] = ty
 	}
-	ds := []uint8{}
-	for _, d := range i.DataSection {
-		ds = append(ds, d)
-	}
 	instructions := []lib.Instruction{}
 	for _, d := range i.instructions {
 		instructions = append(instructions, d)
@@ -106,8 +99,7 @@ func (i *IR_Context) Copy() *IR_Context {
 		VariableMap:             variableMap,
 		VariableTypes:           variableTypes,
 		ReturnOperandStack:      returns,
-		DataSection:             ds,
-		DataSectionOffset:       i.DataSectionOffset,
+		Segments:                i.Segments,
 		InstructionPointer:      i.InstructionPointer,
 		StackPointer:            i.StackPointer,
 		Commit:                  i.Commit,

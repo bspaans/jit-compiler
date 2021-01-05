@@ -74,7 +74,7 @@ func NewCommentSection() *Section {
 	return NewSection(".comment", SHT_PROGBITS, SHF_NULL)
 }
 
-// These sections hold initialized data that contribute to the program’smemory image
+// These sections hold initialized data that contribute to the program’s memory image
 func NewDataSection() *Section {
 	return NewSection(".data", SHT_PROGBITS, SHF_ALLOC&SHF_WRITE)
 }

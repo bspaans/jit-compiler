@@ -11,7 +11,7 @@ type IR_Struct struct {
 	StructType *TStruct
 	Values     []IRExpression // only literals are supported
 	// Set during EncodeDataSection
-	Address int
+	Address *SegmentPointer
 }
 
 func NewIR_Struct(ty *TStruct, values []IRExpression) *IR_Struct {
