@@ -115,11 +115,13 @@ func (i *IR_Context) Copy() *IR_Context {
 	}
 }
 
-func (i *IR_Context) AddInstruction(instr lib.Instruction) {
+func (i *IR_Context) AddInstruction(instr ...lib.Instruction) {
 	if i.Commit {
-		i.instructions = append(i.instructions, instr)
-		length, _ := lib.Instruction_Length(instr)
-		i.InstructionPointer += uint(length)
+		for _, in := range instr {
+			i.instructions = append(i.instructions, in)
+			length, _ := lib.Instruction_Length(in)
+			i.InstructionPointer += uint(length)
+		}
 	}
 }
 

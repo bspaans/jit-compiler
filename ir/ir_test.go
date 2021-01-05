@@ -193,6 +193,27 @@ func Test_ParseExecute_Happy(t *testing.T) {
 		`if (15 == 15) || (17 == 14) { f = 53 } else { f = 100 }`,
 		`if (15 == 14) || (17 == 14) { f = 100} else { f = 53 }`,
 
+		// boolean variables and if
+		`b = true; if b { f = 53 } else { f = 100 }`,
+		`b = !false; if b { f = 53 } else { f = 100 }`,
+		`b = false; if !b { f = 53 } else { f = 100 }`,
+		`b = true || true; if b { f = 53 } else { f = 100 }`,
+		`b = true || false; if b { f = 53 } else { f = 100 }`,
+		`b = false || true; if b { f = 53 } else { f = 100 }`,
+		`b = false || false; if !b { f = 53 } else { f = 100 }`,
+		`b = true && true; if b { f = 53 } else { f = 100 }`,
+		`b = true && false; if !b { f = 53 } else { f = 100 }`,
+		`b = false && true; if !b { f = 53 } else { f = 100 }`,
+		`b = false && false; if !b { f = 53 } else { f = 100 }`,
+		`b = 10 > 9; if b { f = 53 } else { f = 100 }`,
+		`b = 10 >= 9; if b { f = 53 } else { f = 100 }`,
+		`b = 10 < 9; if !b { f = 53 } else { f = 100 }`,
+		`b = 10 <= 9; if !b { f = 53 } else { f = 100 }`,
+		`b = int8(15) < int8(-1); if !b { f = 53 } else { f = 100 }`,
+		`c = int8(127) <= int8(-127); if !c { f = 53 } else { f = 100 }`,
+		`b = int8(15) < int8(-1); c = int8(127) <= int8(-127); if (!b) && (!c) { f = 53 } else { f = 100 }`,
+		`b = int8(15) < int8(-1) ; c = !b ; d = int8(127) <= int8(-127) ; e = !d ; if c && e { f = 53 } else { f = 100 }`,
+
 		// if statements with uint8
 		`if uint8(13) < uint8(15) { f = 53 } else { f = 100 }`,
 		`if uint8(15) <= uint8(15) { f = 53 } else { f = 100 }`,
@@ -269,16 +290,18 @@ func Test_ParseExecute_Happy(t *testing.T) {
 			t.Fatal("Expecting 53 got", value, "in", ir, "\n", b)
 		}
 
-		/*
-			b2, err := Compile(TargetArch, []IR{i.SSA_Transform(NewSSA_Context())}, debug)
-			if err != nil {
-				t.Fatal(err)
+		transformed := i.SSA_Transform(NewSSA_Context())
+		b2, err := Compile(TargetArch, []IR{transformed}, debug)
+		if err != nil {
+			t.Fatal(err)
+		}
+		value = b2.Execute(debug)
+		if value != int(53) {
+			if !debug {
+				Compile(TargetArch, []IR{transformed}, true)
 			}
-			value = b2.Execute(debug)
-			if value != int(53) {
-				t.Fatal("Expecting 53 got", value, "in", ir, " after SSA transform\n", b)
-			}
-		*/
+			t.Fatal("Expecting 53 got", value, "in", ir, " after SSA transform\n", transformed)
+		}
 
 	}
 

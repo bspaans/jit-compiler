@@ -217,6 +217,15 @@ func encodeExpressionForDataSection(i IRExpression, ctx *IR_Context, readonly, r
 	case *expr.IR_StructField:
 		return encodeExpressionForDataSection(v.Struct, ctx, readonly, rw)
 	case *expr.IR_Syscall:
+		for _, arg := range v.Args {
+			readonly_, rw_, err := encodeExpressionForDataSection(arg, ctx, readonly, rw)
+			if err != nil {
+				return nil, nil, err
+			}
+			readonly = readonly_
+			rw = rw_
+		}
+		return readonly, rw, nil
 	case *expr.IR_Sub:
 		return encodeOperators(v.Op1, v.Op2, readonly, rw)
 	case *expr.IR_Bool, *expr.IR_Cast, *expr.IR_Variable, *expr.IR_Float64,

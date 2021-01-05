@@ -16,23 +16,31 @@ func encode_IR_Not(i *expr.IR_Not, ctx *IR_Context, target encoding.Operand, inc
 	var reg1 encoding.Operand
 
 	result := []lib.Instruction{}
-	switch i.Op1.(type) {
+
+	switch c := i.Op1.(type) {
 	case *expr.IR_Variable:
-		variable := i.Op1.(*expr.IR_Variable).Value
+		variable := c.Value
 		reg1 = ctx.VariableMap[variable]
-	case *expr.IR_Uint64:
-		value := i.Op1.(*expr.IR_Uint64).Value
+		if !includeSETE {
+			cmp := x86_64.CMP_immediate(1, reg1)
+			result = append(result, cmp)
+			ctx.AddInstruction(cmp)
+		}
+	case *expr.IR_Bool:
+		value := uint64(0)
+		if c.Value {
+			value = 1
+		}
 		reg1 = ctx.AllocateRegister(TUint64)
 		defer ctx.DeallocateRegister(reg1.(*encoding.Register))
-		result = append(result, x86_64.MOV(encoding.Uint64(value), reg1))
+		mov := x86_64.MOV_immediate(value, reg1)
+		cmp := x86_64.CMP_immediate(1, reg1)
+		result = append(result, mov, cmp)
+		ctx.AddInstruction(mov, cmp)
 	case *expr.IR_Equals:
 		var err error
 		var eq []lib.Instruction
-		if includeSETE {
-			eq, err = encodeExpression(i.Op1, ctx, target)
-		} else {
-			eq, err = encode_IR_Equals(i.Op1.(*expr.IR_Equals), ctx, target, false)
-		}
+		eq, err = encode_IR_Equals(c, ctx, target, includeSETE)
 		if err != nil {
 			return nil, err
 		}
@@ -44,11 +52,7 @@ func encode_IR_Not(i *expr.IR_Not, ctx *IR_Context, target encoding.Operand, inc
 	case *expr.IR_LT:
 		var err error
 		var eq []lib.Instruction
-		if includeSETE {
-			eq, err = encodeExpression(i.Op1, ctx, target)
-		} else {
-			eq, err = encode_IR_LT(i.Op1.(*expr.IR_LT), ctx, target, false)
-		}
+		eq, err = encode_IR_LT(c, ctx, target, includeSETE)
 		if err != nil {
 			return nil, err
 		}
@@ -60,11 +64,7 @@ func encode_IR_Not(i *expr.IR_Not, ctx *IR_Context, target encoding.Operand, inc
 	case *expr.IR_LTE:
 		var err error
 		var eq []lib.Instruction
-		if includeSETE {
-			eq, err = encodeExpression(i.Op1, ctx, target)
-		} else {
-			eq, err = encode_IR_LTE(i.Op1.(*expr.IR_LTE), ctx, target, false)
-		}
+		eq, err = encode_IR_LTE(c, ctx, target, includeSETE)
 		if err != nil {
 			return nil, err
 		}
@@ -75,11 +75,7 @@ func encode_IR_Not(i *expr.IR_Not, ctx *IR_Context, target encoding.Operand, inc
 	case *expr.IR_GT:
 		var err error
 		var eq []lib.Instruction
-		if includeSETE {
-			eq, err = encodeExpression(i.Op1, ctx, target)
-		} else {
-			eq, err = encode_IR_GT(i.Op1.(*expr.IR_GT), ctx, target, false)
-		}
+		eq, err = encode_IR_GT(c, ctx, target, includeSETE)
 		if err != nil {
 			return nil, err
 		}
@@ -91,11 +87,7 @@ func encode_IR_Not(i *expr.IR_Not, ctx *IR_Context, target encoding.Operand, inc
 	case *expr.IR_GTE:
 		var err error
 		var eq []lib.Instruction
-		if includeSETE {
-			eq, err = encodeExpression(i.Op1, ctx, target)
-		} else {
-			eq, err = encode_IR_GTE(i.Op1.(*expr.IR_GTE), ctx, target, false)
-		}
+		eq, err = encode_IR_GTE(c, ctx, target, includeSETE)
 		if err != nil {
 			return nil, err
 		}
@@ -106,11 +98,7 @@ func encode_IR_Not(i *expr.IR_Not, ctx *IR_Context, target encoding.Operand, inc
 	case *expr.IR_And:
 		var err error
 		var eq []lib.Instruction
-		if includeSETE {
-			eq, err = encodeExpression(i.Op1, ctx, target)
-		} else {
-			eq, err = encode_IR_And(i.Op1.(*expr.IR_And), ctx, target)
-		}
+		eq, err = encode_IR_And(c, ctx, target)
 		if err != nil {
 			return nil, err
 		}
@@ -121,11 +109,7 @@ func encode_IR_Not(i *expr.IR_Not, ctx *IR_Context, target encoding.Operand, inc
 	case *expr.IR_Or:
 		var err error
 		var eq []lib.Instruction
-		if includeSETE {
-			eq, err = encodeExpression(i.Op1, ctx, target)
-		} else {
-			eq, err = encode_IR_Or(i.Op1.(*expr.IR_Or), ctx, target)
-		}
+		eq, err = encode_IR_Or(c, ctx, target)
 		if err != nil {
 			return nil, err
 		}
@@ -142,8 +126,8 @@ func encode_IR_Not(i *expr.IR_Not, ctx *IR_Context, target encoding.Operand, inc
 	instr := []lib.Instruction{}
 	if includeSETE {
 		// TODO: use test?
-		instr = append(instr, x86_64.CMP_immediate(0, reg1))
 		instr = append(instr, x86_64.XOR(tmpReg, tmpReg))
+		instr = append(instr, x86_64.CMP_immediate(0, reg1))
 		instr = append(instr, x86_64.SETE(tmpReg.Get8BitRegister()))
 		instr = append(instr, x86_64.MOV(tmpReg.ForOperandWidth(target.Width()), target))
 	}

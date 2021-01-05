@@ -89,7 +89,7 @@ func conditionalJump(ctx *IR_Context, condition IRExpression, stmtLen int) ([]li
 		instr = []lib.Instruction{
 			x86_64.JE(encoding.Uint8(stmtLen + jmpSize)),
 		}
-	case *expr.IR_Bool:
+	case *expr.IR_Bool, *expr.IR_Variable:
 		result, err = encodeExpression(condition, ctx, reg)
 		instr = []lib.Instruction{
 			x86_64.CMP_immediate(1, reg),

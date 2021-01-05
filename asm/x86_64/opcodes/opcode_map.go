@@ -30,6 +30,7 @@ func (o OpcodeMaps) ResolveOpcode(operands []Operand) *Opcode {
 		if oper == nil {
 			return nil
 		}
+		reg, isRegister := oper.(*Register)
 		matches := opcodeMap[oper.Type()][oper.Width()]
 		if len(matches) == 0 {
 			return nil
@@ -39,7 +40,8 @@ func (o OpcodeMaps) ResolveOpcode(operands []Operand) *Opcode {
 			if (oper == encoding.Ah || oper == encoding.Ch || oper == encoding.Dh || oper == encoding.Bh) && (opcode.HasExtension(Rex) || opcode.HasExtension(RexW)) {
 				continue
 			}
-			if (oper == encoding.Spl || oper == encoding.Bpl || oper == encoding.Sil || oper == encoding.Dil) && !(opcode.HasExtension(Rex) || opcode.HasExtension(RexW)) {
+			if (oper == encoding.Spl || oper == encoding.Bpl || oper == encoding.Sil || oper == encoding.Dil ||
+				(isRegister && reg.Register >= 8)) && !(opcode.HasExtension(Rex) || opcode.HasExtension(RexW)) {
 				continue
 			}
 
