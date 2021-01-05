@@ -5,7 +5,14 @@ import (
 	"github.com/bspaans/jit-compiler/lib"
 )
 
+type Architecture interface {
+	EncodeExpression(expr IRExpression, ctx *IR_Context, target encoding.Operand) ([]lib.Instruction, error)
+	EncodeStatement(stmt IR, ctx *IR_Context) ([]lib.Instruction, error)
+	EncodeDataSection(stmts []IR, ctx *IR_Context) ([]uint8, []uint8, error)
+}
+
 type IR_Context struct {
+	Architecture            Architecture
 	ABI                     ABI
 	Registers               []bool
 	RegistersAllocated      uint8
@@ -23,8 +30,9 @@ type IR_Context struct {
 	instructions []lib.Instruction
 }
 
-func NewIRContext() *IR_Context {
+func NewIRContext(arch Architecture) *IR_Context {
 	ctx := &IR_Context{
+		Architecture:            arch,
 		ABI:                     NewABI_AMDSystemV(),
 		Registers:               make([]bool, 16),
 		RegistersAllocated:      0,
@@ -89,6 +97,7 @@ func (i *IR_Context) Copy() *IR_Context {
 		returns = append(returns, d)
 	}
 	return &IR_Context{
+		Architecture:            i.Architecture,
 		ABI:                     i.ABI,
 		Registers:               regs,
 		RegistersAllocated:      i.RegistersAllocated,
@@ -175,13 +184,4 @@ func (i *IR_Context) allocateFloatRegister() uint8 {
 func (i *IR_Context) deallocateFloatRegister(reg uint8) {
 	i.FloatRegisters[reg] = false
 	i.FloatRegistersAllocated -= 1
-}
-
-func (i *IR_Context) AddToDataSection(value []uint8) int {
-	address := len(i.DataSection)
-	for _, v := range value {
-		i.DataSection = append(i.DataSection, v)
-		i.InstructionPointer += 1
-	}
-	return address + i.DataSectionOffset
 }

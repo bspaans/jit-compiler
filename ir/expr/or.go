@@ -3,10 +3,7 @@ package expr
 import (
 	"fmt"
 
-	"github.com/bspaans/jit-compiler/asm/x86_64"
-	"github.com/bspaans/jit-compiler/asm/x86_64/encoding"
 	. "github.com/bspaans/jit-compiler/ir/shared"
-	"github.com/bspaans/jit-compiler/lib"
 )
 
 type IR_Or struct {
@@ -27,46 +24,8 @@ func (i *IR_Or) ReturnType(ctx *IR_Context) Type {
 	return i.Op1.ReturnType(ctx)
 }
 
-func (i *IR_Or) EncodeWithoutSETE(ctx *IR_Context, target encoding.Operand) ([]lib.Instruction, error) {
-	return i.Encode(ctx, target)
-}
-
-func (i *IR_Or) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.Instruction, error) {
-	ctx.AddInstruction("operator " + encoding.Comment(i.String()))
-	returnType1, returnType2 := i.Op1.ReturnType(ctx), i.Op2.ReturnType(ctx)
-	if returnType1 != returnType2 {
-		return nil, fmt.Errorf("Unsupported types (%s, %s) in || IR operation: %s", returnType1, returnType2, i.String())
-	}
-	if returnType1 != TBool {
-		return nil, fmt.Errorf("Unsupported types (%s, %s) in || IR operation: %s", returnType1, returnType2, i.String())
-	}
-	reg := ctx.AllocateRegister(returnType1)
-	defer ctx.DeallocateRegister(reg)
-
-	result, err := i.Op1.Encode(ctx, reg)
-	if err != nil {
-		return nil, err
-	}
-	expr2, err := i.Op2.Encode(ctx, target)
-	if err != nil {
-		return nil, err
-	}
-	result = lib.Instructions(result).Add(expr2)
-	and := asm.OR(reg, target)
-	result = append(result, and)
-	ctx.AddInstruction(and)
-	return result, nil
-}
-
 func (i *IR_Or) String() string {
 	return fmt.Sprintf("%s || %s", i.Op1.String(), i.Op2.String())
-}
-
-func (b *IR_Or) AddToDataSection(ctx *IR_Context) error {
-	if err := b.Op1.AddToDataSection(ctx); err != nil {
-		return err
-	}
-	return b.Op2.AddToDataSection(ctx)
 }
 
 func (b *IR_Or) SSA_Transform(ctx *SSA_Context) (SSA_Rewrites, IRExpression) {

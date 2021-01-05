@@ -3,10 +3,7 @@ package expr
 import (
 	"fmt"
 
-	"github.com/bspaans/jit-compiler/asm/x86_64"
-	"github.com/bspaans/jit-compiler/asm/x86_64/encoding"
 	. "github.com/bspaans/jit-compiler/ir/shared"
-	"github.com/bspaans/jit-compiler/lib"
 )
 
 type IR_Float64 struct {
@@ -27,18 +24,6 @@ func (i *IR_Float64) ReturnType(ctx *IR_Context) Type {
 
 func (i *IR_Float64) String() string {
 	return fmt.Sprintf("%f", i.Value)
-}
-
-func (i *IR_Float64) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.Instruction, error) {
-	tmp := ctx.AllocateRegister(TUint64)
-	defer ctx.DeallocateRegister(tmp)
-
-	result := []lib.Instruction{
-		asm.MOV(encoding.Float64(i.Value), tmp),
-		asm.MOV(tmp, target),
-	}
-	ctx.AddInstructions(result)
-	return result, nil
 }
 
 func (b *IR_Float64) SSA_Transform(ctx *SSA_Context) (SSA_Rewrites, IRExpression) {

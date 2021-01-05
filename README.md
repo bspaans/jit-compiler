@@ -7,7 +7,7 @@ This is a Golang library containing an x86-64 assembler (see 'asm/') and a
 higher level intermediate representation that compiles down into x86-64 (see
 'ir/').
 
-## Why Though?
+## Motivation
 
 The original intent behind this project was to be able to compile complicated
 Sequencer and Synthesizer definitions down to machine code (see my [bleep](https://github.com/bspaans/bleep))
@@ -124,8 +124,8 @@ calls and syscalls is supported however.
 
 ```golang
 import (
-    "github.com/bspaans/jit-compiler/asm"
-    "github.com/bspaans/jit-compiler/asm/encoding"
+    "github.com/bspaans/jit-compiler/asm/x86_64"
+    "github.com/bspaans/jit-compiler/asm/x86_64/encoding"
     "github.com/bspaans/jit-compiler/lib"
 )
 
@@ -133,7 +133,7 @@ import (
 ...
 
 result := lib.Instructions
-result = result.Add(asm.MOV(encoding.Rax, encoding.Rcx))
+result = result.Add(x86_64.MOV(encoding.Rax, encoding.Rcx))
 machineCode, err := result.Encode()
 if err != nil {
     panic(err)

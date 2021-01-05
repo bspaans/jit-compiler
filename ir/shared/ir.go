@@ -18,7 +18,6 @@ type IR interface {
 	Type() IRType
 	String() string
 	AddToDataSection(ctx *IR_Context) error
-	Encode(*IR_Context) ([]lib.Instruction, error)
 	SSA_Transform(*SSA_Context) IR
 }
 
@@ -41,7 +40,7 @@ func (b *BaseIR) AddToDataSection(ctx *IR_Context) error {
 func IR_Length(stmt IR, ctx *IR_Context) (int, error) {
 	commit := ctx.Commit
 	ctx.Commit = false
-	instr, err := stmt.Encode(ctx)
+	instr, err := ctx.Architecture.EncodeStatement(stmt, ctx)
 	if err != nil {
 		return 0, err
 	}

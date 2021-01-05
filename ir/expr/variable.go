@@ -1,12 +1,7 @@
 package expr
 
 import (
-	"fmt"
-
-	"github.com/bspaans/jit-compiler/asm/x86_64"
-	"github.com/bspaans/jit-compiler/asm/x86_64/encoding"
 	. "github.com/bspaans/jit-compiler/ir/shared"
-	"github.com/bspaans/jit-compiler/lib"
 )
 
 type IR_Variable struct {
@@ -32,15 +27,6 @@ func (i *IR_Variable) String() string {
 	return i.Value
 }
 
-func (i *IR_Variable) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.Instruction, error) {
-	reg, ok := ctx.VariableMap[i.Value]
-	if !ok || reg == nil {
-		return nil, fmt.Errorf("Unknown variable '%s'", i.Value)
-	}
-	result := []lib.Instruction{asm.MOV(reg, target)}
-	ctx.AddInstructions(result)
-	return result, nil
-}
 func (b *IR_Variable) SSA_Transform(ctx *SSA_Context) (SSA_Rewrites, IRExpression) {
 	return nil, b
 }

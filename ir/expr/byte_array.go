@@ -3,16 +3,15 @@ package expr
 import (
 	"fmt"
 
-	"github.com/bspaans/jit-compiler/asm/x86_64"
-	"github.com/bspaans/jit-compiler/asm/x86_64/encoding"
 	. "github.com/bspaans/jit-compiler/ir/shared"
-	"github.com/bspaans/jit-compiler/lib"
 )
 
 type IR_ByteArray struct {
 	*BaseIRExpression
-	Value   []uint8
-	address int
+	Value []uint8
+
+	// Set during EncodeDataSection
+	Address int
 }
 
 func NewIR_ByteArray(value []uint8) *IR_ByteArray {
@@ -30,21 +29,6 @@ func (i *IR_ByteArray) String() string {
 	return fmt.Sprintf("%v", i.Value)
 }
 
-func (i *IR_ByteArray) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.Instruction, error) {
-	// Calculate the displacement between RIP (the instruction pointer,
-	// pointing to the *next* instruction) and the address of our byte array,
-	// and load the resulting address into target using a LEA instruction.
-	ownLength := uint(7)
-	diff := uint(ctx.InstructionPointer+ownLength) - uint(i.address)
-	result := []lib.Instruction{asm.LEA(&encoding.RIPRelative{encoding.Int32(int32(-diff))}, target)}
-	ctx.AddInstructions(result)
-	return result, nil
-}
-
-func (b *IR_ByteArray) AddToDataSection(ctx *IR_Context) error {
-	b.address = ctx.AddToDataSection(b.Value)
-	return nil
-}
 func (b *IR_ByteArray) SSA_Transform(ctx *SSA_Context) (SSA_Rewrites, IRExpression) {
 	return nil, b
 }

@@ -10,7 +10,6 @@ type IRExpression interface {
 	Type() IRExpressionType
 	ReturnType(ctx *IR_Context) Type
 	AddToDataSection(ctx *IR_Context) error
-	Encode(ctx *IR_Context, target encoding.Operand) ([]lib.Instruction, error)
 	String() string
 	SSA_Transform(*SSA_Context) (SSA_Rewrites, IRExpression)
 }
@@ -86,7 +85,7 @@ func IsLiteralOrVariable(e IRExpression) bool {
 func IREXpression_length(expr IRExpression, ctx *IR_Context, target encoding.Operand) (int, error) {
 	commit := ctx.Commit
 	ctx.Commit = false
-	instr, err := expr.Encode(ctx, target)
+	instr, err := ctx.Architecture.EncodeExpression(expr, ctx, target)
 	if err != nil {
 		return 0, err
 	}

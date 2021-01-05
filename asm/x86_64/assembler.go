@@ -1,4 +1,4 @@
-package asm
+package x86_64
 
 /*
 	Instructions

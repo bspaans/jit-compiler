@@ -3,10 +3,7 @@ package expr
 import (
 	"fmt"
 
-	"github.com/bspaans/jit-compiler/asm/x86_64"
-	"github.com/bspaans/jit-compiler/asm/x86_64/encoding"
 	. "github.com/bspaans/jit-compiler/ir/shared"
-	"github.com/bspaans/jit-compiler/lib"
 )
 
 type IR_Int16 struct {
@@ -29,12 +26,6 @@ func (i *IR_Int16) String() string {
 	return fmt.Sprintf("%d", i.Value)
 }
 
-func (i *IR_Int16) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.Instruction, error) {
-
-	result := []lib.Instruction{asm.MOV(encoding.Uint16(uint16(i.Value)), target)}
-	ctx.AddInstructions(result)
-	return result, nil
-}
 func (b *IR_Int16) SSA_Transform(ctx *SSA_Context) (SSA_Rewrites, IRExpression) {
 	return nil, b
 }

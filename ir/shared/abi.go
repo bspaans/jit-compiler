@@ -58,7 +58,7 @@ func PreserveRegisters(ctx *IR_Context, argTypes []Type, returnType Type) (lib.I
 
 	// push the return register; TODO: check if in use?
 	returnOp := ctx.ABI.ReturnTypeToOperand(returnType)
-	push := asm.PUSH(returnOp)
+	push := x86_64.PUSH(returnOp)
 	result = append(result, push)
 	clobbered = append(clobbered, returnOp)
 	ctx.AddInstruction(push)
@@ -74,8 +74,8 @@ func PreserveRegisters(ctx *IR_Context, argTypes []Type, returnType Type) (lib.I
 			inUse = ctx.Registers[reg.Register]
 		}
 		if inUse {
-			result = append(result, asm.PUSH(reg))
-			ctx.AddInstruction(asm.PUSH(reg))
+			result = append(result, x86_64.PUSH(reg))
+			ctx.AddInstruction(x86_64.PUSH(reg))
 			clobbered = append(clobbered, reg)
 		}
 	}
@@ -122,7 +122,11 @@ func ABI_Call_Setup(ctx *IR_Context, args []IRExpression, returnType Type) (lib.
 	}
 
 	for i, arg := range args {
-		instr, err := arg.Encode(ctx_, regs[i])
+		// TODO: this should probably move to the "encode" package
+		if ctx.Architecture == nil {
+			return nil, nil, nil, fmt.Errorf("Missing Architecture in IR_Context")
+		}
+		instr, err := ctx.Architecture.EncodeExpression(arg, ctx_, regs[i])
 		if err != nil {
 			return nil, nil, nil, err
 		}
@@ -144,8 +148,8 @@ func RestoreRegisters(ctx *IR_Context, clobbered []encoding.Operand) lib.Instruc
 	result := []lib.Instruction{}
 	for j := len(clobbered) - 1; j >= 0; j-- {
 		reg := clobbered[j]
-		result = append(result, asm.POP(reg))
-		ctx.AddInstruction(asm.POP(reg))
+		result = append(result, x86_64.POP(reg))
+		ctx.AddInstruction(x86_64.POP(reg))
 	}
 	return result
 }

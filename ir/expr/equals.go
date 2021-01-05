@@ -3,10 +3,7 @@ package expr
 import (
 	"fmt"
 
-	"github.com/bspaans/jit-compiler/asm/x86_64"
-	"github.com/bspaans/jit-compiler/asm/x86_64/encoding"
 	. "github.com/bspaans/jit-compiler/ir/shared"
-	"github.com/bspaans/jit-compiler/lib"
 )
 
 type IR_Equals struct {
@@ -25,33 +22,6 @@ func NewIR_Equals(op1, op2 IRExpression) *IR_Equals {
 
 func (i *IR_Equals) ReturnType(ctx *IR_Context) Type {
 	return TBool
-}
-
-func (i *IR_Equals) EncodeWithoutSETE(ctx *IR_Context, target encoding.Operand) ([]lib.Instruction, error) {
-	return i.encode(ctx, target, false)
-}
-
-func (i *IR_Equals) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.Instruction, error) {
-	return i.encode(ctx, target, true)
-}
-
-func (i *IR_Equals) encode(ctx *IR_Context, target encoding.Operand, includeSETE bool) ([]lib.Instruction, error) {
-	result, err := Compare(i.Op1, i.Op2, ctx)
-	if err != nil {
-		return nil, fmt.Errorf("%s in %s", err.Error(), i.String())
-	}
-	if includeSETE {
-		tmpReg := ctx.AllocateRegister(TUint64)
-		defer ctx.DeallocateRegister(tmpReg)
-		// TODO xor tmpreg
-		sete := asm.SETE(tmpReg.Get8BitRegister())
-		mov := asm.MOV(tmpReg.ForOperandWidth(target.Width()), target)
-		result = append(result, sete)
-		result = append(result, mov)
-		ctx.AddInstruction(sete)
-		ctx.AddInstruction(mov)
-	}
-	return result, nil
 }
 
 func (i *IR_Equals) String() string {

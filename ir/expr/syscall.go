@@ -3,10 +3,7 @@ package expr
 import (
 	"fmt"
 
-	"github.com/bspaans/jit-compiler/asm/x86_64"
-	"github.com/bspaans/jit-compiler/asm/x86_64/encoding"
 	. "github.com/bspaans/jit-compiler/ir/shared"
-	"github.com/bspaans/jit-compiler/lib"
 )
 
 type IR_Syscall struct {
@@ -28,38 +25,6 @@ func (i *IR_Syscall) ReturnType(ctx *IR_Context) Type {
 
 func (i *IR_Syscall) String() string {
 	return fmt.Sprintf("syscall(%v, %v)", i.Syscall, i.Args)
-}
-
-func (i *IR_Syscall) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.Instruction, error) {
-
-	result, _, clobbered, err := ABI_Call_Setup(ctx, i.Args, TUint64)
-	if err != nil {
-		return nil, err
-	}
-	instr, err := i.Syscall.Encode(ctx, encoding.Rax)
-	if err != nil {
-		return nil, err
-	}
-	for _, inst := range instr {
-		result = append(result, inst)
-	}
-	tmpTarget := ctx.AllocateRegister(TUint64)
-	defer ctx.DeallocateRegister(tmpTarget)
-
-	instr = []lib.Instruction{
-		asm.SYSCALL(),
-		asm.MOV(encoding.Rax, tmpTarget),
-	}
-	for _, inst := range instr {
-		result = append(result, inst)
-		ctx.AddInstruction(inst)
-	}
-	restore := RestoreRegisters(ctx, clobbered)
-	result = result.Add(restore)
-	mov := asm.MOV(tmpTarget, target)
-	ctx.AddInstruction(mov)
-	result = append(result, mov)
-	return result, nil
 }
 
 func (b *IR_Syscall) AddToDataSection(ctx *IR_Context) error {

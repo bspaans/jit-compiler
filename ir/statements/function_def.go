@@ -6,7 +6,6 @@ import (
 
 	"github.com/bspaans/jit-compiler/ir/expr"
 	. "github.com/bspaans/jit-compiler/ir/shared"
-	"github.com/bspaans/jit-compiler/lib"
 )
 
 type IR_FunctionDef struct {
@@ -24,25 +23,12 @@ func NewIR_FunctionDef(name string, expr *expr.IR_Function) *IR_FunctionDef {
 	}
 }
 
-// Allocates a new register and assigns it the value of the expression.
-func (i *IR_FunctionDef) Encode(ctx *IR_Context) ([]lib.Instruction, error) {
-	reg := ctx.AllocateRegister(TUint64)
-	returnType := i.Expr.ReturnType(ctx)
-	ctx.VariableTypes[i.Name] = returnType
-	ctx.VariableMap[i.Name] = reg
-	return i.Expr.Encode(ctx, reg)
-}
-
 func (i *IR_FunctionDef) String() string {
 	args := []string{}
 	for j, arg := range i.Expr.Signature.ArgNames {
 		args = append(args, arg+" "+i.Expr.Signature.Args[j].String())
 	}
 	return fmt.Sprintf("func %s(%s) %s { %s }", i.Name, strings.Join(args, ", "), i.Expr.Signature.ReturnType.String(), i.Expr.Body.String())
-}
-
-func (i *IR_FunctionDef) AddToDataSection(ctx *IR_Context) error {
-	return i.Expr.AddToDataSection(ctx)
 }
 
 func (i *IR_FunctionDef) SSA_Transform(ctx *SSA_Context) IR {

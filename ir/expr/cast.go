@@ -3,10 +3,7 @@ package expr
 import (
 	"fmt"
 
-	"github.com/bspaans/jit-compiler/asm/x86_64"
-	"github.com/bspaans/jit-compiler/asm/x86_64/encoding"
 	. "github.com/bspaans/jit-compiler/ir/shared"
-	"github.com/bspaans/jit-compiler/lib"
 )
 
 type IR_Cast struct {
@@ -31,107 +28,6 @@ func (i *IR_Cast) String() string {
 	return fmt.Sprintf("%s(%s)", i.CastToType.String(), i.Value.String())
 }
 
-func (i *IR_Cast) Encode(ctx *IR_Context, target encoding.Operand) ([]lib.Instruction, error) {
-	ctx.AddInstruction("cast " + encoding.Comment(i.String()))
-	result := []lib.Instruction{}
-	valueType := i.Value.ReturnType(ctx)
-	if valueType == nil {
-		return nil, fmt.Errorf("nil return type in %s", i.Value.String())
-	}
-	// TODO: use movsx and movzx
-	if i.CastToType == TUint64 {
-		if valueType == TUint64 {
-			return i.Value.Encode(ctx, target)
-		} else if valueType == TUint32 {
-			tmpReg := ctx.AllocateRegister(valueType)
-			defer ctx.DeallocateRegister(tmpReg)
-			expr, err := i.Value.Encode(ctx, tmpReg)
-			if err != nil {
-				return nil, err
-			}
-			for _, code := range expr {
-				result = append(result, code)
-			}
-			mov := asm.MOV(tmpReg.Get64BitRegister(), target)
-			ctx.AddInstruction(mov)
-			result = append(result, mov)
-			return result, nil
-		} else if valueType == TUint16 || valueType == TUint8 {
-			tmpReg := ctx.AllocateRegister(valueType)
-			defer ctx.DeallocateRegister(tmpReg)
-			expr, err := i.Value.Encode(ctx, tmpReg)
-			if err != nil {
-				return nil, err
-			}
-			for _, code := range expr {
-				result = append(result, code)
-			}
-			mov := asm.MOVZX(tmpReg, target)
-			ctx.AddInstruction(mov)
-			result = append(result, mov)
-			return result, nil
-		} else if valueType == TFloat64 {
-			tmpReg := ctx.AllocateRegister(TFloat64)
-			defer ctx.DeallocateRegister(tmpReg)
-
-			expr, err := i.Value.Encode(ctx, tmpReg)
-			if err != nil {
-				return nil, err
-			}
-			for _, code := range expr {
-				result = append(result, code)
-			}
-			cvt := asm.CVTTSD2SI(tmpReg, target)
-			ctx.AddInstruction(cvt)
-			result = append(result, cvt)
-			return result, nil
-		}
-	} else if i.CastToType == TUint8 {
-		if valueType == TUint64 || valueType == TUint32 || valueType == TUint16 || valueType == TUint8 {
-			result, err := i.Value.Encode(ctx, target)
-			if err != nil {
-				return nil, err
-			}
-			return result, nil
-		}
-	} else if i.CastToType == TUint16 {
-		if valueType == TUint64 || valueType == TUint32 || valueType == TUint16 || valueType == TUint8 {
-			result, err := i.Value.Encode(ctx, target)
-			if err != nil {
-				return nil, err
-			}
-			return result, nil
-		}
-	} else if i.CastToType == TUint32 {
-		if valueType == TUint64 || valueType == TUint32 || valueType == TUint16 || valueType == TUint8 {
-			result, err := i.Value.Encode(ctx, target)
-			if err != nil {
-				return nil, err
-			}
-			return result, nil
-		}
-	} else if i.CastToType == TFloat64 {
-		if valueType == TFloat64 {
-			return i.Value.Encode(ctx, target)
-		} else if valueType == TUint64 {
-			tmpReg := ctx.AllocateRegister(TUint64)
-			defer ctx.DeallocateRegister(tmpReg)
-
-			expr, err := i.Value.Encode(ctx, tmpReg)
-			if err != nil {
-				return nil, err
-			}
-			for _, code := range expr {
-				result = append(result, code)
-			}
-			cvt := asm.CVTSI2SD(tmpReg, target)
-			ctx.AddInstruction(cvt)
-			result = append(result, cvt)
-			return result, nil
-		}
-	}
-	return nil, fmt.Errorf("Unsupported cast operation %s -> (%s) in: %s", valueType.String(), i.CastToType.String(), i.String())
-}
 func (b *IR_Cast) SSA_Transform(ctx *SSA_Context) (SSA_Rewrites, IRExpression) {
 	if IsLiteralOrVariable(b.Value) {
 		return nil, b

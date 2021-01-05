@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/bspaans/jit-compiler/ir"
+	"github.com/bspaans/jit-compiler/ir/encoding/x86_64"
 	"github.com/bspaans/jit-compiler/ir/shared"
 )
 
@@ -23,7 +24,7 @@ func REPL() {
 		}
 		debug := true
 		statements = statements.SSA_Transform(shared.NewSSA_Context())
-		instr, err := ir.Compile([]shared.IR{statements}, debug)
+		instr, err := ir.Compile(&x86_64.X86_64{}, []shared.IR{statements}, debug)
 		if err != nil {
 			fmt.Println("Compile error: ", err.Error())
 			continue
@@ -49,7 +50,7 @@ func CompileFiles() {
 
 	debug := true
 	statements = statements.SSA_Transform(shared.NewSSA_Context())
-	if err := ir.CompileToBinary([]shared.IR{statements}, debug, "test.bin"); err != nil {
+	if err := ir.CompileToBinary(&x86_64.X86_64{}, []shared.IR{statements}, debug, "test.bin"); err != nil {
 		panic(err)
 
 	}

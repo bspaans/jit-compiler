@@ -10,13 +10,13 @@ import (
 	"github.com/bspaans/jit-compiler/lib"
 )
 
-func Compile(stmts []IR, debug bool) (lib.MachineCode, error) {
-	ctx := NewIRContext()
+func Compile(targetArchitecture Architecture, stmts []IR, debug bool) (lib.MachineCode, error) {
+	ctx := NewIRContext(targetArchitecture)
 	return CompileWithContext(stmts, debug, ctx)
 }
 
-func CompileToBinary(stmts []IR, debug bool, path string) error {
-	ctx := NewIRContext()
+func CompileToBinary(targetArchitecture Architecture, stmts []IR, debug bool, path string) error {
+	ctx := NewIRContext(targetArchitecture)
 	ctx.ReturnOperandStack = []encoding.Operand{encoding.Rax}
 	code, err := CompileWithContext(stmts, debug, ctx)
 	if err != nil {
@@ -27,29 +27,25 @@ func CompileToBinary(stmts []IR, debug bool, path string) error {
 
 func CompileWithContext(stmts []IR, debug bool, ctx *IR_Context) (lib.MachineCode, error) {
 	result := []uint8{}
+	readonly, rw, err := ctx.Architecture.EncodeDataSection(stmts, ctx)
+	if err != nil {
+		return nil, err
+	}
 	if debug {
+		fmt.Println(".rodata:")
+		fmt.Println(readonly)
 		fmt.Println(".data:")
+		fmt.Println(rw)
 	}
-	for _, stmt := range stmts {
-		currentOffset := ctx.DataSectionOffset + len(ctx.DataSection)
-		if err := stmt.AddToDataSection(ctx); err != nil {
-			return nil, err
-		}
-		if len(ctx.DataSection) != currentOffset-2 {
-			if debug {
-				fmt.Printf("0x%x-0x%x (0x%x): %s\n",
-					currentOffset,
-					len(ctx.DataSection)+ctx.DataSectionOffset,
-					len(ctx.DataSection)+ctx.DataSectionOffset-currentOffset, stmt.String())
-				fmt.Println(lib.MachineCode(ctx.DataSection[currentOffset-ctx.DataSectionOffset : len(ctx.DataSection)]))
-			}
-		}
-	}
+	// TODO: do this properly
+	ctx.DataSection = append(readonly, rw...)
+	ctx.InstructionPointer += uint(len(ctx.DataSection))
 	if debug {
 		fmt.Println("_start:")
 	}
 	if len(ctx.DataSection) > 0 {
-		jmp := asm.JMP(encoding.Uint8(len(ctx.DataSection)))
+		// TODO make Architecture dependent
+		jmp := x86_64.JMP(encoding.Uint8(len(ctx.DataSection)))
 		if debug {
 			fmt.Printf("0x%x: %s\n", 0, jmp.String())
 		}
@@ -70,7 +66,7 @@ func CompileWithContext(stmts []IR, debug bool, ctx *IR_Context) (lib.MachineCod
 	}
 	address := uint(ctx.DataSectionOffset + len(ctx.DataSection))
 	for _, stmt := range stmts {
-		code, err := stmt.Encode(ctx)
+		code, err := ctx.Architecture.EncodeStatement(stmt, ctx)
 		if err != nil {
 			return nil, fmt.Errorf("Error encoding %s: %s", stmt, err.Error())
 		}
