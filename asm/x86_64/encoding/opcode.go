@@ -3,6 +3,8 @@ package encoding
 import (
 	"fmt"
 	"strings"
+
+	"github.com/bspaans/jit-compiler/lib"
 )
 
 //go:generate stringer -type=OperandType
@@ -83,7 +85,7 @@ func (o *OpcodeOperand) String() string {
 	return o.Type.String()[3:]
 }
 
-func (o OpcodeOperand) TypeCheck(op Operand) bool {
+func (o OpcodeOperand) TypeCheck(op lib.Operand) bool {
 	// TODO
 	return true
 }
@@ -105,7 +107,7 @@ func (o *Opcode) HasExtension(ext OpcodeExtensions) bool {
 	return false
 }
 
-func (o *Opcode) Encode(ops []Operand) ([]uint8, error) {
+func (o *Opcode) Encode(ops []lib.Operand) ([]uint8, error) {
 	instr := NewInstructionFormat(o.Opcode)
 	exts := map[OpcodeExtensions]bool{}
 	for _, p := range o.Prefixes {
@@ -171,7 +173,7 @@ func (o *Opcode) Encode(ops []Operand) ([]uint8, error) {
 	for i, opcodeOperand := range o.Operands {
 		op := ops[i]
 		if opcodeOperand.TypeCheck(op) {
-			if op.Type() == T_Register {
+			if op.Type() == lib.T_Register {
 				oper := op.(*Register)
 				if opcodeOperand.Encoding == ModRM_rm_r || opcodeOperand.Encoding == ModRM_rm_rw {
 					if instr.ModRM == nil {
@@ -199,7 +201,7 @@ func (o *Opcode) Encode(ops []Operand) ([]uint8, error) {
 				} else {
 					return nil, fmt.Errorf("Unsupported encoding [%d] in %s", opcodeOperand.Encoding, o.String())
 				}
-			} else if op.Type() == T_DisplacedRegister {
+			} else if op.Type() == lib.T_DisplacedRegister {
 				oper := op.(*DisplacedRegister)
 				if opcodeOperand.Encoding == ModRM_rm_r || opcodeOperand.Encoding == ModRM_rm_rw {
 					if instr.ModRM == nil {
@@ -225,7 +227,7 @@ func (o *Opcode) Encode(ops []Operand) ([]uint8, error) {
 				} else {
 					return nil, fmt.Errorf("Unsupported encoding [%d] in %s", opcodeOperand.Encoding, o.String())
 				}
-			} else if op.Type() == T_IndirectRegister {
+			} else if op.Type() == lib.T_IndirectRegister {
 				oper := op.(*IndirectRegister)
 				if opcodeOperand.Encoding == ModRM_rm_r || opcodeOperand.Encoding == ModRM_rm_rw {
 					if instr.ModRM == nil {
@@ -249,7 +251,7 @@ func (o *Opcode) Encode(ops []Operand) ([]uint8, error) {
 				} else {
 					return nil, fmt.Errorf("Unsupported encoding [%d] in %s", opcodeOperand.Encoding, o.String())
 				}
-			} else if op.Type() == T_RIPRelative {
+			} else if op.Type() == lib.T_RIPRelative {
 				oper := op.(*RIPRelative)
 				if opcodeOperand.Encoding == ModRM_rm_r || opcodeOperand.Encoding == ModRM_rm_rw {
 					if instr.ModRM == nil {
@@ -266,7 +268,7 @@ func (o *Opcode) Encode(ops []Operand) ([]uint8, error) {
 					instr.ModRM.Reg = 5
 					instr.SetDisplacement(op, oper.Displacement.Encode())
 				}
-			} else if op.Type() == T_SIBRegister {
+			} else if op.Type() == lib.T_SIBRegister {
 				oper := op.(*SIBRegister)
 				if opcodeOperand.Encoding == ModRM_rm_r || opcodeOperand.Encoding == ModRM_rm_rw {
 					if instr.ModRM == nil {
@@ -287,23 +289,23 @@ func (o *Opcode) Encode(ops []Operand) ([]uint8, error) {
 						instr.SetDisplacement(oper.Register, []uint8{0})
 					}
 				}
-			} else if op.Type() == T_Uint64 {
+			} else if op.Type() == lib.T_Uint64 {
 				for _, b := range op.(Uint64).Encode() {
 					instr.Immediate = append(instr.Immediate, b)
 				}
-			} else if op.Type() == T_Float64 {
+			} else if op.Type() == lib.T_Float64 {
 				for _, b := range op.(Float64).Encode() {
 					instr.Immediate = append(instr.Immediate, b)
 				}
-			} else if op.Type() == T_Uint32 {
+			} else if op.Type() == lib.T_Uint32 {
 				for _, b := range op.(Uint32).Encode() {
 					instr.Immediate = append(instr.Immediate, b)
 				}
-			} else if op.Type() == T_Uint16 {
+			} else if op.Type() == lib.T_Uint16 {
 				for _, b := range op.(Uint16).Encode() {
 					instr.Immediate = append(instr.Immediate, b)
 				}
-			} else if op.Type() == T_Uint8 {
+			} else if op.Type() == lib.T_Uint8 {
 				for _, b := range op.(Uint8).Encode() {
 					instr.Immediate = append(instr.Immediate, b)
 				}

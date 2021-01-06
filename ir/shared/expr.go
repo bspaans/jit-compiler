@@ -1,7 +1,6 @@
 package shared
 
 import (
-	"github.com/bspaans/jit-compiler/asm/x86_64/encoding"
 	"github.com/bspaans/jit-compiler/lib"
 )
 
@@ -82,7 +81,7 @@ func IsLiteralOrVariable(e IRExpression) bool {
 	return IsVariable(e) || IsLiteral(e)
 }
 
-func IREXpression_length(expr IRExpression, ctx *IR_Context, target encoding.Operand) (int, error) {
+func IREXpression_length(expr IRExpression, ctx *IR_Context, target lib.Operand) (int, error) {
 	commit := ctx.Commit
 	ctx.Commit = false
 	instr, err := ctx.Architecture.EncodeExpression(expr, ctx, target)

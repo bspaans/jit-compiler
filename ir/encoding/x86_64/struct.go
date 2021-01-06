@@ -10,7 +10,7 @@ import (
 	"github.com/bspaans/jit-compiler/lib"
 )
 
-func encode_IR_Struct(i *expr.IR_Struct, ctx *IR_Context, target encoding.Operand) ([]lib.Instruction, error) {
+func encode_IR_Struct(i *expr.IR_Struct, ctx *IR_Context, target lib.Operand) ([]lib.Instruction, error) {
 	// Calculate the displacement between RIP (the instruction pointer,
 	// pointing to the *next* instruction) and the address of our byte array,
 	// and load the resulting address into target using a LEA instruction.

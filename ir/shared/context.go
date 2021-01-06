@@ -6,15 +6,15 @@ import (
 )
 
 type Architecture interface {
-	EncodeExpression(expr IRExpression, ctx *IR_Context, target encoding.Operand) ([]lib.Instruction, error)
+	EncodeExpression(expr IRExpression, ctx *IR_Context, target lib.Operand) ([]lib.Instruction, error)
 	EncodeStatement(stmt IR, ctx *IR_Context) ([]lib.Instruction, error)
 	EncodeDataSection(stmts []IR, ctx *IR_Context) (*Segments, error)
 	GetAllocator() Allocator
 }
 
 type Allocator interface {
-	AllocateRegister(typ Type) encoding.Operand
-	DeallocateRegister(encoding.Operand)
+	AllocateRegister(typ Type) lib.Operand
+	DeallocateRegister(lib.Operand)
 	Copy() Allocator
 }
 
@@ -23,9 +23,9 @@ type IR_Context struct {
 	ABI          ABI
 	Allocator    Allocator
 
-	VariableMap        map[string]encoding.Operand
+	VariableMap        map[string]lib.Operand
 	VariableTypes      map[string]Type
-	ReturnOperandStack []encoding.Operand
+	ReturnOperandStack []lib.Operand
 	Segments           *Segments
 	InstructionPointer uint
 	StackPointer       int
@@ -38,9 +38,9 @@ func NewIRContext(arch Architecture, abi ABI) *IR_Context {
 	ctx := &IR_Context{
 		Architecture:       arch,
 		ABI:                abi,
-		VariableMap:        map[string]encoding.Operand{},
+		VariableMap:        map[string]lib.Operand{},
 		VariableTypes:      map[string]Type{},
-		ReturnOperandStack: []encoding.Operand{&encoding.DisplacedRegister{encoding.Rsp, 8}},
+		ReturnOperandStack: []lib.Operand{&encoding.DisplacedRegister{encoding.Rsp, 8}},
 		InstructionPointer: 2,
 		StackPointer:       8,
 		Commit:             true,
@@ -50,21 +50,21 @@ func NewIRContext(arch Architecture, abi ABI) *IR_Context {
 	return ctx
 }
 
-func (i *IR_Context) PushReturnOperand(op encoding.Operand) {
+func (i *IR_Context) PushReturnOperand(op lib.Operand) {
 	i.ReturnOperandStack = append(i.ReturnOperandStack, op)
 }
-func (i *IR_Context) PeekReturn() encoding.Operand {
+func (i *IR_Context) PeekReturn() lib.Operand {
 	return i.ReturnOperandStack[len(i.ReturnOperandStack)-1]
 }
 
-func (i *IR_Context) PopReturn() encoding.Operand {
+func (i *IR_Context) PopReturn() lib.Operand {
 	op := i.ReturnOperandStack[len(i.ReturnOperandStack)-1]
 	i.ReturnOperandStack = i.ReturnOperandStack[:len(i.ReturnOperandStack)-1]
 	return op
 }
 
 func (i *IR_Context) Copy() *IR_Context {
-	variableMap := map[string]encoding.Operand{}
+	variableMap := map[string]lib.Operand{}
 	for arg, reg := range i.VariableMap {
 		variableMap[arg] = reg
 	}
@@ -76,7 +76,7 @@ func (i *IR_Context) Copy() *IR_Context {
 	for _, d := range i.instructions {
 		instructions = append(instructions, d)
 	}
-	returns := []encoding.Operand{}
+	returns := []lib.Operand{}
 	for _, d := range i.ReturnOperandStack {
 		returns = append(returns, d)
 	}

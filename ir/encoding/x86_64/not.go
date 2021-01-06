@@ -11,9 +11,9 @@ import (
 	"github.com/bspaans/jit-compiler/lib"
 )
 
-func encode_IR_Not(i *expr.IR_Not, ctx *IR_Context, target encoding.Operand, includeSETE bool) ([]lib.Instruction, error) {
+func encode_IR_Not(i *expr.IR_Not, ctx *IR_Context, target lib.Operand, includeSETE bool) ([]lib.Instruction, error) {
 
-	var reg1 encoding.Operand
+	var reg1 lib.Operand
 
 	result := []lib.Instruction{}
 

@@ -39,7 +39,7 @@ func (a *ABI_AMDSystemV) GetRegistersForArgs(args []Type) []*encoding.Register {
 	return result
 }
 
-func (a *ABI_AMDSystemV) ReturnTypeToOperand(arg Type) encoding.Operand {
+func (a *ABI_AMDSystemV) ReturnTypeToOperand(arg Type) lib.Operand {
 	if arg.Type() == T_Float64 {
 		return encoding.Xmm0
 	}
@@ -47,10 +47,10 @@ func (a *ABI_AMDSystemV) ReturnTypeToOperand(arg Type) encoding.Operand {
 }
 
 // returns instructions and clobbered registers
-func PreserveRegisters(ctx *IR_Context, argTypes []Type, returnType Type) (lib.Instructions, map[encoding.Operand]encoding.Operand, []encoding.Operand) {
-	clobbered := []encoding.Operand{}
+func PreserveRegisters(ctx *IR_Context, argTypes []Type, returnType Type) (lib.Instructions, map[lib.Operand]lib.Operand, []lib.Operand) {
+	clobbered := []lib.Operand{}
 	result := []lib.Instruction{}
-	mapping := map[encoding.Operand]encoding.Operand{}
+	mapping := map[lib.Operand]lib.Operand{}
 
 	// push the return register; TODO: check if in use?
 	returnOp := ctx.ABI.ReturnTypeToOperand(returnType)
@@ -94,7 +94,7 @@ func PreserveRegisters(ctx *IR_Context, argTypes []Type, returnType Type) (lib.I
 	return result, mapping, clobbered
 }
 
-func ABI_Call_Setup(ctx *IR_Context, args []IRExpression, returnType Type) (lib.Instructions, map[encoding.Operand]encoding.Operand, []encoding.Operand, error) {
+func ABI_Call_Setup(ctx *IR_Context, args []IRExpression, returnType Type) (lib.Instructions, map[lib.Operand]lib.Operand, []lib.Operand, error) {
 	argTypes := make([]Type, len(args))
 	for i, arg := range args {
 		argTypes[i] = arg.ReturnType(ctx)
@@ -141,7 +141,7 @@ func ABI_Call_Setup(ctx *IR_Context, args []IRExpression, returnType Type) (lib.
 
 }
 
-func RestoreRegisters(ctx *IR_Context, clobbered []encoding.Operand) lib.Instructions {
+func RestoreRegisters(ctx *IR_Context, clobbered []lib.Operand) lib.Instructions {
 	// Pop in reverse order
 	result := []lib.Instruction{}
 	for j := len(clobbered) - 1; j >= 0; j-- {

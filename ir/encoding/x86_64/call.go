@@ -10,7 +10,7 @@ import (
 	"github.com/bspaans/jit-compiler/lib"
 )
 
-func encode_IR_Call(i *expr.IR_Call, ctx *IR_Context, target encoding.Operand) ([]lib.Instruction, error) {
+func encode_IR_Call(i *expr.IR_Call, ctx *IR_Context, target lib.Operand) ([]lib.Instruction, error) {
 	result, mapping, clobbered, err := ABI_Call_Setup(ctx, i.Args, ctx.VariableTypes[i.Function].(*TFunction).ReturnType)
 	if err != nil {
 		return nil, err

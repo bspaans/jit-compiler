@@ -1,6 +1,10 @@
 package encoding
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/bspaans/jit-compiler/lib"
+)
 
 type SIBRegister struct {
 	*Register
@@ -8,8 +12,8 @@ type SIBRegister struct {
 	Scale Scale
 }
 
-func (t *SIBRegister) Type() Type {
-	return T_SIBRegister
+func (t *SIBRegister) Type() lib.Type {
+	return lib.T_SIBRegister
 }
 
 func (t *SIBRegister) String() string {

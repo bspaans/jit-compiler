@@ -17,7 +17,7 @@ func Compile(targetArchitecture Architecture, abi ABI, stmts []IR, debug bool) (
 
 func CompileToBinary(targetArchitecture Architecture, abi ABI, stmts []IR, debug bool, path string) error {
 	ctx := NewIRContext(targetArchitecture, abi)
-	ctx.ReturnOperandStack = []encoding.Operand{encoding.Rax}
+	ctx.ReturnOperandStack = []lib.Operand{encoding.Rax}
 	code, err := CompileWithContext(stmts, debug, ctx)
 	if err != nil {
 		return err

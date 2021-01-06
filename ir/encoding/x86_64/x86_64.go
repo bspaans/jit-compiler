@@ -13,7 +13,7 @@ import (
 type X86_64 struct {
 }
 
-func (x *X86_64) EncodeExpression(expr IRExpression, ctx *IR_Context, target encoding.Operand) ([]lib.Instruction, error) {
+func (x *X86_64) EncodeExpression(expr IRExpression, ctx *IR_Context, target lib.Operand) ([]lib.Instruction, error) {
 	return encodeExpression(expr, ctx, target)
 }
 
@@ -31,7 +31,7 @@ func (x *X86_64) EncodeDataSection(stmts []IR, ctx *IR_Context) (*Segments, erro
 	return segments, nil
 }
 
-func encodeExpression(e IRExpression, ctx *IR_Context, target encoding.Operand) ([]lib.Instruction, error) {
+func encodeExpression(e IRExpression, ctx *IR_Context, target lib.Operand) ([]lib.Instruction, error) {
 	switch v := e.(type) {
 	case *expr.IR_Add:
 		return encode_IR_Add(v, ctx, target)
@@ -248,14 +248,14 @@ func NewX86_64_Allocator() *X86_64_Allocator {
 	return x
 }
 
-func (i *X86_64_Allocator) AllocateRegister(typ Type) encoding.Operand {
+func (i *X86_64_Allocator) AllocateRegister(typ Type) lib.Operand {
 	if typ == TFloat64 {
 		return encoding.GetFloatingPointRegisterByIndex(i.allocateFloatRegister())
 	}
 	return encoding.Get64BitRegisterByIndex(i.allocateRegister()).ForOperandWidth(typ.Width())
 }
 
-func (i *X86_64_Allocator) DeallocateRegister(op encoding.Operand) {
+func (i *X86_64_Allocator) DeallocateRegister(op lib.Operand) {
 	reg, ok := op.(*encoding.Register)
 	if !ok {
 		return

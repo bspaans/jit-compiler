@@ -1,6 +1,4 @@
-package encoding
-
-import "github.com/bspaans/jit-compiler/lib"
+package lib
 
 //go:generate stringer -type=Type
 type Type uint8
@@ -25,7 +23,7 @@ const (
 type Operand interface {
 	Type() Type
 	String() string
-	Width() lib.Size
+	Width() Size
 }
 
 func IsRegister(op Operand) bool {

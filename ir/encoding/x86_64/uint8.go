@@ -8,7 +8,7 @@ import (
 	"github.com/bspaans/jit-compiler/lib"
 )
 
-func encode_IR_Uint8(i *expr.IR_Uint8, ctx *IR_Context, target encoding.Operand) ([]lib.Instruction, error) {
+func encode_IR_Uint8(i *expr.IR_Uint8, ctx *IR_Context, target lib.Operand) ([]lib.Instruction, error) {
 	result := []lib.Instruction{x86_64.MOV(encoding.Uint8(i.Value), target)}
 	ctx.AddInstruction(result...)
 	return result, nil

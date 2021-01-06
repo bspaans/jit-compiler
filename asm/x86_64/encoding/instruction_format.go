@@ -31,7 +31,7 @@ func (i *InstructionFormat) SetModRM(mode Mode, rm, reg uint8) {
 	i.ModRM = NewModRM(mode, rm, reg)
 }
 
-func (i *InstructionFormat) SetDisplacement(op Operand, displacement []uint8) {
+func (i *InstructionFormat) SetDisplacement(op lib.Operand, displacement []uint8) {
 	// Not sure why this is needed, but it is
 	if _, ok := op.(*Register); ok && op.(*Register) == Rsp {
 		i.Displacement = append(i.Displacement, 0x24)

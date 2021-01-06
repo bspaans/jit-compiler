@@ -50,8 +50,8 @@ Multiply four pairs of floats:
 mulps %xmm0, %xmm1
 */
 
-func (f Float32) Type() Type {
-	return T_Float32
+func (f Float32) Type() lib.Type {
+	return lib.T_Float32
 }
 func (f Float32) String() string {
 	return fmt.Sprintf("$%f", f)
@@ -65,8 +65,8 @@ func (t Float32) Width() lib.Size {
 	return lib.DOUBLE
 }
 
-func (f Float64) Type() Type {
-	return T_Float64
+func (f Float64) Type() lib.Type {
+	return lib.T_Float64
 }
 func (f Float64) String() string {
 	return fmt.Sprintf("$f%f", f)

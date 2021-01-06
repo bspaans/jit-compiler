@@ -10,7 +10,7 @@ import (
 	"github.com/bspaans/jit-compiler/lib"
 )
 
-func encode_IR_Cast(i *expr.IR_Cast, ctx *IR_Context, target encoding.Operand) ([]lib.Instruction, error) {
+func encode_IR_Cast(i *expr.IR_Cast, ctx *IR_Context, target lib.Operand) ([]lib.Instruction, error) {
 	ctx.AddInstruction("cast " + encoding.Comment(i.String()))
 	result := []lib.Instruction{}
 	valueType := i.Value.ReturnType(ctx)

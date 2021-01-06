@@ -8,7 +8,7 @@ import (
 	"github.com/bspaans/jit-compiler/lib"
 )
 
-func encode_IR_Float64(i *expr.IR_Float64, ctx *IR_Context, target encoding.Operand) ([]lib.Instruction, error) {
+func encode_IR_Float64(i *expr.IR_Float64, ctx *IR_Context, target lib.Operand) ([]lib.Instruction, error) {
 	tmp := ctx.AllocateRegister(TUint64)
 	defer ctx.DeallocateRegister(tmp)
 

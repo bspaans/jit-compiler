@@ -1,11 +1,13 @@
 package encoding
 
+import "github.com/bspaans/jit-compiler/lib"
+
 type Opcode struct {
 	Name     string
 	Operands []OpcodeChunk
 }
 
-func (o *Opcode) Encode(ops []Operand) ([]uint8, error) {
+func (o *Opcode) Encode(ops []lib.Operand) ([]uint8, error) {
 	return []uint8{}, nil
 
 }

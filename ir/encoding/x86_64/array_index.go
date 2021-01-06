@@ -10,7 +10,7 @@ import (
 	"github.com/bspaans/jit-compiler/lib"
 )
 
-func encode_IR_ArrayIndex(i *expr.IR_ArrayIndex, ctx *IR_Context, target encoding.Operand) ([]lib.Instruction, error) {
+func encode_IR_ArrayIndex(i *expr.IR_ArrayIndex, ctx *IR_Context, target lib.Operand) ([]lib.Instruction, error) {
 	ctx.AddInstruction("array_index " + encoding.Comment(i.String()))
 
 	itemWidth := i.ReturnType(ctx).Width()

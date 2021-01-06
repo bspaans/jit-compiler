@@ -10,7 +10,7 @@ import (
 	"github.com/bspaans/jit-compiler/lib"
 )
 
-func encode_IR_StructField(i *expr.IR_StructField, ctx *IR_Context, target encoding.Operand) ([]lib.Instruction, error) {
+func encode_IR_StructField(i *expr.IR_StructField, ctx *IR_Context, target lib.Operand) ([]lib.Instruction, error) {
 	// Pointer to target struct is stored into tmpReg
 	tmpReg := ctx.AllocateRegister(TUint64)
 	defer ctx.DeallocateRegister(tmpReg)

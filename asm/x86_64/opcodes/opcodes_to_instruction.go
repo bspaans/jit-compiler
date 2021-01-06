@@ -8,11 +8,11 @@ import (
 	"github.com/bspaans/jit-compiler/lib"
 )
 
-func OpcodeToInstruction(name string, opcode *Opcode, argCount int, operands ...Operand) lib.Instruction {
+func OpcodeToInstruction(name string, opcode *Opcode, argCount int, operands ...lib.Operand) lib.Instruction {
 	return OpcodesToInstruction(name, []*Opcode{opcode}, argCount, operands...)
 }
 
-func OpcodesToInstruction(name string, opcodes []*Opcode, argCount int, operands ...Operand) lib.Instruction {
+func OpcodesToInstruction(name string, opcodes []*Opcode, argCount int, operands ...lib.Operand) lib.Instruction {
 	maps := OpcodesToOpcodeMaps(opcodes, argCount)
 	return NewOpcodeMapsInstruction(name, maps, operands, opcodes)
 }
@@ -20,17 +20,17 @@ func OpcodesToInstruction(name string, opcodes []*Opcode, argCount int, operands
 type opcodeMapsInstruction struct {
 	Name       string
 	opcodeMaps OpcodeMaps
-	Operands   []Operand
+	Operands   []lib.Operand
 	Opcodes    []*Opcode
 }
 
-func NewOpcodeMapsInstruction(name string, maps OpcodeMaps, operands []Operand, opcodes []*Opcode) lib.Instruction {
+func NewOpcodeMapsInstruction(name string, maps OpcodeMaps, operands []lib.Operand, opcodes []*Opcode) lib.Instruction {
 	return &opcodeMapsInstruction{name, maps, operands, opcodes}
 }
 
 func (o *opcodeMapsInstruction) Encode() (lib.MachineCode, error) {
 	if len(o.Operands) == 0 {
-		return o.Opcodes[0].Encode([]Operand{})
+		return o.Opcodes[0].Encode([]lib.Operand{})
 	}
 	opcode := o.opcodeMaps.ResolveOpcode(o.Operands)
 	if opcode == nil {

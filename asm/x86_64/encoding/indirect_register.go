@@ -1,13 +1,17 @@
 package encoding
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/bspaans/jit-compiler/lib"
+)
 
 type IndirectRegister struct {
 	*Register
 }
 
-func (t *IndirectRegister) Type() Type {
-	return T_IndirectRegister
+func (t *IndirectRegister) Type() lib.Type {
+	return lib.T_IndirectRegister
 }
 
 func (t *IndirectRegister) String() string {

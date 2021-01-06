@@ -11,8 +11,8 @@ type RIPRelative struct {
 	Displacement Int32
 }
 
-func (t *RIPRelative) Type() Type {
-	return T_RIPRelative
+func (t *RIPRelative) Type() lib.Type {
+	return lib.T_RIPRelative
 }
 
 func (t *RIPRelative) String() string {

@@ -10,7 +10,7 @@ import (
 	"github.com/bspaans/jit-compiler/lib"
 )
 
-func encode_IR_Function(i *expr.IR_Function, ctx *IR_Context, target encoding.Operand) ([]lib.Instruction, error) {
+func encode_IR_Function(i *expr.IR_Function, ctx *IR_Context, target lib.Operand) ([]lib.Instruction, error) {
 	ownLength := uint(7)
 	diff := uint(ctx.InstructionPointer+ownLength) - uint(ctx.Segments.GetAddress(i.Address))
 	result := []lib.Instruction{x86_64.LEA(&encoding.RIPRelative{encoding.Int32(int32(-diff))}, target)}
@@ -25,7 +25,7 @@ func encode_IR_Function_for_DataSection(b *expr.IR_Function, ctx *IR_Context, se
 	returnTarget := encoding.Rax
 	registers := make([]bool, 16)
 	registers[returnTarget.Register] = true
-	variableMap := map[string]encoding.Operand{}
+	variableMap := map[string]lib.Operand{}
 	variableTypes := map[string]Type{}
 	for i, arg := range b.Signature.Args {
 		if arg.Type() == T_Float64 {

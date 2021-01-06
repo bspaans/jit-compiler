@@ -9,9 +9,9 @@ import (
 	"github.com/bspaans/jit-compiler/lib"
 )
 
-type op func(o1, o2 encoding.Operand) lib.Instruction
+type op func(o1, o2 lib.Operand) lib.Instruction
 
-func encode_Operator(op1, op2 IRExpression, operator op, repr string, ctx *IR_Context, target encoding.Operand) ([]lib.Instruction, error) {
+func encode_Operator(op1, op2 IRExpression, operator op, repr string, ctx *IR_Context, target lib.Operand) ([]lib.Instruction, error) {
 	ctx.AddInstruction("operator " + encoding.Comment(repr))
 	returnType1, returnType2 := op1.ReturnType(ctx), op2.ReturnType(ctx)
 	if returnType1 == returnType2 && IsNumber(returnType1) {
@@ -20,7 +20,7 @@ func encode_Operator(op1, op2 IRExpression, operator op, repr string, ctx *IR_Co
 			return nil, err
 		}
 
-		var reg encoding.Operand
+		var reg lib.Operand
 		if op2.Type() == Variable {
 			variable := op2.(*expr.IR_Variable).Value
 			reg = ctx.VariableMap[variable]

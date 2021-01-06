@@ -13,7 +13,7 @@ import (
 
 func encode_IR_Return(i *statements.IR_Return, ctx *IR_Context) ([]lib.Instruction, error) {
 	result := []lib.Instruction{}
-	var reg encoding.Operand
+	var reg lib.Operand
 	var ok bool
 	if i.Expr.Type() == Variable {
 		reg, ok = ctx.VariableMap[i.Expr.(*expr.IR_Variable).Value]

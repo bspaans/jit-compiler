@@ -8,7 +8,7 @@ import (
 	"github.com/bspaans/jit-compiler/lib"
 )
 
-func encode_IR_Int32(i *expr.IR_Int32, ctx *IR_Context, target encoding.Operand) ([]lib.Instruction, error) {
+func encode_IR_Int32(i *expr.IR_Int32, ctx *IR_Context, target lib.Operand) ([]lib.Instruction, error) {
 
 	result := []lib.Instruction{x86_64.MOV(encoding.Uint32(uint32(i.Value)), target)}
 	ctx.AddInstruction(result...)

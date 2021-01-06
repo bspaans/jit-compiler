@@ -10,7 +10,7 @@ import (
 	"github.com/bspaans/jit-compiler/lib"
 )
 
-func encode_IR_And(i *expr.IR_And, ctx *IR_Context, target encoding.Operand) ([]lib.Instruction, error) {
+func encode_IR_And(i *expr.IR_And, ctx *IR_Context, target lib.Operand) ([]lib.Instruction, error) {
 	ctx.AddInstruction("operator " + encoding.Comment(i.String()))
 	returnType1, returnType2 := i.Op1.ReturnType(ctx), i.Op2.ReturnType(ctx)
 	if returnType1 != returnType2 {

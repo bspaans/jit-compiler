@@ -9,7 +9,7 @@ import (
 )
 
 type Value interface {
-	Type() Type
+	Type() lib.Type
 	String() string
 	Encode() []uint8
 	Width() lib.Size
@@ -21,8 +21,8 @@ type Uint32 uint32
 type Uint64 uint64
 type Int32 int32
 
-func (i Uint8) Type() Type {
-	return T_Uint8
+func (i Uint8) Type() lib.Type {
+	return lib.T_Uint8
 }
 func (i Uint8) String() string {
 	return fmt.Sprintf("u8$%d", i)
@@ -36,8 +36,8 @@ func (t Uint8) Width() lib.Size {
 	return lib.BYTE
 }
 
-func (i Uint16) Type() Type {
-	return T_Uint16
+func (i Uint16) Type() lib.Type {
+	return lib.T_Uint16
 }
 func (i Uint16) String() string {
 	return fmt.Sprintf("u16$%d", i)
@@ -51,8 +51,8 @@ func (t Uint16) Width() lib.Size {
 	return lib.WORD
 }
 
-func (i Uint32) Type() Type {
-	return T_Uint32
+func (i Uint32) Type() lib.Type {
+	return lib.T_Uint32
 }
 func (i Uint32) String() string {
 	return fmt.Sprintf("u32$%d", i)
@@ -66,8 +66,8 @@ func (t Uint32) Width() lib.Size {
 	return lib.DOUBLE
 }
 
-func (i Uint64) Type() Type {
-	return T_Uint64
+func (i Uint64) Type() lib.Type {
+	return lib.T_Uint64
 }
 func (i Uint64) String() string {
 	return fmt.Sprintf("u64$%d", i)
@@ -81,8 +81,8 @@ func (t Uint64) Width() lib.Size {
 	return lib.QUADWORD
 }
 
-func (i Int32) Type() Type {
-	return T_Int32
+func (i Int32) Type() lib.Type {
+	return lib.T_Int32
 }
 func (i Int32) String() string {
 	return fmt.Sprintf("i32$%d", i)

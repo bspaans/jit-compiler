@@ -8,7 +8,7 @@ import (
 	"github.com/bspaans/jit-compiler/lib"
 )
 
-func encode_IR_Syscall(i *expr.IR_Syscall, ctx *IR_Context, target encoding.Operand) ([]lib.Instruction, error) {
+func encode_IR_Syscall(i *expr.IR_Syscall, ctx *IR_Context, target lib.Operand) ([]lib.Instruction, error) {
 
 	result, _, clobbered, err := ABI_Call_Setup(ctx, i.Args, TUint64)
 	if err != nil {

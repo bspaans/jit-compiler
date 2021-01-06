@@ -177,7 +177,7 @@ func Test_SIB_Addressing(t *testing.T) {
 		[]interface{}{encoding.Al, &encoding.SIBRegister{encoding.Rax, encoding.Rcx, encoding.Scale8}, "  40 88 04 c8"},
 	}
 	for _, testCase := range table {
-		unit, err := MOV(testCase[0].(encoding.Operand), testCase[1].(encoding.Operand)).Encode()
+		unit, err := MOV(testCase[0].(lib.Operand), testCase[1].(lib.Operand)).Encode()
 		if err != nil {
 			t.Fatal(err)
 		}

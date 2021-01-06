@@ -19,19 +19,19 @@ import (
 	"github.com/bspaans/jit-compiler/lib"
 )
 
-func ADD(src, dest encoding.Operand) lib.Instruction {
+func ADD(src, dest lib.Operand) lib.Instruction {
 	return opcodes.OpcodesToInstruction("add", opcodes.ADD, 2, dest, src)
 }
-func AND(src, dest encoding.Operand) lib.Instruction {
+func AND(src, dest lib.Operand) lib.Instruction {
 	return opcodes.OpcodesToInstruction("and", opcodes.AND, 2, dest, src)
 }
-func CALL(dest encoding.Operand) lib.Instruction {
+func CALL(dest lib.Operand) lib.Instruction {
 	return opcodes.OpcodesToInstruction("call", opcodes.CALL, 1, dest)
 }
-func CMP(src, dest encoding.Operand) lib.Instruction {
+func CMP(src, dest lib.Operand) lib.Instruction {
 	return opcodes.OpcodesToInstruction("cmp", opcodes.CMP, 2, dest, src)
 }
-func CMP_immediate(v uint64, dest encoding.Operand) lib.Instruction {
+func CMP_immediate(v uint64, dest lib.Operand) lib.Instruction {
 	if reg, ok := dest.(*encoding.Register); ok && reg.Width() == lib.BYTE {
 		return CMP(encoding.Uint8(v), dest)
 	}
@@ -39,12 +39,12 @@ func CMP_immediate(v uint64, dest encoding.Operand) lib.Instruction {
 }
 
 // Convert signed integer to scalar double-precision floating point (float64)
-func CVTSI2SD(src, dest encoding.Operand) lib.Instruction {
+func CVTSI2SD(src, dest lib.Operand) lib.Instruction {
 	return opcodes.OpcodesToInstruction("cvtsi2sd", opcodes.CVTSI2SD, 2, dest, src)
 }
 
 // Convert double precision float to signed integer
-func CVTTSD2SI(src, dest encoding.Operand) lib.Instruction {
+func CVTTSD2SI(src, dest lib.Operand) lib.Instruction {
 	return opcodes.OpcodesToInstruction("cvttsd2si", opcodes.CVTTSD2SI, 2, dest, src)
 }
 
@@ -67,85 +67,85 @@ func CDQ() lib.Instruction {
 func CQO() lib.Instruction {
 	return opcodes.OpcodesToInstruction("cqo", []*encoding.Opcode{opcodes.CQO}, 0)
 }
-func DEC(dest encoding.Operand) lib.Instruction {
+func DEC(dest lib.Operand) lib.Instruction {
 	return opcodes.OpcodesToInstruction("dec", opcodes.DEC, 1, dest)
 }
-func DIV(src encoding.Operand) lib.Instruction {
+func DIV(src lib.Operand) lib.Instruction {
 	return opcodes.OpcodesToInstruction("div", opcodes.DIV, 1, src)
 }
-func IDIV1(dest encoding.Operand) lib.Instruction {
+func IDIV1(dest lib.Operand) lib.Instruction {
 	return opcodes.OpcodesToInstruction("div", opcodes.IDIV1, 1, dest)
 }
-func IDIV2(src, dest encoding.Operand) lib.Instruction {
+func IDIV2(src, dest lib.Operand) lib.Instruction {
 	return opcodes.OpcodesToInstruction("div", opcodes.IDIV2, 2, dest, src)
 }
-func INC(dest encoding.Operand) lib.Instruction {
+func INC(dest lib.Operand) lib.Instruction {
 	return opcodes.OpcodesToInstruction("inc", opcodes.INC, 1, dest)
 }
-func JA(dest encoding.Operand) lib.Instruction {
+func JA(dest lib.Operand) lib.Instruction {
 	return opcodes.OpcodesToInstruction("ja", opcodes.JA, 1, dest)
 }
-func JAE(dest encoding.Operand) lib.Instruction {
+func JAE(dest lib.Operand) lib.Instruction {
 	return opcodes.OpcodesToInstruction("jae", opcodes.JAE, 1, dest)
 }
-func JB(dest encoding.Operand) lib.Instruction {
+func JB(dest lib.Operand) lib.Instruction {
 	return opcodes.OpcodesToInstruction("jb", opcodes.JB, 1, dest)
 }
-func JBE(dest encoding.Operand) lib.Instruction {
+func JBE(dest lib.Operand) lib.Instruction {
 	return opcodes.OpcodesToInstruction("jbe", opcodes.JBE, 1, dest)
 }
-func JE(dest encoding.Operand) lib.Instruction {
+func JE(dest lib.Operand) lib.Instruction {
 	return opcodes.OpcodesToInstruction("je", opcodes.JE, 1, dest)
 }
-func JG(dest encoding.Operand) lib.Instruction {
+func JG(dest lib.Operand) lib.Instruction {
 	return opcodes.OpcodesToInstruction("jg", opcodes.JG, 1, dest)
 }
-func JGE(dest encoding.Operand) lib.Instruction {
+func JGE(dest lib.Operand) lib.Instruction {
 	return opcodes.OpcodesToInstruction("jge", opcodes.JGE, 1, dest)
 }
-func JL(dest encoding.Operand) lib.Instruction {
+func JL(dest lib.Operand) lib.Instruction {
 	return opcodes.OpcodesToInstruction("jl", opcodes.JL, 1, dest)
 }
-func JLE(dest encoding.Operand) lib.Instruction {
+func JLE(dest lib.Operand) lib.Instruction {
 	return opcodes.OpcodesToInstruction("jle", opcodes.JLE, 1, dest)
 }
-func JNA(dest encoding.Operand) lib.Instruction {
+func JNA(dest lib.Operand) lib.Instruction {
 	return opcodes.OpcodesToInstruction("jna", opcodes.JNA, 1, dest)
 }
-func JNAE(dest encoding.Operand) lib.Instruction {
+func JNAE(dest lib.Operand) lib.Instruction {
 	return opcodes.OpcodesToInstruction("jnae", opcodes.JNAE, 1, dest)
 }
-func JNB(dest encoding.Operand) lib.Instruction {
+func JNB(dest lib.Operand) lib.Instruction {
 	return opcodes.OpcodesToInstruction("jnb", opcodes.JNB, 1, dest)
 }
-func JNBE(dest encoding.Operand) lib.Instruction {
+func JNBE(dest lib.Operand) lib.Instruction {
 	return opcodes.OpcodesToInstruction("jnbe", opcodes.JNBE, 1, dest)
 }
-func JNE(dest encoding.Operand) lib.Instruction {
+func JNE(dest lib.Operand) lib.Instruction {
 	return opcodes.OpcodesToInstruction("jne", opcodes.JNE, 1, dest)
 }
-func JNG(dest encoding.Operand) lib.Instruction {
+func JNG(dest lib.Operand) lib.Instruction {
 	return opcodes.OpcodesToInstruction("jng", opcodes.JNG, 1, dest)
 }
-func JNGE(dest encoding.Operand) lib.Instruction {
+func JNGE(dest lib.Operand) lib.Instruction {
 	return opcodes.OpcodesToInstruction("jnge", opcodes.JNGE, 1, dest)
 }
-func JNL(dest encoding.Operand) lib.Instruction {
+func JNL(dest lib.Operand) lib.Instruction {
 	return opcodes.OpcodesToInstruction("jnl", opcodes.JNL, 1, dest)
 }
-func JNLE(dest encoding.Operand) lib.Instruction {
+func JNLE(dest lib.Operand) lib.Instruction {
 	return opcodes.OpcodesToInstruction("jnle", opcodes.JNLE, 1, dest)
 }
-func JMP(dest encoding.Operand) lib.Instruction {
+func JMP(dest lib.Operand) lib.Instruction {
 	return opcodes.OpcodesToInstruction("jmp", opcodes.JMP, 1, dest)
 }
-func LEA(src, dest encoding.Operand) lib.Instruction {
+func LEA(src, dest lib.Operand) lib.Instruction {
 	return opcodes.OpcodesToInstruction("lea", opcodes.LEA, 2, dest, src)
 }
-func MOV(src, dest encoding.Operand) lib.Instruction {
+func MOV(src, dest lib.Operand) lib.Instruction {
 	return opcodes.OpcodesToInstruction("mov", opcodes.MOV, 2, dest, src)
 }
-func MOV_immediate(v uint64, dest encoding.Operand) lib.Instruction {
+func MOV_immediate(v uint64, dest lib.Operand) lib.Instruction {
 	if reg, ok := dest.(*encoding.Register); ok && reg.Width() == lib.BYTE {
 		return MOV(encoding.Uint8(v), dest)
 	}
@@ -159,30 +159,30 @@ func MOV_immediate(v uint64, dest encoding.Operand) lib.Instruction {
 }
 
 // Move with sign-extend
-func MOVSX(src, dest encoding.Operand) lib.Instruction {
+func MOVSX(src, dest lib.Operand) lib.Instruction {
 	return opcodes.OpcodesToInstruction("movsx", opcodes.MOVSX, 2, dest, src)
 }
 
 // Move with zero-extend
-func MOVZX(src, dest encoding.Operand) lib.Instruction {
+func MOVZX(src, dest lib.Operand) lib.Instruction {
 	return opcodes.OpcodesToInstruction("movzx", opcodes.MOVZX, 2, dest, src)
 }
-func IMUL1(dest encoding.Operand) lib.Instruction {
+func IMUL1(dest lib.Operand) lib.Instruction {
 	return opcodes.OpcodesToInstruction("imul", opcodes.IMUL1, 1, dest)
 }
-func IMUL2(src, dest encoding.Operand) lib.Instruction {
+func IMUL2(src, dest lib.Operand) lib.Instruction {
 	return opcodes.OpcodesToInstruction("imul", opcodes.IMUL2, 2, dest, src)
 }
-func MUL(src encoding.Operand) lib.Instruction {
+func MUL(src lib.Operand) lib.Instruction {
 	return opcodes.OpcodesToInstruction("mul", opcodes.MUL, 1, src)
 }
-func OR(src, dest encoding.Operand) lib.Instruction {
+func OR(src, dest lib.Operand) lib.Instruction {
 	return opcodes.OpcodesToInstruction("or", opcodes.OR, 2, dest, src)
 }
-func POP(dest encoding.Operand) lib.Instruction {
+func POP(dest lib.Operand) lib.Instruction {
 	return opcodes.OpcodesToInstruction("pop", opcodes.POP, 1, dest)
 }
-func PUSH(dest encoding.Operand) lib.Instruction {
+func PUSH(dest lib.Operand) lib.Instruction {
 	return opcodes.OpcodesToInstruction("push", opcodes.PUSH, 1, dest)
 }
 func PUSHFQ() lib.Instruction {
@@ -191,51 +191,51 @@ func PUSHFQ() lib.Instruction {
 func RETURN() lib.Instruction {
 	return opcodes.OpcodeToInstruction("return", opcodes.RETURN, 0)
 }
-func SETA(dest encoding.Operand) lib.Instruction {
+func SETA(dest lib.Operand) lib.Instruction {
 	return opcodes.OpcodesToInstruction("seta", opcodes.SETA, 1, dest)
 }
-func SETAE(dest encoding.Operand) lib.Instruction {
+func SETAE(dest lib.Operand) lib.Instruction {
 	return opcodes.OpcodesToInstruction("setae", opcodes.SETAE, 1, dest)
 }
-func SETB(dest encoding.Operand) lib.Instruction {
+func SETB(dest lib.Operand) lib.Instruction {
 	return opcodes.OpcodesToInstruction("setb", opcodes.SETB, 1, dest)
 }
-func SETBE(dest encoding.Operand) lib.Instruction {
+func SETBE(dest lib.Operand) lib.Instruction {
 	return opcodes.OpcodesToInstruction("setbe", opcodes.SETBE, 1, dest)
 }
-func SETC(dest encoding.Operand) lib.Instruction {
+func SETC(dest lib.Operand) lib.Instruction {
 	return opcodes.OpcodesToInstruction("setc", opcodes.SETC, 1, dest)
 }
-func SETE(dest encoding.Operand) lib.Instruction {
+func SETE(dest lib.Operand) lib.Instruction {
 	return opcodes.OpcodesToInstruction("sete", opcodes.SETE, 1, dest)
 }
-func SETL(dest encoding.Operand) lib.Instruction {
+func SETL(dest lib.Operand) lib.Instruction {
 	return opcodes.OpcodesToInstruction("setl", opcodes.SETL, 1, dest)
 }
-func SETLE(dest encoding.Operand) lib.Instruction {
+func SETLE(dest lib.Operand) lib.Instruction {
 	return opcodes.OpcodesToInstruction("setle", opcodes.SETLE, 1, dest)
 }
-func SETG(dest encoding.Operand) lib.Instruction {
+func SETG(dest lib.Operand) lib.Instruction {
 	return opcodes.OpcodesToInstruction("setg", opcodes.SETG, 1, dest)
 }
-func SETGE(dest encoding.Operand) lib.Instruction {
+func SETGE(dest lib.Operand) lib.Instruction {
 	return opcodes.OpcodesToInstruction("setge", opcodes.SETGE, 1, dest)
 }
-func SETNE(dest encoding.Operand) lib.Instruction {
+func SETNE(dest lib.Operand) lib.Instruction {
 	return opcodes.OpcodesToInstruction("setne", opcodes.SETNE, 1, dest)
 }
-func SUB(src, dest encoding.Operand) lib.Instruction {
+func SUB(src, dest lib.Operand) lib.Instruction {
 	return opcodes.OpcodesToInstruction("sub", opcodes.SUB, 2, dest, src)
 }
-func SHL(src, dest encoding.Operand) lib.Instruction {
+func SHL(src, dest lib.Operand) lib.Instruction {
 	return opcodes.OpcodesToInstruction("shl", opcodes.SHL, 2, dest, src)
 }
-func SHR(src, dest encoding.Operand) lib.Instruction {
+func SHR(src, dest lib.Operand) lib.Instruction {
 	return opcodes.OpcodesToInstruction("shr", opcodes.SHR, 2, dest, src)
 }
 func SYSCALL() lib.Instruction {
 	return opcodes.OpcodeToInstruction("syscall", opcodes.SYSCALL, 0)
 }
-func XOR(src, dest encoding.Operand) lib.Instruction {
+func XOR(src, dest lib.Operand) lib.Instruction {
 	return opcodes.OpcodesToInstruction("xor", opcodes.XOR, 2, dest, src)
 }

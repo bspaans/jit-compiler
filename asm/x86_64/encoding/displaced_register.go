@@ -1,6 +1,10 @@
 package encoding
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/bspaans/jit-compiler/lib"
+)
 
 type DisplacedRegister struct {
 	*Register
@@ -8,8 +12,8 @@ type DisplacedRegister struct {
 	Displacement uint8
 }
 
-func (t *DisplacedRegister) Type() Type {
-	return T_DisplacedRegister
+func (t *DisplacedRegister) Type() lib.Type {
+	return lib.T_DisplacedRegister
 }
 
 func (t *DisplacedRegister) String() string {

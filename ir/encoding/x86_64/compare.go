@@ -18,7 +18,7 @@ func Compare(op1, op2 IRExpression, ctx *IR_Context) ([]lib.Instruction, error) 
 		return nil, fmt.Errorf("Unsupported types (%s, %s) in compare operation", returnType1, returnType2)
 	}
 
-	var reg1, reg2 encoding.Operand
+	var reg1, reg2 lib.Operand
 
 	if op1.Type() == Variable {
 		variable := op1.(*expr.IR_Variable).Value
