@@ -13,7 +13,7 @@ var (
 	ADDS_Wd_Wn_imm12 = &Opcode{"adds", []OpcodeChunk{OP_Exact(10, 0b001_100010_0), OP_Imm12, OP_Wn, OP_Wd}}
 	ADDS_Xd_Xn_imm12 = &Opcode{"adds", []OpcodeChunk{OP_Exact(10, 0b101_100010_0), OP_Imm12, OP_Xn, OP_Xd}}
 
-	MOVK_Wd_imm16 = &Opcode{"movk", []OpcodeChunk{OP_Exact(11, 0b011_100101_00), OP_Imm16, OP_Xd}}
+	MOVK_Wd_imm16 = &Opcode{"movk", []OpcodeChunk{OP_Exact(11, 0b011_100101_00), OP_Imm16, OP_Wd}}
 	MOVK_Xd_imm16 = &Opcode{"movk", []OpcodeChunk{OP_Exact(11, 0b111_100101_00), OP_Imm16, OP_Xd}}
 
 	SUB_Wd_Wn_imm12 = &Opcode{"sub", []OpcodeChunk{OP_Exact(10, 0b010_100010_0), OP_Imm12, OP_Wn, OP_Wd}}

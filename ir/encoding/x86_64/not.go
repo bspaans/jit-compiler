@@ -121,19 +121,19 @@ func encode_IR_Not(i *expr.IR_Not, ctx *IR_Context, target lib.Operand, includeS
 		return nil, fmt.Errorf("Unsupported ! operation: %s", i.Op1.Type())
 	}
 
-	tmpReg := ctx.AllocateRegister(TUint64)
-	defer ctx.DeallocateRegister(tmpReg)
-	instr := []lib.Instruction{}
 	if includeSETE {
+		tmpReg := ctx.AllocateRegister(TUint64)
+		defer ctx.DeallocateRegister(tmpReg)
+		instr := []lib.Instruction{}
 		// TODO: use test?
 		instr = append(instr, x86_64.XOR(tmpReg, tmpReg))
 		instr = append(instr, x86_64.CMP_immediate(0, reg1))
 		instr = append(instr, x86_64.SETE(tmpReg.(*encoding.Register).Get8BitRegister()))
 		instr = append(instr, x86_64.MOV(tmpReg.(*encoding.Register).ForOperandWidth(target.Width()), target))
-	}
-	for _, inst := range instr {
-		result = append(result, inst)
-		ctx.AddInstruction(inst)
+		for _, inst := range instr {
+			result = append(result, inst)
+			ctx.AddInstruction(inst)
+		}
 	}
 	return result, nil
 }

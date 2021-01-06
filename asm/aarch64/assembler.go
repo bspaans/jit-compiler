@@ -5,22 +5,22 @@ import (
 	"github.com/bspaans/jit-compiler/lib"
 )
 
-func ADD(dest, src, val lib.Operand) lib.Instruction {
-	return opcodes.OpcodesToInstruction("add", opcodes.ADD, 3, dest, src, val)
+func ADD(src, dest, val lib.Operand) lib.Instruction {
+	return opcodes.OpcodesToInstruction("add", opcodes.ADD, dest, src, val)
 }
 
-func ADDS(dest, src, val lib.Operand) lib.Instruction {
-	return opcodes.OpcodesToInstruction("adds", opcodes.ADDS, 3, dest, src, val)
+func ADDS(src, dest, val lib.Operand) lib.Instruction {
+	return opcodes.OpcodesToInstruction("adds", opcodes.ADDS, dest, src, val)
 }
 
-func MOVK(dest, val lib.Operand) lib.Instruction {
-	return opcodes.OpcodesToInstruction("movk", opcodes.MOVK, 2, dest, val)
+func MOVK(val, dest lib.Operand) lib.Instruction {
+	return opcodes.OpcodesToInstruction("movk", opcodes.MOVK, val, dest)
 }
 
-func SUB(dest, src, val lib.Operand) lib.Instruction {
-	return opcodes.OpcodesToInstruction("sub", opcodes.SUB, 3, dest, src, val)
+func SUB(src, dest, val lib.Operand) lib.Instruction {
+	return opcodes.OpcodesToInstruction("sub", opcodes.SUB, dest, src, val)
 }
 
-func SUBS(dest, src, val lib.Operand) lib.Instruction {
-	return opcodes.OpcodesToInstruction("subs", opcodes.SUBS, 3, dest, src, val)
+func SUBS(src, dest, val lib.Operand) lib.Instruction {
+	return opcodes.OpcodesToInstruction("subs", opcodes.SUBS, dest, src, val)
 }

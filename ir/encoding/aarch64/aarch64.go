@@ -35,6 +35,8 @@ func encodeExpression(e IRExpression, ctx *IR_Context, target lib.Operand) ([]li
 	switch v := e.(type) {
 	case *expr.IR_Variable:
 		return encode_IR_Variable(v, ctx, target)
+	case *expr.IR_Int64:
+		return encode_IR_Int64(v, ctx, target)
 	case *expr.IR_Add:
 	case *expr.IR_And:
 	case *expr.IR_ArrayIndex:
@@ -51,7 +53,6 @@ func encodeExpression(e IRExpression, ctx *IR_Context, target lib.Operand) ([]li
 	case *expr.IR_Int8:
 	case *expr.IR_Int16:
 	case *expr.IR_Int32:
-	case *expr.IR_Int64:
 	case *expr.IR_LT:
 	case *expr.IR_LTE:
 	case *expr.IR_Mul:
