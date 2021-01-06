@@ -26,19 +26,6 @@ func (i *IR_If) String() string {
 	return fmt.Sprintf("if %s { %s } else { %s }", i.Condition.String(), i.Stmt1.String(), i.Stmt2.String())
 }
 
-func (i *IR_If) AddToDataSection(ctx *IR_Context) error {
-	if err := i.Condition.AddToDataSection(ctx); err != nil {
-		return err
-	}
-	if err := i.Stmt1.AddToDataSection(ctx); err != nil {
-		return err
-	}
-	if err := i.Stmt2.AddToDataSection(ctx); err != nil {
-		return err
-	}
-	return nil
-}
-
 func (i *IR_If) SSA_Transform(ctx *SSA_Context) IR {
 	rewrites, expr := i.Condition.SSA_Transform(ctx)
 	ir := SSA_Rewrites_to_IR(rewrites)

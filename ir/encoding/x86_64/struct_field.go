@@ -31,7 +31,7 @@ func encode_IR_StructField(i *expr.IR_StructField, ctx *IR_Context, target lib.O
 	}
 	// Add offset and load value at address into target
 	add := x86_64.ADD(encoding.Uint32(uint32(offset)), tmpReg)
-	mov := x86_64.MOV(&encoding.IndirectRegister{tmpReg}, target)
+	mov := x86_64.MOV(&encoding.IndirectRegister{tmpReg.(*encoding.Register)}, target)
 	ctx.AddInstruction(add)
 	ctx.AddInstruction(mov)
 	result = append(result, add)

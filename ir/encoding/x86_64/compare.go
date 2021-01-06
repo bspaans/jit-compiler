@@ -10,7 +10,7 @@ import (
 	"github.com/bspaans/jit-compiler/lib"
 )
 
-func Compare(op1, op2 IRExpression, ctx *IR_Context) ([]lib.Instruction, error) {
+func compare(op1, op2 IRExpression, ctx *IR_Context) ([]lib.Instruction, error) {
 
 	result := []lib.Instruction{}
 	returnType1, returnType2 := op1.ReturnType(ctx), op2.ReturnType(ctx)
@@ -48,5 +48,30 @@ func Compare(op1, op2 IRExpression, ctx *IR_Context) ([]lib.Instruction, error) 
 	cmp := x86_64.CMP(reg2, reg1)
 	result = append(result, cmp)
 	ctx.AddInstruction(cmp)
+	return result, nil
+}
+
+type orderOpcode func(lib.Operand) lib.Instruction
+
+func order(op1, op2 IRExpression, ctx *IR_Context, target lib.Operand, includeSETE bool, repr string, unsignedOp, signedOp orderOpcode) ([]lib.Instruction, error) {
+
+	result, err := compare(op1, op2, ctx)
+	if err != nil {
+		return nil, fmt.Errorf("%s in %s", err.Error(), repr)
+	}
+	if includeSETE {
+		tmpReg := ctx.AllocateRegister(TUint64)
+		defer ctx.DeallocateRegister(tmpReg)
+		reg8 := tmpReg.(*encoding.Register).Get8BitRegister()
+		sete := unsignedOp(reg8)
+		if IsSignedInteger(op1.ReturnType(ctx)) {
+			sete = signedOp(reg8)
+		}
+		mov := x86_64.MOV(tmpReg.(*encoding.Register).ForOperandWidth(target.Width()), target)
+		result = append(result, sete)
+		result = append(result, mov)
+		ctx.AddInstruction(sete)
+		ctx.AddInstruction(mov)
+	}
 	return result, nil
 }

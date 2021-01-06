@@ -30,6 +30,25 @@ func (r *Register) Type() Type {
 func (r *Register) Width() Size {
 	return r.Size
 }
+func (r *Register) ForOperandWidth(w Size) *Register {
+	// TODO: support more sizes
+	if w == DOUBLE {
+		return r.Get32BitRegister()
+	}
+	return r
+}
+func (r *Register) Get32BitRegister() *Register {
+	return Registers32[r.Register]
+}
+
+func Get64BitRegisterByIndex(ix uint8) *Register {
+	return Registers64[ix]
+}
+
+// TODO
+func GetFloatingPointRegisterByIndex(ix uint8) *Register {
+	return nil
+}
 
 var Registers64 []*Register = []*Register{
 	X0, X1, X2, X3, X4, X5, X6, X7, X8,

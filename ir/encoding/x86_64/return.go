@@ -22,7 +22,7 @@ func encode_IR_Return(i *statements.IR_Return, ctx *IR_Context) ([]lib.Instructi
 		}
 	} else {
 		reg = ctx.AllocateRegister(i.Expr.ReturnType(ctx))
-		defer ctx.DeallocateRegister(reg.(*encoding.Register))
+		defer ctx.DeallocateRegister(reg)
 		result_, err := encodeExpression(i.Expr, ctx, reg)
 		if err != nil {
 			return nil, err
@@ -43,7 +43,7 @@ func encode_IR_Return(i *statements.IR_Return, ctx *IR_Context) ([]lib.Instructi
 			ctx.AddInstruction(movzx)
 		} else {
 			xor := x86_64.XOR(cast, cast)
-			mov := x86_64.MOV(reg, cast.ForOperandWidth(reg.Width()))
+			mov := x86_64.MOV(reg, cast.(*encoding.Register).ForOperandWidth(reg.Width()))
 			result = append(result, xor)
 			result = append(result, mov)
 			ctx.AddInstruction(mov)

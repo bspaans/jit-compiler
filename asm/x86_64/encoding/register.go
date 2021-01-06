@@ -47,30 +47,15 @@ func (r *Register) Get64BitRegister() *Register {
 }
 
 func (r *Register) Get8BitRegister() *Register {
-	for _, reg := range Registers8 {
-		if reg.Register == r.Register {
-			return reg
-		}
-	}
-	return nil
+	return Registers8[r.Register]
 }
 
 func (r *Register) Get16BitRegister() *Register {
-	for _, reg := range Registers16 {
-		if reg.Register == r.Register {
-			return reg
-		}
-	}
-	return nil
+	return Registers16[r.Register]
 }
 
 func (r *Register) Get32BitRegister() *Register {
-	for _, reg := range Registers32 {
-		if reg.Register == r.Register {
-			return reg
-		}
-	}
-	return nil
+	return Registers32[r.Register]
 }
 
 func Get64BitRegisterByIndex(ix uint8) *Register {

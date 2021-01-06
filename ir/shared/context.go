@@ -109,10 +109,10 @@ func (i *IR_Context) GetInstructions() []lib.Instruction {
 	return i.instructions
 }
 
-func (i *IR_Context) AllocateRegister(typ Type) *encoding.Register {
-	return i.Allocator.AllocateRegister(typ).(*encoding.Register) // TODO: remove cast
+func (i *IR_Context) AllocateRegister(typ Type) lib.Operand {
+	return i.Allocator.AllocateRegister(typ)
 }
 
-func (i *IR_Context) DeallocateRegister(reg *encoding.Register) {
-	i.Allocator.DeallocateRegister(reg) // TODO: remove cast
+func (i *IR_Context) DeallocateRegister(reg lib.Operand) {
+	i.Allocator.DeallocateRegister(reg)
 }

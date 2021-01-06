@@ -37,8 +37,8 @@ func encode_IR_ArrayAssignment(i *statements.IR_ArrayAssignment, ctx *IR_Context
 	}
 	result = lib.Instructions(result).Add(exprInstr)
 
-	target := &encoding.SIBRegister{reg.(*encoding.Register), indexReg, encoding.ScaleForItemWidth(itemWidth)}
-	mov := x86_64.MOV(exprReg.ForOperandWidth(itemWidth), target)
+	target := &encoding.SIBRegister{reg.(*encoding.Register), indexReg.(*encoding.Register), encoding.ScaleForItemWidth(itemWidth)}
+	mov := x86_64.MOV(exprReg.(*encoding.Register).ForOperandWidth(itemWidth), target)
 	ctx.AddInstruction(mov)
 	result = append(result, mov)
 	return result, nil

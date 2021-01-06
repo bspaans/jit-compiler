@@ -26,8 +26,7 @@ func encode_IR_Mul(i *expr.IR_Mul, ctx *IR_Context, target lib.Operand) ([]lib.I
 
 		shouldPreserveRdx := (returnType1.Width() != lib.BYTE) && allocator.Registers[2]
 		shouldPreserveRax := target.(*encoding.Register).Register != 0 && raxInUse
-		var tmpRdx *encoding.Register
-		var tmpRax *encoding.Register
+		var tmpRdx, tmpRax lib.Operand
 
 		result := lib.Instructions{}
 		ctxCopy := ctx

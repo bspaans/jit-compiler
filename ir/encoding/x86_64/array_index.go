@@ -15,15 +15,14 @@ func encode_IR_ArrayIndex(i *expr.IR_ArrayIndex, ctx *IR_Context, target lib.Ope
 
 	itemWidth := i.ReturnType(ctx).Width()
 
-	var arrayReg *encoding.Register
-	var indexReg *encoding.Register
+	var arrayReg, indexReg lib.Operand
 	if i.Array.Type() == Variable {
 		variable := i.Array.(*expr.IR_Variable).Value
 		reg, ok := ctx.VariableMap[variable]
 		if !ok {
 			return nil, fmt.Errorf("Unknown variable %s", variable)
 		}
-		arrayReg = reg.(*encoding.Register)
+		arrayReg = reg
 	} else {
 		arrayReg = ctx.AllocateRegister(TUint64)
 		defer ctx.DeallocateRegister(arrayReg)
@@ -38,7 +37,9 @@ func encode_IR_ArrayIndex(i *expr.IR_ArrayIndex, ctx *IR_Context, target lib.Ope
 	if i.Index.Type() == Uint64 {
 		op := i.Index.(*expr.IR_Uint64)
 		if op.Value == 0 {
-			mov := x86_64.MOV(&encoding.IndirectRegister{arrayReg.ForOperandWidth(itemWidth)}, target.(*encoding.Register).ForOperandWidth(itemWidth))
+			mov := x86_64.MOV(&encoding.IndirectRegister{
+				arrayReg.(*encoding.Register).ForOperandWidth(itemWidth)},
+				target.(*encoding.Register).ForOperandWidth(itemWidth))
 			// Move 0 into target register if going from a wider to narrower register
 			mov0 := x86_64.MOV(encoding.Uint64(0), target.(*encoding.Register).Get64BitRegister()) // TODO use xor reg, reg
 			if itemWidth < lib.QUADWORD {
@@ -70,7 +71,10 @@ func encode_IR_ArrayIndex(i *expr.IR_ArrayIndex, ctx *IR_Context, target lib.Ope
 		return nil, fmt.Errorf("Array index encoding issue: %s", err.Error())
 	}
 	result = lib.Instructions(result).Add(index)
-	mov := x86_64.MOV(&encoding.SIBRegister{arrayReg, indexReg, encoding.ScaleForItemWidth(itemWidth)},
+	mov := x86_64.MOV(&encoding.SIBRegister{
+		arrayReg.(*encoding.Register),
+		indexReg.(*encoding.Register),
+		encoding.ScaleForItemWidth(itemWidth)},
 		target.(*encoding.Register).ForOperandWidth(itemWidth))
 
 	// Move 0 into target register if going from a wider to narrower register

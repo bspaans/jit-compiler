@@ -31,7 +31,7 @@ func encode_IR_Cast(i *expr.IR_Cast, ctx *IR_Context, target lib.Operand) ([]lib
 			for _, code := range expr {
 				result = append(result, code)
 			}
-			mov := x86_64.MOV(tmpReg.Get64BitRegister(), target)
+			mov := x86_64.MOV(tmpReg.(*encoding.Register).Get64BitRegister(), target)
 			ctx.AddInstruction(mov)
 			result = append(result, mov)
 			return result, nil

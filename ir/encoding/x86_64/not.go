@@ -128,8 +128,8 @@ func encode_IR_Not(i *expr.IR_Not, ctx *IR_Context, target lib.Operand, includeS
 		// TODO: use test?
 		instr = append(instr, x86_64.XOR(tmpReg, tmpReg))
 		instr = append(instr, x86_64.CMP_immediate(0, reg1))
-		instr = append(instr, x86_64.SETE(tmpReg.Get8BitRegister()))
-		instr = append(instr, x86_64.MOV(tmpReg.ForOperandWidth(target.Width()), target))
+		instr = append(instr, x86_64.SETE(tmpReg.(*encoding.Register).Get8BitRegister()))
+		instr = append(instr, x86_64.MOV(tmpReg.(*encoding.Register).ForOperandWidth(target.Width()), target))
 	}
 	for _, inst := range instr {
 		result = append(result, inst)
