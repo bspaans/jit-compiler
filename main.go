@@ -24,7 +24,7 @@ func REPL() {
 		}
 		debug := true
 		statements = statements.SSA_Transform(shared.NewSSA_Context())
-		instr, err := ir.Compile(&x86_64.X86_64{}, []shared.IR{statements}, debug)
+		instr, err := ir.Compile(&x86_64.X86_64{}, x86_64.NewABI_AMDSystemV(), []shared.IR{statements}, debug)
 		if err != nil {
 			fmt.Println("Compile error: ", err.Error())
 			continue
@@ -50,7 +50,7 @@ func CompileFiles() {
 
 	debug := true
 	statements = statements.SSA_Transform(shared.NewSSA_Context())
-	if err := ir.CompileToBinary(&x86_64.X86_64{}, []shared.IR{statements}, debug, "test.bin"); err != nil {
+	if err := ir.CompileToBinary(&x86_64.X86_64{}, x86_64.NewABI_AMDSystemV(), []shared.IR{statements}, debug, "test.bin"); err != nil {
 		panic(err)
 
 	}

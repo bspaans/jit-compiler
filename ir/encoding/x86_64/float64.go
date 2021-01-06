@@ -16,6 +16,6 @@ func encode_IR_Float64(i *expr.IR_Float64, ctx *IR_Context, target encoding.Oper
 		x86_64.MOV(encoding.Float64(i.Value), tmp),
 		x86_64.MOV(tmp, target),
 	}
-	ctx.AddInstructions(result)
+	ctx.AddInstruction(result...)
 	return result, nil
 }

@@ -15,6 +15,6 @@ func encode_IR_ByteArray(i *expr.IR_ByteArray, ctx *IR_Context, target encoding.
 	ownLength := uint(7)
 	diff := uint(ctx.InstructionPointer+ownLength) - uint(ctx.Segments.GetAddress(i.Address))
 	result := []lib.Instruction{x86_64.LEA(&encoding.RIPRelative{encoding.Int32(int32(-diff))}, target)}
-	ctx.AddInstructions(result)
+	ctx.AddInstruction(result...)
 	return result, nil
 }

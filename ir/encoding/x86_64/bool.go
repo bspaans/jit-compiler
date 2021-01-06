@@ -14,6 +14,6 @@ func encode_IR_Bool(i *expr.IR_Bool, ctx *IR_Context, target encoding.Operand) (
 		value = 1
 	}
 	result := []lib.Instruction{x86_64.MOV_immediate(uint64(value), target)}
-	ctx.AddInstructions(result)
+	ctx.AddInstruction(result...)
 	return result, nil
 }

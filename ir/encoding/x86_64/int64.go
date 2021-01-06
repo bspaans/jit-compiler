@@ -11,6 +11,6 @@ import (
 func encode_IR_Int64(i *expr.IR_Int64, ctx *IR_Context, target encoding.Operand) ([]lib.Instruction, error) {
 
 	result := []lib.Instruction{x86_64.MOV_immediate(uint64(i.Value), target)}
-	ctx.AddInstructions(result)
+	ctx.AddInstruction(result...)
 	return result, nil
 }

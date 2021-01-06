@@ -11,6 +11,6 @@ import (
 func encode_IR_Int16(i *expr.IR_Int16, ctx *IR_Context, target encoding.Operand) ([]lib.Instruction, error) {
 
 	result := []lib.Instruction{x86_64.MOV(encoding.Uint16(uint16(i.Value)), target)}
-	ctx.AddInstructions(result)
+	ctx.AddInstruction(result...)
 	return result, nil
 }

@@ -14,7 +14,7 @@ func encode_IR_Function(i *expr.IR_Function, ctx *IR_Context, target encoding.Op
 	ownLength := uint(7)
 	diff := uint(ctx.InstructionPointer+ownLength) - uint(ctx.Segments.GetAddress(i.Address))
 	result := []lib.Instruction{x86_64.LEA(&encoding.RIPRelative{encoding.Int32(int32(-diff))}, target)}
-	ctx.AddInstructions(result)
+	ctx.AddInstruction(result...)
 	return result, nil
 }
 
@@ -40,8 +40,8 @@ func encode_IR_Function_for_DataSection(b *expr.IR_Function, ctx *IR_Context, se
 	ctx_ := ctx.Copy()
 	ctx_.PushReturnOperand(returnTarget)
 	ctx_.Commit = false
-	ctx_.Registers = registers
-	ctx_.RegistersAllocated = uint8(len(b.Signature.Args) + 1)
+	ctx_.Allocator.(*X86_64_Allocator).Registers = registers
+	ctx_.Allocator.(*X86_64_Allocator).RegistersAllocated = uint8(len(b.Signature.Args) + 1)
 	ctx_.VariableMap = variableMap
 	ctx_.VariableTypes = variableTypes
 	instr, err := encodeStatement(b.Body, ctx_)

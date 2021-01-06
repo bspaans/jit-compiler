@@ -221,3 +221,101 @@ func encodeExpressionForDataSection(i IRExpression, ctx *IR_Context, segments *S
 	}
 	return nil
 }
+
+func (x *X86_64) GetAllocator() Allocator {
+	return NewX86_64_Allocator()
+}
+
+type X86_64_Allocator struct {
+	Registers               []bool
+	RegistersAllocated      uint8
+	FloatRegisters          []bool
+	FloatRegistersAllocated uint8
+}
+
+func NewX86_64_Allocator() *X86_64_Allocator {
+	x := &X86_64_Allocator{
+		Registers:               make([]bool, 16),
+		RegistersAllocated:      0,
+		FloatRegisters:          make([]bool, 16),
+		FloatRegistersAllocated: 0,
+	}
+	// Always allocate the stack and frame pointer so that they don't
+	// get overwritten. We could be smarter here, but meh.
+	x.Registers[4] = true // stack pointer
+	x.Registers[5] = true // frame pointer
+	x.RegistersAllocated = 2
+	return x
+}
+
+func (i *X86_64_Allocator) AllocateRegister(typ Type) encoding.Operand {
+	if typ == TFloat64 {
+		return encoding.GetFloatingPointRegisterByIndex(i.allocateFloatRegister())
+	}
+	return encoding.Get64BitRegisterByIndex(i.allocateRegister()).ForOperandWidth(typ.Width())
+}
+
+func (i *X86_64_Allocator) DeallocateRegister(op encoding.Operand) {
+	reg, ok := op.(*encoding.Register)
+	if !ok {
+		return
+	}
+	if reg.Size == lib.QUADDOUBLE {
+		i.deallocateFloatRegister(reg.Register)
+		return
+	}
+	i.deallocateRegister(reg.Register)
+}
+
+func (i *X86_64_Allocator) allocateRegister() uint8 {
+	if i.RegistersAllocated >= 16 {
+		panic("Register allocation limit. Needs stack handling")
+	}
+	for j := 0; j < len(i.Registers); j++ {
+		if !i.Registers[j] {
+			i.Registers[j] = true
+			i.RegistersAllocated += 1
+			return uint8(j)
+		}
+	}
+	panic("Register allocation limit reached with incorrect allocation counter. Needs stack handling")
+}
+
+func (i *X86_64_Allocator) deallocateRegister(reg uint8) {
+	i.Registers[reg] = false
+	i.RegistersAllocated -= 1
+}
+
+func (i *X86_64_Allocator) allocateFloatRegister() uint8 {
+	if i.FloatRegistersAllocated >= 16 {
+		panic("FloatRegister allocation limit. Needs stack handling")
+	}
+	for j := 0; j < len(i.FloatRegisters); j++ {
+		if !i.FloatRegisters[j] {
+			i.FloatRegisters[j] = true
+			i.FloatRegistersAllocated += 1
+			return uint8(j)
+		}
+	}
+	panic("FloatRegister allocation limit reached with incorrect allocation counter. Needs stack handling")
+}
+
+func (i *X86_64_Allocator) deallocateFloatRegister(reg uint8) {
+	i.FloatRegisters[reg] = false
+	i.FloatRegistersAllocated -= 1
+}
+
+func (i *X86_64_Allocator) Copy() Allocator {
+	regs := make([]bool, 16)
+	floatRegs := make([]bool, 16)
+	for j := 0; j < 16; j++ {
+		regs[j] = i.Registers[j]
+		floatRegs[j] = i.FloatRegisters[j]
+	}
+	return &X86_64_Allocator{
+		Registers:               regs,
+		RegistersAllocated:      i.RegistersAllocated,
+		FloatRegisters:          floatRegs,
+		FloatRegistersAllocated: i.FloatRegistersAllocated,
+	}
+}

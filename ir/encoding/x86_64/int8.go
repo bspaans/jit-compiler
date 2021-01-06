@@ -10,6 +10,6 @@ import (
 
 func encode_IR_Int8(i *expr.IR_Int8, ctx *IR_Context, target encoding.Operand) ([]lib.Instruction, error) {
 	result := []lib.Instruction{x86_64.MOV(encoding.Uint8(int8(i.Value)), target)}
-	ctx.AddInstructions(result)
+	ctx.AddInstruction(result...)
 	return result, nil
 }

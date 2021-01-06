@@ -16,6 +16,6 @@ func encode_IR_Variable(i *expr.IR_Variable, ctx *IR_Context, target encoding.Op
 		return nil, fmt.Errorf("Unknown variable '%s'", i.Value)
 	}
 	result := []lib.Instruction{x86_64.MOV(reg, target)}
-	ctx.AddInstructions(result)
+	ctx.AddInstruction(result...)
 	return result, nil
 }

@@ -10,13 +10,13 @@ import (
 	"github.com/bspaans/jit-compiler/lib"
 )
 
-func Compile(targetArchitecture Architecture, stmts []IR, debug bool) (lib.MachineCode, error) {
-	ctx := NewIRContext(targetArchitecture)
+func Compile(targetArchitecture Architecture, abi ABI, stmts []IR, debug bool) (lib.MachineCode, error) {
+	ctx := NewIRContext(targetArchitecture, abi)
 	return CompileWithContext(stmts, debug, ctx)
 }
 
-func CompileToBinary(targetArchitecture Architecture, stmts []IR, debug bool, path string) error {
-	ctx := NewIRContext(targetArchitecture)
+func CompileToBinary(targetArchitecture Architecture, abi ABI, stmts []IR, debug bool, path string) error {
+	ctx := NewIRContext(targetArchitecture, abi)
 	ctx.ReturnOperandStack = []encoding.Operand{encoding.Rax}
 	code, err := CompileWithContext(stmts, debug, ctx)
 	if err != nil {

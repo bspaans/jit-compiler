@@ -18,7 +18,7 @@ func encode_IR_StaticArray(i *expr.IR_StaticArray, ctx *IR_Context, target encod
 	// TODO: instead of address + 2; use datasectionOffset + len(ctx.ReadonlySegment) + address; in JIT mode
 	diff := uint(ctx.InstructionPointer+ownLength) - uint(ctx.Segments.GetAddress(i.Address))
 	result := []lib.Instruction{x86_64.LEA(&encoding.RIPRelative{encoding.Int32(int32(-diff))}, target)}
-	ctx.AddInstructions(result)
+	ctx.AddInstruction(result...)
 	return result, nil
 }
 

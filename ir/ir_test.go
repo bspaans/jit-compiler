@@ -10,6 +10,7 @@ import (
 )
 
 var TargetArch = &x86_64.X86_64{}
+var TargetABI = x86_64.NewABI_AMDSystemV()
 
 var ShouldRun = [][]IR{
 	[]IR{NewIR_Assignment("a", NewIR_ByteArray([]uint8("test"))),
@@ -26,7 +27,7 @@ var ShouldRun = [][]IR{
 func Test_ShouldRun(t *testing.T) {
 	for _, ir := range ShouldRun {
 		debug := false
-		b, err := Compile(TargetArch, ir, debug)
+		b, err := Compile(TargetArch, TargetABI, ir, debug)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -274,31 +275,31 @@ func Test_ParseExecute_Happy(t *testing.T) {
 			t.Fatal(err, "in", ir)
 		}
 		debug := false
-		b, err := Compile(TargetArch, []IR{i}, debug)
+		b, err := Compile(TargetArch, TargetABI, []IR{i}, debug)
 		if err != nil {
 			if !debug {
-				Compile(TargetArch, []IR{i}, true)
+				Compile(TargetArch, TargetABI, []IR{i}, true)
 			}
 			t.Fatal(err, "in", ir)
 		}
 		value := b.Execute(debug)
 		if value != int(53) {
 			if !debug {
-				Compile(TargetArch, []IR{i}, true)
+				Compile(TargetArch, TargetABI, []IR{i}, true)
 				b.Execute(true)
 			}
 			t.Fatal("Expecting 53 got", value, "in", ir, "\n", b)
 		}
 
 		transformed := i.SSA_Transform(NewSSA_Context())
-		b2, err := Compile(TargetArch, []IR{transformed}, debug)
+		b2, err := Compile(TargetArch, TargetABI, []IR{transformed}, debug)
 		if err != nil {
 			t.Fatal(err)
 		}
 		value = b2.Execute(debug)
 		if value != int(53) {
 			if !debug {
-				Compile(TargetArch, []IR{transformed}, true)
+				Compile(TargetArch, TargetABI, []IR{transformed}, true)
 			}
 			t.Fatal("Expecting 53 got", value, "in", ir, " after SSA transform\n", transformed)
 		}
@@ -380,7 +381,7 @@ func Test_Execute_Result(t *testing.T) {
 	for _, ir := range units {
 		i := append(ir, NewIR_Return(NewIR_Variable("f")))
 		debug := false
-		b, err := Compile(TargetArch, i, debug)
+		b, err := Compile(TargetArch, TargetABI, i, debug)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -393,7 +394,7 @@ func Test_Execute_Result(t *testing.T) {
 
 func Test_IR_Length(t *testing.T) {
 
-	ctx := NewIRContext(TargetArch)
+	ctx := NewIRContext(TargetArch, TargetABI)
 	stmt := NewIR_Assignment("f", NewIR_Uint64(43))
 	l, err := IR_Length(stmt, ctx)
 	if err != nil {
@@ -406,7 +407,7 @@ func Test_IR_Length(t *testing.T) {
 
 func Test_IR_Length_does_not_affect_instruction_pointer(t *testing.T) {
 
-	ctx := NewIRContext(TargetArch)
+	ctx := NewIRContext(TargetArch, TargetABI)
 	stmt := NewIR_Assignment("f", NewIR_Uint64(43))
 	rip := ctx.InstructionPointer
 	_, err := IR_Length(stmt, ctx)

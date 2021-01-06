@@ -21,9 +21,10 @@ func encode_IR_Mul(i *expr.IR_Mul, ctx *IR_Context, target encoding.Operand) ([]
 	}
 	if IsInteger(returnType1) {
 
-		raxInUse := ctx.Registers[0]
+		allocator := ctx.Allocator.(*X86_64_Allocator)
+		raxInUse := allocator.Registers[0]
 
-		shouldPreserveRdx := (returnType1.Width() != lib.BYTE) && ctx.Registers[2]
+		shouldPreserveRdx := (returnType1.Width() != lib.BYTE) && allocator.Registers[2]
 		shouldPreserveRax := target.(*encoding.Register).Register != 0 && raxInUse
 		var tmpRdx *encoding.Register
 		var tmpRax *encoding.Register
@@ -37,7 +38,7 @@ func encode_IR_Mul(i *expr.IR_Mul, ctx *IR_Context, target encoding.Operand) ([]
 			defer ctx.DeallocateRegister(tmpRdx)
 			preserveRdx := x86_64.MOV(encoding.Rdx, tmpRdx)
 			result = append(result, preserveRdx)
-			ctx.AddInstructions(result)
+			ctx.AddInstruction(result...)
 			// Replace variables in the variablemap that point to rdx with the new register
 			ctxCopy = ctxCopy.Copy()
 			for v, vTarget := range ctxCopy.VariableMap {
@@ -51,15 +52,16 @@ func encode_IR_Mul(i *expr.IR_Mul, ctx *IR_Context, target encoding.Operand) ([]
 		// Preserve the %rax register
 		if shouldPreserveRax {
 			ctxCopy = ctxCopy.Copy()
+			allocator = ctxCopy.Allocator.(*X86_64_Allocator)
 			// Make sure we don't allocate %rdx
-			if !ctxCopy.Registers[2] && (returnType1.Width() != lib.BYTE) {
-				ctxCopy.Registers[2] = true
+			if !allocator.Registers[2] && (returnType1.Width() != lib.BYTE) {
+				allocator.Registers[2] = true
 			}
 			tmpRax = ctxCopy.AllocateRegister(TUint64)
 			defer ctxCopy.DeallocateRegister(tmpRax)
 			preserveRax := x86_64.MOV(encoding.Rax, tmpRax)
 			result = append(result, preserveRax)
-			ctx.AddInstructions(result)
+			ctx.AddInstruction(result...)
 			// Replace variables in the variablemap that point to rax with the new register
 			for v, vTarget := range ctxCopy.VariableMap {
 				if r, ok := vTarget.(*encoding.Register); ok && r.Register == 0 {
