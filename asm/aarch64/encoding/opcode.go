@@ -45,7 +45,6 @@ func (o *Opcode) Encode(ops []lib.Operand) ([]uint8, error) {
 	}
 	bytes := make([]byte, 4)
 	binary.LittleEndian.PutUint32(bytes, uint32(result))
-	fmt.Println(o.String())
 	return bytes, nil
 }
 
@@ -64,7 +63,6 @@ func (o *Opcode) MatchesOperands(operands []lib.Operand) bool {
 	if len(expected) != len(operands) {
 		return false
 	}
-	fmt.Println(expected)
 	for i, exp := range expected {
 		op := operands[i]
 		switch exp {
@@ -72,7 +70,6 @@ func (o *Opcode) MatchesOperands(operands []lib.Operand) bool {
 			if op.Type() != lib.T_Register || op.Width() != lib.QUADWORD {
 				return false
 			}
-			fmt.Println(op, "matches", exp)
 		case OT_ImmediateValue:
 			if op.Type() != lib.T_Uint64 {
 				return false

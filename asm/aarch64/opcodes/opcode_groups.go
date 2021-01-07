@@ -24,6 +24,8 @@ var MOVK = []*Opcode{
 var SUB = []*Opcode{
 	SUB_Wd_Wn_imm12,
 	SUB_Xd_Xn_imm12,
+	SUB_Wd_Wn_Wm,
+	SUB_Xd_Xn_Xm,
 }
 
 var SUBS = []*Opcode{

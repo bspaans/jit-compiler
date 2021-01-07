@@ -33,11 +33,8 @@ func (x *AArch64) EncodeDataSection(stmts []IR, ctx *IR_Context) (*Segments, err
 
 func encodeExpression(e IRExpression, ctx *IR_Context, target lib.Operand) ([]lib.Instruction, error) {
 	switch v := e.(type) {
-	case *expr.IR_Variable:
-		return encode_IR_Variable(v, ctx, target)
-	case *expr.IR_Int64:
-		return encode_IR_Int64(v, ctx, target)
 	case *expr.IR_Add:
+		return encode_IR_Add(v, ctx, target)
 	case *expr.IR_And:
 	case *expr.IR_ArrayIndex:
 	case *expr.IR_Bool:
@@ -53,6 +50,8 @@ func encodeExpression(e IRExpression, ctx *IR_Context, target lib.Operand) ([]li
 	case *expr.IR_Int8:
 	case *expr.IR_Int16:
 	case *expr.IR_Int32:
+	case *expr.IR_Int64:
+		return encode_IR_Int64(v, ctx, target)
 	case *expr.IR_LT:
 	case *expr.IR_LTE:
 	case *expr.IR_Mul:
@@ -63,10 +62,13 @@ func encodeExpression(e IRExpression, ctx *IR_Context, target lib.Operand) ([]li
 	case *expr.IR_StructField:
 	case *expr.IR_Syscall:
 	case *expr.IR_Sub:
+		return encode_IR_Sub(v, ctx, target)
 	case *expr.IR_Uint8:
 	case *expr.IR_Uint16:
 	case *expr.IR_Uint32:
 	case *expr.IR_Uint64:
+	case *expr.IR_Variable:
+		return encode_IR_Variable(v, ctx, target)
 	}
 	return nil, fmt.Errorf("Unsupported '%s' :: %s expression in x86_64 encoder", e.String(), e.Type().String())
 }
