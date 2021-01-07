@@ -145,11 +145,18 @@ machineCode.Execute()
 ### Using the Intermediate Representation
 
 ```golang
+package main
+
 import (
-    "github.com/bspaans/jit-compiler/ir"
+	"fmt"
+
+	"github.com/bspaans/jit-compiler/ir"
+	"github.com/bspaans/jit-compiler/ir/encoding/x86_64"
+	"github.com/bspaans/jit-compiler/ir/shared"
 )
 
-var code = `prev = 1; current = 1;
+func main() {
+	var code = `prev = 1; current = 1;
 while current != 13 {
   tmp = current
   current = current + prev
@@ -158,11 +165,18 @@ while current != 13 {
 return current
 `
 
-machineCode, err := ir.Compile(ir.MustParseIR(code))
-if err != nil {
-    panic(err)
+	debug := true
+	statements := ir.MustParseIR(code)
+	machineCode, err := ir.Compile(&x86_64.X86_64{},
+		x86_64.NewABI_AMDSystemV(),
+		[]shared.IR{statements},
+		debug)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(machineCode.Execute(debug))
 }
-fmt.Println(machineCode.Execute())
+
 ```
 
 ## Next steps
