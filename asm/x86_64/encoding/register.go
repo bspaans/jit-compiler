@@ -59,21 +59,11 @@ func (r *Register) Get32BitRegister() *Register {
 }
 
 func Get64BitRegisterByIndex(ix uint8) *Register {
-	for _, reg := range Registers64 {
-		if reg.Register == ix {
-			return reg
-		}
-	}
-	return nil
+	return Registers64[ix]
 }
 
 func GetFloatingPointRegisterByIndex(ix uint8) *Register {
-	for _, reg := range RegistersSSE {
-		if reg.Register == ix {
-			return reg
-		}
-	}
-	return nil
+	return Registers128[ix]
 }
 
 var Registers64 []*Register = []*Register{
@@ -88,15 +78,26 @@ var Registers16 []*Register = []*Register{
 	Ax, Cx, Dx, Bx, Sp, Bp, Si, Di,
 	R8w, R9w, R10w, R11w, R12w, R13w, R14w, R15w,
 }
+
+// Note: does not include Ah, Bh, Ch, Dh
 var Registers8 []*Register = []*Register{
 	Al, Cl, Dl, Bl, Spl, Bpl, Sil, Dil,
 	R8b, R9b, R10b, R11b, R12b, R13b, R14b, R15b,
-	// TODO: AH, BH, CH, DH
 }
 
-var RegistersSSE []*Register = []*Register{
+var Registers128 []*Register = []*Register{
 	Xmm0, Xmm1, Xmm2, Xmm3, Xmm4, Xmm5, Xmm6, Xmm7,
 	Xmm8, Xmm9, Xmm10, Xmm11, Xmm11, Xmm12, Xmm13, Xmm14, Xmm15,
+}
+
+var Registers256 []*Register = []*Register{
+	Ymm0, Ymm1, Ymm2, Ymm3, Ymm4, Ymm5, Ymm6, Ymm7,
+	Ymm8, Ymm9, Ymm10, Ymm11, Ymm11, Ymm12, Ymm13, Ymm14, Ymm15,
+}
+
+var Registers512 []*Register = []*Register{
+	Zmm0, Zmm1, Zmm2, Zmm3, Zmm4, Zmm5, Zmm6, Zmm7,
+	Zmm8, Zmm9, Zmm10, Zmm11, Zmm11, Zmm12, Zmm13, Zmm14, Zmm15,
 }
 
 var (
@@ -116,23 +117,6 @@ var (
 	R13 *Register = NewRegister("r13", 13, QUADWORD)
 	R14 *Register = NewRegister("r14", 14, QUADWORD)
 	R15 *Register = NewRegister("r15", 15, QUADWORD)
-
-	Xmm0  *Register = NewRegister("xmm0", 0, QUADDOUBLE)
-	Xmm1  *Register = NewRegister("xmm1", 1, QUADDOUBLE)
-	Xmm2  *Register = NewRegister("xmm2", 2, QUADDOUBLE)
-	Xmm3  *Register = NewRegister("xmm3", 3, QUADDOUBLE)
-	Xmm4  *Register = NewRegister("xmm4", 4, QUADDOUBLE)
-	Xmm5  *Register = NewRegister("xmm5", 5, QUADDOUBLE)
-	Xmm6  *Register = NewRegister("xmm6", 6, QUADDOUBLE)
-	Xmm7  *Register = NewRegister("xmm7", 7, QUADDOUBLE)
-	Xmm8  *Register = NewRegister("xmm8", 8, QUADDOUBLE)
-	Xmm9  *Register = NewRegister("xmm9", 9, QUADDOUBLE)
-	Xmm10 *Register = NewRegister("xmm10", 10, QUADDOUBLE)
-	Xmm11 *Register = NewRegister("xmm11", 11, QUADDOUBLE)
-	Xmm12 *Register = NewRegister("xmm12", 12, QUADDOUBLE)
-	Xmm13 *Register = NewRegister("xmm13", 13, QUADDOUBLE)
-	Xmm14 *Register = NewRegister("xmm14", 14, QUADDOUBLE)
-	Xmm15 *Register = NewRegister("xmm15", 15, QUADDOUBLE)
 
 	Eax  *Register = NewRegister("eax", 0, DOUBLE)
 	Ecx  *Register = NewRegister("ecx", 1, DOUBLE)
@@ -189,4 +173,55 @@ var (
 	Ch *Register = NewRegister("ch", 5, BYTE)
 	Dh *Register = NewRegister("dh", 6, BYTE)
 	Bh *Register = NewRegister("bh", 7, BYTE)
+
+	Xmm0  *Register = NewRegister("xmm0", 0, OWORD)
+	Xmm1  *Register = NewRegister("xmm1", 1, OWORD)
+	Xmm2  *Register = NewRegister("xmm2", 2, OWORD)
+	Xmm3  *Register = NewRegister("xmm3", 3, OWORD)
+	Xmm4  *Register = NewRegister("xmm4", 4, OWORD)
+	Xmm5  *Register = NewRegister("xmm5", 5, OWORD)
+	Xmm6  *Register = NewRegister("xmm6", 6, OWORD)
+	Xmm7  *Register = NewRegister("xmm7", 7, OWORD)
+	Xmm8  *Register = NewRegister("xmm8", 8, OWORD)
+	Xmm9  *Register = NewRegister("xmm9", 9, OWORD)
+	Xmm10 *Register = NewRegister("xmm10", 10, OWORD)
+	Xmm11 *Register = NewRegister("xmm11", 11, OWORD)
+	Xmm12 *Register = NewRegister("xmm12", 12, OWORD)
+	Xmm13 *Register = NewRegister("xmm13", 13, OWORD)
+	Xmm14 *Register = NewRegister("xmm14", 14, OWORD)
+	Xmm15 *Register = NewRegister("xmm15", 15, OWORD)
+
+	Ymm0  *Register = NewRegister("ymm0", 0, YWORD)
+	Ymm1  *Register = NewRegister("ymm1", 1, YWORD)
+	Ymm2  *Register = NewRegister("ymm2", 2, YWORD)
+	Ymm3  *Register = NewRegister("ymm3", 3, YWORD)
+	Ymm4  *Register = NewRegister("ymm4", 4, YWORD)
+	Ymm5  *Register = NewRegister("ymm5", 5, YWORD)
+	Ymm6  *Register = NewRegister("ymm6", 6, YWORD)
+	Ymm7  *Register = NewRegister("ymm7", 7, YWORD)
+	Ymm8  *Register = NewRegister("ymm8", 8, YWORD)
+	Ymm9  *Register = NewRegister("ymm9", 9, YWORD)
+	Ymm10 *Register = NewRegister("ymm10", 10, YWORD)
+	Ymm11 *Register = NewRegister("ymm11", 11, YWORD)
+	Ymm12 *Register = NewRegister("ymm12", 12, YWORD)
+	Ymm13 *Register = NewRegister("ymm13", 13, YWORD)
+	Ymm14 *Register = NewRegister("ymm14", 14, YWORD)
+	Ymm15 *Register = NewRegister("ymm15", 15, YWORD)
+
+	Zmm0  *Register = NewRegister("zmm0", 0, ZWORD)
+	Zmm1  *Register = NewRegister("zmm1", 1, ZWORD)
+	Zmm2  *Register = NewRegister("zmm2", 2, ZWORD)
+	Zmm3  *Register = NewRegister("zmm3", 3, ZWORD)
+	Zmm4  *Register = NewRegister("zmm4", 4, ZWORD)
+	Zmm5  *Register = NewRegister("zmm5", 5, ZWORD)
+	Zmm6  *Register = NewRegister("zmm6", 6, ZWORD)
+	Zmm7  *Register = NewRegister("zmm7", 7, ZWORD)
+	Zmm8  *Register = NewRegister("zmm8", 8, ZWORD)
+	Zmm9  *Register = NewRegister("zmm9", 9, ZWORD)
+	Zmm10 *Register = NewRegister("zmm10", 10, ZWORD)
+	Zmm11 *Register = NewRegister("zmm11", 11, ZWORD)
+	Zmm12 *Register = NewRegister("zmm12", 12, ZWORD)
+	Zmm13 *Register = NewRegister("zmm13", 13, ZWORD)
+	Zmm14 *Register = NewRegister("zmm14", 14, ZWORD)
+	Zmm15 *Register = NewRegister("zmm15", 15, ZWORD)
 )

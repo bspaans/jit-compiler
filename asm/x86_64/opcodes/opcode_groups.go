@@ -202,6 +202,23 @@ var SUB = []*Opcode{
 	SUBSD_xmm1_xmm2m64,
 }
 
+var VPADDB = []*Opcode{
+	VPADDB_xmm1_xmm2_xmm3m128,
+	VPADDB_ymm1_ymm2_ymm3m128,
+}
+var VPADDW = []*Opcode{
+	VPADDW_xmm1_xmm2_xmm3m128,
+	VPADDW_ymm1_ymm2_ymm3m128,
+}
+var VPADDD = []*Opcode{
+	VPADDD_xmm1_xmm2_xmm3m128,
+	VPADDD_ymm1_ymm2_ymm3m128,
+}
+var VPADDQ = []*Opcode{
+	VPADDQ_xmm1_xmm2_xmm3m128,
+	VPADDQ_ymm1_ymm2_ymm3m128,
+}
+
 var XOR = []*Opcode{
 	XOR_r8_rm8,
 	XOR_r8_rm8_no_rex,

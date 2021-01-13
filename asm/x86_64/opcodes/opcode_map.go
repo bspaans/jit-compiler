@@ -41,7 +41,7 @@ func (o OpcodeMaps) ResolveOpcode(operands []lib.Operand) *Opcode {
 				continue
 			}
 			if (oper == encoding.Spl || oper == encoding.Bpl || oper == encoding.Sil || oper == encoding.Dil ||
-				(isRegister && reg.Register >= 8)) && !(opcode.HasExtension(Rex) || opcode.HasExtension(RexW)) {
+				(isRegister && reg.Register >= 8)) && !(opcode.HasExtension(Rex) || opcode.HasExtension(RexW) || opcode.HasExtension(VEX128) || opcode.HasExtension(VEX256)) {
 				continue
 			}
 
@@ -159,25 +159,29 @@ func OpcodesToOpcodeMap(opcodes []*Opcode, operand int) OpcodeMap {
 		} else if opcode.Operands[operand].Type == OT_r64 {
 			opcodeMap.add(lib.T_Register, lib.QUADWORD, opcode)
 		} else if opcode.Operands[operand].Type == OT_xmm1 {
-			opcodeMap.add(lib.T_Register, lib.QUADDOUBLE, opcode)
+			opcodeMap.add(lib.T_Register, lib.OWORD, opcode)
 		} else if opcode.Operands[operand].Type == OT_xmm2 {
-			opcodeMap.add(lib.T_Register, lib.QUADDOUBLE, opcode)
+			opcodeMap.add(lib.T_Register, lib.OWORD, opcode)
 		} else if opcode.Operands[operand].Type == OT_xmm1m64 {
-			opcodeMap.add(lib.T_Register, lib.QUADDOUBLE, opcode)
+			opcodeMap.add(lib.T_Register, lib.OWORD, opcode)
 			opcodeMap.add(lib.T_Register, lib.QUADWORD, opcode)
 			opcodeMap.add(lib.T_IndirectRegister, lib.QUADWORD, opcode)
 			opcodeMap.add(lib.T_RIPRelative, lib.QUADWORD, opcode)
 			opcodeMap.add(lib.T_SIBRegister, lib.QUADWORD, opcode)
 		} else if opcode.Operands[operand].Type == OT_xmm2m64 {
-			opcodeMap.add(lib.T_Register, lib.QUADDOUBLE, opcode)
+			opcodeMap.add(lib.T_Register, lib.OWORD, opcode)
 			opcodeMap.add(lib.T_Register, lib.QUADWORD, opcode)
 			opcodeMap.add(lib.T_IndirectRegister, lib.QUADWORD, opcode)
 			opcodeMap.add(lib.T_RIPRelative, lib.QUADWORD, opcode)
 			opcodeMap.add(lib.T_SIBRegister, lib.QUADWORD, opcode)
 		} else if opcode.Operands[operand].Type == OT_xmm2m128 {
-			opcodeMap.add(lib.T_Register, lib.QUADDOUBLE, opcode)
+			opcodeMap.add(lib.T_Register, lib.OWORD, opcode)
 			opcodeMap.add(lib.T_Register, lib.QUADWORD, opcode)
 			opcodeMap.add(lib.T_RIPRelative, lib.QUADWORD, opcode)
+		} else if opcode.Operands[operand].Type == OT_ymm1 {
+			opcodeMap.add(lib.T_Register, lib.YWORD, opcode)
+		} else if opcode.Operands[operand].Type == OT_ymm2 {
+			opcodeMap.add(lib.T_Register, lib.YWORD, opcode)
 		}
 	}
 	return opcodeMap

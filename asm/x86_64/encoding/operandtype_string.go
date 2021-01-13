@@ -32,11 +32,14 @@ func _() {
 	_ = x[OT_xmm2-21]
 	_ = x[OT_xmm2m64-22]
 	_ = x[OT_xmm2m128-23]
+	_ = x[OT_ymm1-24]
+	_ = x[OT_ymm2-25]
+	_ = x[OT_ymm2m128-26]
 }
 
-const _OperandType_name = "OT_rel8OT_rel16OT_rel32OT_mOT_m16OT_m32OT_m64OT_r8OT_r16OT_r32OT_r64OT_rm8OT_rm16OT_rm32OT_rm64OT_imm8OT_imm16OT_imm32OT_imm64OT_xmm1OT_xmm1m64OT_xmm2OT_xmm2m64OT_xmm2m128"
+const _OperandType_name = "OT_rel8OT_rel16OT_rel32OT_mOT_m16OT_m32OT_m64OT_r8OT_r16OT_r32OT_r64OT_rm8OT_rm16OT_rm32OT_rm64OT_imm8OT_imm16OT_imm32OT_imm64OT_xmm1OT_xmm1m64OT_xmm2OT_xmm2m64OT_xmm2m128OT_ymm1OT_ymm2OT_ymm2m128"
 
-var _OperandType_index = [...]uint8{0, 7, 15, 23, 27, 33, 39, 45, 50, 56, 62, 68, 74, 81, 88, 95, 102, 110, 118, 126, 133, 143, 150, 160, 171}
+var _OperandType_index = [...]uint8{0, 7, 15, 23, 27, 33, 39, 45, 50, 56, 62, 68, 74, 81, 88, 95, 102, 110, 118, 126, 133, 143, 150, 160, 171, 178, 185, 196}
 
 func (i OperandType) String() string {
 	if i < 0 || i >= OperandType(len(_OperandType_index)-1) {

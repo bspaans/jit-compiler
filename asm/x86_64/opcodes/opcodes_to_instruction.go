@@ -41,7 +41,8 @@ func (o *opcodeMapsInstruction) Encode() (lib.MachineCode, error) {
 			}
 			args = append(args, arg.String())
 		}
-		return nil, fmt.Errorf("unsupported %s instruction: %s %s", o.Name, o.Name, strings.Join(args, ", "))
+		fmt.Println(o.opcodeMaps)
+		return nil, fmt.Errorf("unsupported %s instruction, couldn't resolve: %s %s", o.Name, o.Name, strings.Join(args, ", "))
 	}
 	return opcode.Encode(o.Operands)
 }

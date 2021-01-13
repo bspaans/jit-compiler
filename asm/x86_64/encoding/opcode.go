@@ -35,6 +35,9 @@ const (
 	OT_xmm2     OperandType = iota
 	OT_xmm2m64  OperandType = iota
 	OT_xmm2m128 OperandType = iota
+	OT_ymm1     OperandType = iota
+	OT_ymm2     OperandType = iota
+	OT_ymm2m128 OperandType = iota
 )
 
 //go:generate stringer -type=OperandEncoding
@@ -51,6 +54,8 @@ const (
 	ModRM_reg_rw OperandEncoding = iota
 	// Immediate value
 	ImmediateValue OperandEncoding = iota
+	// Set VEX.vvvv
+	VEX_vvvv OperandEncoding = iota
 	// Add register to opcode
 	Opcode_plus_rd_r = iota
 )
@@ -74,6 +79,17 @@ const (
 	SlashR          OpcodeExtensions = iota
 	Rex             OpcodeExtensions = iota
 	RexW            OpcodeExtensions = iota
+	VEX128          OpcodeExtensions = iota
+	VEX256          OpcodeExtensions = iota
+	VEX_66          OpcodeExtensions = iota
+	VEX_f3          OpcodeExtensions = iota
+	VEX_f2          OpcodeExtensions = iota
+	VEX_0f          OpcodeExtensions = iota
+	VEX_0f_38       OpcodeExtensions = iota
+	VEX_0f_3a       OpcodeExtensions = iota
+	VEX_W0          OpcodeExtensions = iota
+	VEX_W1          OpcodeExtensions = iota
+	VEX_WIG         OpcodeExtensions = iota
 )
 
 type OpcodeOperand struct {
@@ -167,6 +183,60 @@ func (o *Opcode) Encode(ops []lib.Operand) ([]uint8, error) {
 			if instr.ModRM == nil {
 				instr.ModRM = &ModRM{}
 			}
+		} else if ext == VEX128 {
+			if instr.VEXPrefix == nil {
+				instr.VEXPrefix = NewVEXPrefix()
+			}
+		} else if ext == VEX256 {
+			if instr.VEXPrefix == nil {
+				instr.VEXPrefix = NewVEXPrefix()
+			}
+			instr.VEXPrefix.L = true
+		} else if ext == VEX_66 {
+			if instr.VEXPrefix == nil {
+				instr.VEXPrefix = NewVEXPrefix()
+			}
+			instr.VEXPrefix.VEXOpcodeExtension = VEXOpcodeExtension_66
+		} else if ext == VEX_f2 {
+			if instr.VEXPrefix == nil {
+				instr.VEXPrefix = NewVEXPrefix()
+			}
+			instr.VEXPrefix.VEXOpcodeExtension = VEXOpcodeExtension_f2
+		} else if ext == VEX_f3 {
+			if instr.VEXPrefix == nil {
+				instr.VEXPrefix = NewVEXPrefix()
+			}
+			instr.VEXPrefix.VEXOpcodeExtension = VEXOpcodeExtension_f3
+		} else if ext == VEX_0f {
+			if instr.VEXPrefix == nil {
+				instr.VEXPrefix = NewVEXPrefix()
+			}
+			instr.VEXPrefix.VEXLegacyByte = VEXLegacyByte_0f
+		} else if ext == VEX_0f_38 {
+			if instr.VEXPrefix == nil {
+				instr.VEXPrefix = NewVEXPrefix()
+			}
+			instr.VEXPrefix.VEXLegacyByte = VEXLegacyByte_0f_38
+		} else if ext == VEX_0f_3a {
+			if instr.VEXPrefix == nil {
+				instr.VEXPrefix = NewVEXPrefix()
+			}
+			instr.VEXPrefix.VEXLegacyByte = VEXLegacyByte_0f_3a
+		} else if ext == VEX_W0 {
+			if instr.VEXPrefix == nil {
+				instr.VEXPrefix = NewVEXPrefix()
+			}
+			instr.VEXPrefix.W = false
+		} else if ext == VEX_W1 {
+			if instr.VEXPrefix == nil {
+				instr.VEXPrefix = NewVEXPrefix()
+			}
+			instr.VEXPrefix.W = true
+		} else if ext == VEX_WIG {
+			if instr.VEXPrefix == nil {
+				instr.VEXPrefix = NewVEXPrefix()
+			}
+			instr.VEXPrefix.W = false
 		}
 		exts[ext] = true
 	}
@@ -183,6 +253,8 @@ func (o *Opcode) Encode(ops []lib.Operand) ([]uint8, error) {
 					instr.ModRM.RM = oper.Encode()
 					if exts[RexW] || exts[Rex] {
 						instr.REXPrefix.B = oper.Register > 7
+					} else if exts[VEX128] || exts[VEX256] {
+						instr.VEXPrefix.B = oper.Register <= 7
 					}
 				} else if opcodeOperand.Encoding == ModRM_reg_r || opcodeOperand.Encoding == ModRM_reg_rw {
 					if instr.ModRM == nil {
@@ -192,14 +264,23 @@ func (o *Opcode) Encode(ops []lib.Operand) ([]uint8, error) {
 					instr.ModRM.Reg = oper.Encode()
 					if exts[RexW] || exts[Rex] {
 						instr.REXPrefix.R = oper.Register > 7
+					} else if exts[VEX128] || exts[VEX256] {
+						instr.VEXPrefix.R = oper.Register <= 7
 					}
 				} else if opcodeOperand.Encoding == Opcode_plus_rd_r {
 					instr.Opcode[0] += op.(*Register).Register & 7
 					if exts[RexW] || exts[Rex] {
 						instr.REXPrefix.B = op.(*Register).Register > 7
 					}
+				} else if opcodeOperand.Encoding == VEX_vvvv {
+					if instr.VEXPrefix == nil {
+						instr.VEXPrefix = NewVEXPrefix()
+					}
+					instr.VEXPrefix.Source = 15 - op.(*Register).Register // two's complement
+					instr.VEXPrefix.R = op.(*Register).Register <= 7
+
 				} else {
-					return nil, fmt.Errorf("Unsupported encoding [%d] in %s", opcodeOperand.Encoding, o.String())
+					return nil, fmt.Errorf("Unsupported encoding [%s] in %s", opcodeOperand.Encoding.String(), o.String())
 				}
 			} else if op.Type() == lib.T_DisplacedRegister {
 				oper := op.(*DisplacedRegister)

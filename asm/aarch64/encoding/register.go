@@ -99,7 +99,7 @@ var (
 
 	// TODO program counter
 
-	SP  *Register = NewRegister("sp", 31, QUADWORD) // stack pointer
+	SP  *Register = NewRegister("sp", 31, QUADWORD) // stack pointer. MUST BE 16 byte aligned when accessing memory
 	XZR *Register = NewRegister("zr", 31, QUADWORD) // zero register
 
 	W0  *Register = NewRegister("w0", 0, DOUBLE)

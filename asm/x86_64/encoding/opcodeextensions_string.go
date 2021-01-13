@@ -23,11 +23,22 @@ func _() {
 	_ = x[SlashR-12]
 	_ = x[Rex-13]
 	_ = x[RexW-14]
+	_ = x[VEX128-15]
+	_ = x[VEX256-16]
+	_ = x[VEX_66-17]
+	_ = x[VEX_f3-18]
+	_ = x[VEX_f2-19]
+	_ = x[VEX_0f-20]
+	_ = x[VEX_0f_38-21]
+	_ = x[VEX_0f_3a-22]
+	_ = x[VEX_W0-23]
+	_ = x[VEX_W1-24]
+	_ = x[VEX_WIG-25]
 }
 
-const _OpcodeExtensions_name = "NoExtensionsImmediateByteImmediateWordImmediateDoubleSlash0Slash1Slash2Slash3Slash4Slash5Slash6Slash7SlashRRexRexW"
+const _OpcodeExtensions_name = "NoExtensionsImmediateByteImmediateWordImmediateDoubleSlash0Slash1Slash2Slash3Slash4Slash5Slash6Slash7SlashRRexRexWVEX128VEX256VEX_66VEX_f3VEX_f2VEX_0fVEX_0f_38VEX_0f_3aVEX_W0VEX_W1VEX_WIG"
 
-var _OpcodeExtensions_index = [...]uint8{0, 12, 25, 38, 53, 59, 65, 71, 77, 83, 89, 95, 101, 107, 110, 114}
+var _OpcodeExtensions_index = [...]uint8{0, 12, 25, 38, 53, 59, 65, 71, 77, 83, 89, 95, 101, 107, 110, 114, 120, 126, 132, 138, 144, 150, 159, 168, 174, 180, 187}
 
 func (i OpcodeExtensions) String() string {
 	if i < 0 || i >= OpcodeExtensions(len(_OpcodeExtensions_index)-1) {

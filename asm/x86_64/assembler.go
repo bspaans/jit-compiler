@@ -236,6 +236,31 @@ func SHR(src, dest lib.Operand) lib.Instruction {
 func SYSCALL() lib.Instruction {
 	return opcodes.OpcodeToInstruction("syscall", opcodes.SYSCALL, 0)
 }
+
+// Add packed byte integers from op1 (register), and op2 (register or address)
+// and store in dest.
+func VPADDB(op1, op2, dest lib.Operand) lib.Instruction {
+	return opcodes.OpcodesToInstruction("vpaddb", opcodes.VPADDB, 3, dest, op2, op1)
+}
+
+// Add packed word integers from op1 (register), and op2 (register or address)
+// and store in dest.
+func VPADDW(op1, op2, dest lib.Operand) lib.Instruction {
+	return opcodes.OpcodesToInstruction("vpaddw", opcodes.VPADDW, 3, dest, op2, op1)
+}
+
+// Add packed double integers from op1 (register), and op2 (register or address)
+// and store in dest.
+func VPADDD(op1, op2, dest lib.Operand) lib.Instruction {
+	return opcodes.OpcodesToInstruction("vpaddd", opcodes.VPADDD, 3, dest, op2, op1)
+}
+
+// Add packed quadword integers from op1 (register), and op2 (register or address)
+// and store in dest.
+func VPADDQ(op1, op2, dest lib.Operand) lib.Instruction {
+	return opcodes.OpcodesToInstruction("vpaddq", opcodes.VPADDD, 3, dest, op2, op1)
+}
+
 func XOR(src, dest lib.Operand) lib.Instruction {
 	return opcodes.OpcodesToInstruction("xor", opcodes.XOR, 2, dest, src)
 }

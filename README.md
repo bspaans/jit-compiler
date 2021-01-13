@@ -68,6 +68,7 @@ overview see [`asm/x86_64/opcodes/`](https://github.com/bspaans/jit-compiler/tre
 * CMP (compare numbers)
 * CBW, CWD, CDQ, CQO (sign extend %al, %ax, %eax and %rax)
 * CVTSI2SD, CVTTSD2SI (convert int to and from float)
+* VPADDB, VPADDD, VPADDW, VPADDQ
 * SETA, SETAE, SETB, SETBE, SETE, SETL, SETLE, SETG, SETGE, SETNE
 * JMP, JA, JAE, JB, JBE, JE, JG, JGE, JL, JLE, JNA, JNAE, JNB, JNBE, JNE, JNG, JNGE, JNL, JNLE (jumps and conditional jumps)
 * CALL and SYSCALL
@@ -178,15 +179,6 @@ return current
 }
 
 ```
-
-## Next steps
-
-* SIMD support 
-* Improve array support (SIMD, auto-vectorisation)
-* Possibly a higher level language that compiles down into the IR
-* Possible a WASM or ARM backend
-* Test output against other assemblers
-* Try and use it from bleep ([prototype](https://github.com/bspaans/bleep-jit))
 
 ## Contributing
 

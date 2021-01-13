@@ -1,12 +1,18 @@
 package encoding
 
 type VEXOpcodeExtension uint8
+type VEXLegacyByte uint8
 
 const (
 	VEXOpcodeExtension_None VEXOpcodeExtension = 0x00
 	VEXOpcodeExtension_66   VEXOpcodeExtension = 0x01
-	VEXOpcodeExtension_f3   VEXOpcodeExtension = 0x10
-	VEXOpcodeExtension_f2   VEXOpcodeExtension = 0x11
+	VEXOpcodeExtension_f2   VEXOpcodeExtension = 0x03
+	VEXOpcodeExtension_f3   VEXOpcodeExtension = 0x02
+
+	VEXLegacyByte_None  VEXLegacyByte = 0x00
+	VEXLegacyByte_0f    VEXLegacyByte = 0x01
+	VEXLegacyByte_0f_38 VEXLegacyByte = 0x02
+	VEXLegacyByte_0f_3a VEXLegacyByte = 0x03
 )
 
 // The VEX prefix is encoded in either the two-byte form (the first byte must
@@ -42,6 +48,8 @@ type VEXPrefix struct {
 	// presence of any SIMD prefix. The VEX-encoded 128-bit instruction will
 	// zero-out bits 255:128 of the destination register. VEX-encoded
 	// instruction may have 128 bit vector length or 256 bits length.
+	//
+	// VEX.pp
 	VEXOpcodeExtension VEXOpcodeExtension
 
 	// Compaction of two-byte and three-byte opcode: More recently introduced
@@ -57,13 +65,30 @@ type VEXPrefix struct {
 	// 00010: implied 0F 38 leading opcode bytes
 	// 00011: implied 0F 3A leading opcode bytes
 	// 00100-11111: Reserved for future use (will #UD)
-	Mmmmm uint8
+	//
+	// VEX.mmmmm
+	VEXLegacyByte VEXLegacyByte
+}
+
+func NewVEXPrefix() *VEXPrefix {
+	return &VEXPrefix{
+		// 2's complement, so set to true by default
+		R: true,
+		W: true,
+		X: true,
+		B: true,
+	}
 }
 
 func (v *VEXPrefix) Encode() []uint8 {
 
 	// Two byte form
-	if v.Mmmmm == 0 {
+	// The presence of 0F3A and 0F38 in the opcode column implies that opcode
+	// can only be encoded by the three-byte form of VEX. The presence of 0F in
+	// the opcode column does not preclude the opcode to be encoded by the
+	// two-byte of VEX if the semantics of the opcode does not require any
+	// subfield of VEX not present in the two-byte form of the VEX prefix.
+	if (v.VEXLegacyByte == 0 || v.VEXLegacyByte == VEXLegacyByte_0f) && v.X && v.B {
 		byte0 := uint8(0xc5)
 		byte1 := uint8(0)
 		if v.R {
@@ -90,7 +115,7 @@ func (v *VEXPrefix) Encode() []uint8 {
 	if v.B {
 		byte1 += (1 << 5)
 	}
-	byte1 += v.Mmmmm
+	byte1 += uint8(v.VEXLegacyByte)
 
 	byte2 := uint8(0)
 	if v.W {

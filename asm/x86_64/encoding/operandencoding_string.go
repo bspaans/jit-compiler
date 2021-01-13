@@ -13,11 +13,12 @@ func _() {
 	_ = x[ModRM_reg_r-2]
 	_ = x[ModRM_reg_rw-3]
 	_ = x[ImmediateValue-4]
+	_ = x[VEX_vvvv-5]
 }
 
-const _OperandEncoding_name = "ModRM_rm_rModRM_rm_rwModRM_reg_rModRM_reg_rwImmediateValue"
+const _OperandEncoding_name = "ModRM_rm_rModRM_rm_rwModRM_reg_rModRM_reg_rwImmediateValueVEX_vvvv"
 
-var _OperandEncoding_index = [...]uint8{0, 10, 21, 32, 44, 58}
+var _OperandEncoding_index = [...]uint8{0, 10, 21, 32, 44, 58, 66}
 
 func (i OperandEncoding) String() string {
 	if i < 0 || i >= OperandEncoding(len(_OperandEncoding_index)-1) {

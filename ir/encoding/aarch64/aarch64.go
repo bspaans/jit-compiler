@@ -225,7 +225,7 @@ func (i *AArch64_Allocator) DeallocateRegister(op lib.Operand) {
 	if !ok {
 		return
 	}
-	if reg.Size == lib.QUADDOUBLE {
+	if reg.Size == lib.OWORD {
 		i.deallocateFloatRegister(reg.Register)
 		return
 	}

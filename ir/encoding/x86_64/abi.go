@@ -9,6 +9,12 @@ import (
 	"github.com/bspaans/jit-compiler/lib"
 )
 
+// The calling convention of the System V AMD64 ABI is followed on Solaris,
+// Linux, FreeBSD, macOS, and is the de facto standard among Unix and Unix-like
+// operating systems. The first six integer or pointer arguments are passed in
+// registers RDI, RSI, RDX, RCX, R8, R9 (R10 is used as a static chain pointer
+// in case of nested functions[25]:21), while XMM0, XMM1, XMM2, XMM3, XMM4,
+// XMM5, XMM6 and XMM7 are used for the first floating point arguments.
 type ABI_AMDSystemV struct {
 	intTargets   []*encoding.Register
 	floatTargets []*encoding.Register
@@ -16,7 +22,7 @@ type ABI_AMDSystemV struct {
 
 func NewABI_AMDSystemV() *ABI_AMDSystemV {
 	return &ABI_AMDSystemV{
-		intTargets:   []*encoding.Register{encoding.Rdi, encoding.Rsi, encoding.Rdx, encoding.R10, encoding.R8, encoding.R9},
+		intTargets:   []*encoding.Register{encoding.Rdi, encoding.Rsi, encoding.Rdx, encoding.Rcx, encoding.R10, encoding.R8, encoding.R9},
 		floatTargets: []*encoding.Register{encoding.Xmm0, encoding.Xmm1, encoding.Xmm2, encoding.Xmm3, encoding.Xmm4, encoding.Xmm5},
 	}
 }
@@ -108,7 +114,7 @@ func ABI_Call_Setup(ctx *IR_Context, args []IRExpression, returnType Type) (lib.
 	ctx_ := ctx.Copy()
 	allocator := ctx_.Allocator.(*X86_64_Allocator)
 	for _, reg := range regs {
-		if reg.Size == lib.QUADDOUBLE {
+		if reg.Size == lib.OWORD {
 			allocator.FloatRegisters[reg.Register] = true
 			allocator.FloatRegistersAllocated += 1
 		} else {

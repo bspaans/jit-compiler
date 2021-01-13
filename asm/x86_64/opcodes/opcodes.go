@@ -1001,6 +1001,70 @@ var (
 	SYSCALL = &Opcode{"syscall", []uint8{}, []uint8{0x0f, 0x05}, []OpcodeExtensions{},
 		[]OpcodeOperand{},
 	}
+	// Add packed byte integers from xmm2, and xmm3/m128 and store in xmm1.
+	VPADDB_xmm1_xmm2_xmm3m128 = &Opcode{"vpaddb", []uint8{}, []uint8{0xfc}, []OpcodeExtensions{VEX128, VEX_66, VEX_0f, VEX_WIG, SlashR},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_xmm1, ModRM_reg_rw},
+			OpcodeOperand{OT_xmm2, VEX_vvvv},
+			OpcodeOperand{OT_xmm2m128, ModRM_rm_r},
+		},
+	}
+	// Add packed byte integers from ymm2, and ymm3/m128 and store in ymm1.
+	VPADDB_ymm1_ymm2_ymm3m128 = &Opcode{"vpaddb", []uint8{}, []uint8{0xfc}, []OpcodeExtensions{VEX256, VEX_66, VEX_0f, VEX_WIG, SlashR},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_ymm1, ModRM_reg_rw},
+			OpcodeOperand{OT_ymm2, VEX_vvvv},
+			OpcodeOperand{OT_ymm2m128, ModRM_rm_r},
+		},
+	}
+	// Add packed word integers from xmm2, xmm3/m128 and store in xmm1.
+	VPADDW_xmm1_xmm2_xmm3m128 = &Opcode{"vpaddw", []uint8{}, []uint8{0xfd}, []OpcodeExtensions{VEX128, VEX_66, VEX_0f, VEX_WIG, SlashR},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_xmm1, ModRM_reg_rw},
+			OpcodeOperand{OT_xmm2, VEX_vvvv},
+			OpcodeOperand{OT_xmm2m128, ModRM_rm_r},
+		},
+	}
+	// Add packed word integers from ymm2, and ymm3/m128 and store in ymm1.
+	VPADDW_ymm1_ymm2_ymm3m128 = &Opcode{"vpaddw", []uint8{}, []uint8{0xfd}, []OpcodeExtensions{VEX256, VEX_66, VEX_0f, VEX_WIG, SlashR},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_ymm1, ModRM_reg_rw},
+			OpcodeOperand{OT_ymm2, VEX_vvvv},
+			OpcodeOperand{OT_ymm2m128, ModRM_rm_r},
+		},
+	}
+	// Add packed doubleword integers from xmm2, xmm3/m128 and store in xmm1.
+	VPADDD_xmm1_xmm2_xmm3m128 = &Opcode{"vpaddd", []uint8{}, []uint8{0xfe}, []OpcodeExtensions{VEX128, VEX_66, VEX_0f, VEX_WIG, SlashR},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_xmm1, ModRM_reg_rw},
+			OpcodeOperand{OT_xmm2, VEX_vvvv},
+			OpcodeOperand{OT_xmm2m128, ModRM_rm_r},
+		},
+	}
+	// Add packed doubleword integers from ymm2, and ymm3/m128 and store in ymm1.
+	VPADDD_ymm1_ymm2_ymm3m128 = &Opcode{"vpaddd", []uint8{}, []uint8{0xfe}, []OpcodeExtensions{VEX256, VEX_66, VEX_0f, VEX_WIG, SlashR},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_ymm1, ModRM_reg_rw},
+			OpcodeOperand{OT_ymm2, VEX_vvvv},
+			OpcodeOperand{OT_ymm2m128, ModRM_rm_r},
+		},
+	}
+	// Add packed quadword integers from xmm2, xmm3/m128 and store in xmm1.
+	VPADDQ_xmm1_xmm2_xmm3m128 = &Opcode{"vpaddq", []uint8{}, []uint8{0xd4}, []OpcodeExtensions{VEX128, VEX_66, VEX_0f, VEX_WIG, SlashR},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_xmm1, ModRM_reg_rw},
+			OpcodeOperand{OT_xmm2, VEX_vvvv},
+			OpcodeOperand{OT_xmm2m128, ModRM_rm_r},
+		},
+	}
+	// Add packed quadword integers from ymm2, and ymm3/m128 and store in ymm1.
+	VPADDQ_ymm1_ymm2_ymm3m128 = &Opcode{"vpaddq", []uint8{}, []uint8{0xd4}, []OpcodeExtensions{VEX256, VEX_66, VEX_0f, VEX_WIG, SlashR},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_ymm1, ModRM_reg_rw},
+			OpcodeOperand{OT_ymm2, VEX_vvvv},
+			OpcodeOperand{OT_ymm2m128, ModRM_rm_r},
+		},
+	}
 	XOR_r8_rm8 = &Opcode{"xor", []uint8{}, []uint8{0x32}, []OpcodeExtensions{Rex, SlashR},
 		[]OpcodeOperand{
 			OpcodeOperand{OT_r8, ModRM_reg_rw},
