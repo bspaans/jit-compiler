@@ -1065,6 +1065,40 @@ var (
 			OpcodeOperand{OT_ymm2m128, ModRM_rm_r},
 		},
 	}
+	// Bitwise AND of xmm3/m128 and xmm2 and store result in xmm1.
+	VPAND_xmm1_xmm2_xmm3m128 = &Opcode{"vpand", []uint8{}, []uint8{0xdb}, []OpcodeExtensions{VEX128, VEX_66, VEX_0f, VEX_WIG, SlashR},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_xmm1, ModRM_reg_rw},
+			OpcodeOperand{OT_xmm2, VEX_vvvv},
+			OpcodeOperand{OT_xmm2m128, ModRM_rm_r},
+		},
+	}
+	// Bitwise AND of ymm2, and ymm3/m256 and store result in ymm1.
+	VPAND_ymm1_ymm2_ymm3m128 = &Opcode{"vpand", []uint8{}, []uint8{0xdb}, []OpcodeExtensions{VEX256, VEX_66, VEX_0f, VEX_WIG, SlashR},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_ymm1, ModRM_reg_rw},
+			OpcodeOperand{OT_ymm2, VEX_vvvv},
+			OpcodeOperand{OT_ymm2m128, ModRM_rm_r},
+		},
+	}
+
+	// Bitwise OR of xmm3/m128 and xmm2 and store result in xmm1.
+	VPOR_xmm1_xmm2_xmm3m128 = &Opcode{"vpor", []uint8{}, []uint8{0xeb}, []OpcodeExtensions{VEX128, VEX_66, VEX_0f, VEX_WIG, SlashR},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_xmm1, ModRM_reg_rw},
+			OpcodeOperand{OT_xmm2, VEX_vvvv},
+			OpcodeOperand{OT_xmm2m128, ModRM_rm_r},
+		},
+	}
+	// Bitwise OR of ymm2, and ymm3/m256 and store result in ymm1.
+	VPOR_ymm1_ymm2_ymm3m128 = &Opcode{"vpor", []uint8{}, []uint8{0xeb}, []OpcodeExtensions{VEX256, VEX_66, VEX_0f, VEX_WIG, SlashR},
+		[]OpcodeOperand{
+			OpcodeOperand{OT_ymm1, ModRM_reg_rw},
+			OpcodeOperand{OT_ymm2, VEX_vvvv},
+			OpcodeOperand{OT_ymm2m128, ModRM_rm_r},
+		},
+	}
+
 	XOR_r8_rm8 = &Opcode{"xor", []uint8{}, []uint8{0x32}, []OpcodeExtensions{Rex, SlashR},
 		[]OpcodeOperand{
 			OpcodeOperand{OT_r8, ModRM_reg_rw},

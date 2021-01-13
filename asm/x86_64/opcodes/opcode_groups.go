@@ -218,6 +218,15 @@ var VPADDQ = []*Opcode{
 	VPADDQ_xmm1_xmm2_xmm3m128,
 	VPADDQ_ymm1_ymm2_ymm3m128,
 }
+var VPAND = []*Opcode{
+	VPAND_xmm1_xmm2_xmm3m128,
+	VPAND_ymm1_ymm2_ymm3m128,
+}
+
+var VPOR = []*Opcode{
+	VPOR_xmm1_xmm2_xmm3m128,
+	VPOR_ymm1_ymm2_ymm3m128,
+}
 
 var XOR = []*Opcode{
 	XOR_r8_rm8,

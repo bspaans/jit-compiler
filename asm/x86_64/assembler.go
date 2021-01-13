@@ -261,6 +261,16 @@ func VPADDQ(op1, op2, dest lib.Operand) lib.Instruction {
 	return opcodes.OpcodesToInstruction("vpaddq", opcodes.VPADDD, 3, dest, op2, op1)
 }
 
+// Bitwise AND of op1 and op2, store result in dest.
+func VPAND(op1, op2, dest lib.Operand) lib.Instruction {
+	return opcodes.OpcodesToInstruction("vpand", opcodes.VPAND, 3, dest, op2, op1)
+}
+
+// Bitwise OR of op1 and op2, store result in dest.
+func VPOR(op1, op2, dest lib.Operand) lib.Instruction {
+	return opcodes.OpcodesToInstruction("vpor", opcodes.VPOR, 3, dest, op2, op1)
+}
+
 func XOR(src, dest lib.Operand) lib.Instruction {
 	return opcodes.OpcodesToInstruction("xor", opcodes.XOR, 2, dest, src)
 }

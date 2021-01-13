@@ -68,12 +68,13 @@ overview see [`asm/x86_64/opcodes/`](https://github.com/bspaans/jit-compiler/tre
 * CMP (compare numbers)
 * CBW, CWD, CDQ, CQO (sign extend %al, %ax, %eax and %rax)
 * CVTSI2SD, CVTTSD2SI (convert int to and from float)
-* VPADDB, VPADDD, VPADDW, VPADDQ
 * SETA, SETAE, SETB, SETBE, SETE, SETL, SETLE, SETG, SETGE, SETNE
 * JMP, JA, JAE, JB, JBE, JE, JG, JGE, JL, JLE, JNA, JNAE, JNB, JNBE, JNE, JNG, JNGE, JNL, JNLE (jumps and conditional jumps)
 * CALL and SYSCALL
 * RET 
 * PUSHFQ (push RFLAGS to the stack)
+* VPADDB, VPADDD, VPADDW, VPADDQ
+* VPAND, VPOR
 * Immediate values
 * Addressing modes: direct and indirect registers, displaced registers, RIP relative, SIB
 
