@@ -6,6 +6,7 @@ import (
 
 type InstructionFormat struct {
 	Prefixes     []uint8
+	VEXPrefix    *VEXPrefix
 	REXPrefix    *REXPrefix
 	Opcode       []uint8
 	ModRM        *ModRM
@@ -45,6 +46,11 @@ func (i *InstructionFormat) Encode() lib.MachineCode {
 	result := []uint8{}
 	for _, b := range i.Prefixes {
 		result = append(result, b)
+	}
+	if i.VEXPrefix != nil {
+		for _, b := range i.VEXPrefix.Encode() {
+			result = append(result, b)
+		}
 	}
 	if i.REXPrefix != nil {
 		result = append(result, i.REXPrefix.Encode())
