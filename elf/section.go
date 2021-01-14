@@ -20,6 +20,8 @@ type Section struct {
 	AddrAlign uint32
 	EntSize   uint32
 	Data      []byte
+
+	header *ELFHeader
 }
 
 func NewSection(name string, typ SHType, flags SHFlags) *Section {
@@ -59,6 +61,13 @@ func (s *Section) String() string {
 		}
 	}
 	return strings.Join(result, "\n")
+}
+
+func (s *Section) GetStringTable() *StringTable {
+	return NewStringTable(s.Data)
+}
+func (s *Section) GetSymbolTable(strTable *StringTable) (*SymbolTable, error) {
+	return ParseSymbolTable(s.header, strTable, bytes.NewReader(s.Data))
 }
 
 // This section holds uninitialized data that contribute to the program’s memory
@@ -145,6 +154,7 @@ func ParseSections(header *ELFHeader, shTable []*SectionHeader, r *bytes.Reader)
 			AddrAlign: sectionHeader.AddrAlign,
 			EntSize:   sectionHeader.EntSize,
 			Data:      data,
+			header:    header,
 		}
 		result = append(result, section)
 

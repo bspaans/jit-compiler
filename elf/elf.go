@@ -148,3 +148,23 @@ func CreateTinyBinary(m lib.MachineCode, path string) error {
 
 	return ioutil.WriteFile(path, result, 0755)
 }
+
+/*
+func init() {
+	e, err := ParseELFFile("/lib/x86_64-linux-gnu/libm-2.31.so")
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(e)
+	strTable := e.GetSection(".dynstr").GetStringTable()
+	s2, err := e.GetSection(".dynsym").GetSymbolTable(strTable)
+	if err != nil {
+		panic(err)
+	}
+	sin := s2.GetSymbol("sin")
+	fmt.Println(strTable)
+	fmt.Println(sin)
+	fmt.Println(e.Sections[sin.Shndx])
+
+}
+*/

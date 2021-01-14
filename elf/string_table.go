@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"errors"
 	"io"
+	"strings"
 )
 
 type StringTable struct {
@@ -12,6 +13,20 @@ type StringTable struct {
 
 func NewStringTable(data []byte) *StringTable {
 	return &StringTable{data}
+}
+
+func (s *StringTable) String() string {
+	result := []string{}
+	current := []byte{}
+	for _, b := range s.data {
+		if b == '\x00' {
+			result = append(result, string(current))
+			current = []byte{}
+		} else {
+			current = append(current, b)
+		}
+	}
+	return strings.Join(result, "\n")
 }
 
 func ParseStringTable(header *ELFHeader, sectionHeader *SectionHeader, r *bytes.Reader) (*StringTable, error) {
