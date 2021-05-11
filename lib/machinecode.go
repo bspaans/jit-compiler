@@ -3,9 +3,13 @@ package lib
 import (
 	"encoding/hex"
 	"fmt"
+	"runtime"
+	"sync"
 	"syscall"
 	"unsafe"
 )
+
+const mmapProtFlags = syscall.PROT_READ | syscall.PROT_WRITE | syscall.PROT_EXEC
 
 type MachineCode []uint8
 
@@ -25,14 +29,9 @@ func (m MachineCode) String() string {
 }
 
 func (m MachineCode) Execute(debug bool) int {
-	mmapFunc, err := syscall.Mmap(
-		-1,
-		0,
-		len(m),
-		syscall.PROT_READ|syscall.PROT_WRITE|syscall.PROT_EXEC, syscall.MAP_PRIVATE|mmapFlags,
-	)
+	mmapFunc, err := syscall.Mmap(-1, 0, len(m), mmapProtFlags, syscall.MAP_PRIVATE|mmapFlags)
 	if err != nil {
-		fmt.Printf("mmap err: %v", err)
+		panic(fmt.Sprintf("mmap err: %v", err))
 	}
 	for i, b := range m {
 		mmapFunc[i] = b
@@ -48,9 +47,49 @@ func (m MachineCode) Execute(debug bool) int {
 	}
 	return value
 }
-func (m MachineCode) Add(m2 MachineCode) MachineCode {
-	for _, code := range m2 {
-		m = append(m, code)
+
+type execFunc func() int
+
+func (m MachineCode) Compile() *CompiledCode {
+	mem, err := syscall.Mmap(-1, 0, len(m), mmapProtFlags, syscall.MAP_PRIVATE|mmapFlags)
+	if err != nil {
+		panic(fmt.Sprintf("mmap err: %v", err))
 	}
+
+	cc := &CompiledCode{mem: mem, mc: m}
+	runtime.SetFinalizer(cc, func(cc *CompiledCode) {
+		cc.release()
+	})
+	return cc
+}
+
+func (m MachineCode) Add(m2 MachineCode) MachineCode {
+	m = append(m, m2...)
 	return m
+}
+
+type CompiledCode struct {
+	mem []byte
+	mc  MachineCode
+	mux sync.Mutex
+}
+
+func (cc *CompiledCode) Execute() int {
+	cc.mux.Lock()
+	defer cc.mux.Unlock()
+	if cc.mem == nil {
+		panic("used after munmap")
+	}
+	copy(cc.mem, cc.mc)
+	unsafeFunc := (uintptr)(unsafe.Pointer(&cc.mem))
+	f := *(*execFunc)(unsafe.Pointer(&unsafeFunc))
+	return f()
+}
+
+func (cc *CompiledCode) release() {
+	if cc.mem != nil {
+		syscall.Munmap(cc.mem)
+		cc.mem = nil
+		cc.mc = nil
+	}
 }
