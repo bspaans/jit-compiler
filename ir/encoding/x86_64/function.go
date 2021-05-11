@@ -19,7 +19,6 @@ func encode_IR_Function(i *expr.IR_Function, ctx *IR_Context, target lib.Operand
 }
 
 func encode_IR_Function_for_DataSection(b *expr.IR_Function, ctx *IR_Context, segments *Segments) error {
-
 	// TODO: restore rbx, rbp, r12-r15
 	targets := []*encoding.Register{encoding.Rdi, encoding.Rsi, encoding.Rdx, encoding.R10, encoding.R8, encoding.R9}
 	returnTarget := encoding.Rax
@@ -48,9 +47,9 @@ func encode_IR_Function_for_DataSection(b *expr.IR_Function, ctx *IR_Context, se
 	if err != nil {
 		return err
 	}
-	for _, i := range instr {
-		fmt.Println(i)
-	}
+	// for _, i := range instr {
+	// 	log.Println(i)
+	// }
 	bytes, err := lib.Instructions(instr).Encode()
 	if err != nil {
 		return err
