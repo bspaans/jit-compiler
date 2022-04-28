@@ -34,9 +34,7 @@ func (m MachineCode) Execute(debug bool) int {
 	if err != nil {
 		fmt.Printf("mmap err: %v", err)
 	}
-	for i, b := range m {
-		mmapFunc[i] = b
-	}
+	copy(mmapFunc, m)
 	type execFunc func() int
 	unsafeFunc := (uintptr)(unsafe.Pointer(&mmapFunc))
 	f := *(*execFunc)(unsafe.Pointer(&unsafeFunc))
@@ -49,8 +47,6 @@ func (m MachineCode) Execute(debug bool) int {
 	return value
 }
 func (m MachineCode) Add(m2 MachineCode) MachineCode {
-	for _, code := range m2 {
-		m = append(m, code)
-	}
+	m = append(m, m2...)
 	return m
 }
